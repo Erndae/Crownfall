@@ -4,4 +4,4 @@ A street-style chess roguelike. Capture pieces to score Material × Brilliance, 
 
 Play it: https://officials901.github.io/gambit-run/
 
-Made with help from Claude (AI).
+
