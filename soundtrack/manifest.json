@@ -1,0 +1,114 @@
+{
+  "source": "Original music generated with Runway",
+  "mastering": "Stereo MP3, 128 kbps, -18 LUFS target, one-second circular overlap",
+  "tracks": [
+    {
+      "key": "street",
+      "title": "After Dark, Before the Crown",
+      "file": "soundtrack/street.mp3",
+      "taskId": "54e6362e-f7e6-423a-9404-4f792163cff9",
+      "seconds": 75.04,
+      "bytes": 1201775,
+      "peak": 0.7623
+    },
+    {
+      "key": "street-battle",
+      "title": "King of the Block",
+      "file": "soundtrack/street-battle.mp3",
+      "taskId": "74a64f19-a59e-4fe7-9b5e-68b6979675f6",
+      "seconds": 86.0,
+      "bytes": 1377307,
+      "peak": 0.7399
+    },
+    {
+      "key": "medieval",
+      "title": "Lanterns on the Ramparts",
+      "file": "soundtrack/medieval.mp3",
+      "taskId": "cf6effb7-fa23-42d3-8a88-2a73d0736a30",
+      "seconds": 70.59,
+      "bytes": 1130718,
+      "peak": 0.6297
+    },
+    {
+      "key": "medieval-battle",
+      "title": "Iron Oath",
+      "file": "soundtrack/medieval-battle.mp3",
+      "taskId": "77b2d744-3cde-4dcc-bf0b-5eae2c362f36",
+      "seconds": 74.82,
+      "bytes": 1198413,
+      "peak": 0.6667
+    },
+    {
+      "key": "greek",
+      "title": "Olive and Marble",
+      "file": "soundtrack/greek.mp3",
+      "taskId": "07204fbe-4a4a-4d5d-a26f-066858964647",
+      "seconds": 83.98,
+      "bytes": 1344705,
+      "peak": 0.6248
+    },
+    {
+      "key": "greek-battle",
+      "title": "Trial Beneath the Gods",
+      "file": "soundtrack/greek-battle.mp3",
+      "taskId": "5cc494a7-0750-46e9-b912-028128cbbde2",
+      "seconds": 77.39,
+      "bytes": 1239386,
+      "peak": 0.7599
+    },
+    {
+      "key": "fantasy",
+      "title": "Between Broken Stars",
+      "file": "soundtrack/fantasy.mp3",
+      "taskId": "9a078da6-d90a-43fe-9339-3d6ec885feb6",
+      "seconds": 68.17,
+      "bytes": 1091844,
+      "peak": 0.5028
+    },
+    {
+      "key": "fantasy-battle",
+      "title": "Across the Rift",
+      "file": "soundtrack/fantasy-battle.mp3",
+      "taskId": "0acdc20c-dea6-4ab7-9081-7d8b2bfb75cc",
+      "seconds": 56.96,
+      "bytes": 912534,
+      "peak": 0.7546
+    },
+    {
+      "key": "throne",
+      "title": "Ashes Remember",
+      "file": "soundtrack/throne.mp3",
+      "taskId": "ed50921b-0dce-45ab-881c-c601c9bca91f",
+      "seconds": 84.47,
+      "bytes": 1352644,
+      "peak": 0.6781
+    },
+    {
+      "key": "throne-battle",
+      "title": "The Last Procession",
+      "file": "soundtrack/throne-battle.mp3",
+      "taskId": "79614fba-513a-48ff-a592-8360e04453ce",
+      "seconds": 73.9,
+      "bytes": 1183794,
+      "peak": 0.6881
+    },
+    {
+      "key": "menu",
+      "title": "The Road to a Crown",
+      "file": "soundtrack/menu.mp3",
+      "taskId": "b5d4dbf7-6a4c-44b3-9c5d-76d3a5d1a8d1",
+      "seconds": 68.8,
+      "bytes": 1101874,
+      "peak": 0.6748
+    },
+    {
+      "key": "crownless",
+      "title": "No King Above the Ashes",
+      "file": "soundtrack/crownless.mp3",
+      "taskId": "82637ad1-0440-4eed-a178-0efdd66a623f",
+      "seconds": 85.63,
+      "bytes": 1371462,
+      "peak": 0.6558
+    }
+  ]
+}

@@ -3261,14 +3261,19 @@ function packPicker(after){
    Tracks are played exactly as authored (Web Audio, sample-accurate loop, no effects/pitch/speed changes).
    Sound effects keep their own path and on/off switch, so music and SFX are independent. */
 const MUSIC = {
-  tracks: {                                   // context → file (files sit next to index.html)
-    menu:      'crownfall-main-theme.mp3',
-    street:    'crown-city-theme.mp3',
-    medieval:  'iron-kingdom-theme.mp3',
-    greek:     'olympian-court-theme.mp3',
-    fantasy:   'shattered-realm-theme.mp3',
-    throne:    'fallen-throne-theme.mp3',
-    crownless: 'crownless-king-battle.mp3',
+  tracks: {
+    'menu': 'soundtrack/menu.mp3',
+    'street': 'soundtrack/street.mp3',
+    'street-battle': 'soundtrack/street-battle.mp3',
+    'medieval': 'soundtrack/medieval.mp3',
+    'medieval-battle': 'soundtrack/medieval-battle.mp3',
+    'greek': 'soundtrack/greek.mp3',
+    'greek-battle': 'soundtrack/greek-battle.mp3',
+    'fantasy': 'soundtrack/fantasy.mp3',
+    'fantasy-battle': 'soundtrack/fantasy-battle.mp3',
+    'throne': 'soundtrack/throne.mp3',
+    'throne-battle': 'soundtrack/throne-battle.mp3',
+    'crownless': 'soundtrack/crownless.mp3',
   },
   fade: 1.2,          // seconds, crossfade between contexts
   maxGain: 0.7,       // 100% on the slider; keeps music under captures, Score Damage, checks and crown sounds
@@ -3354,7 +3359,7 @@ const landMusic = () => MUSIC.tracks[land()] ? land() : 'menu';
 // The Crownless King's own theme is reserved for the actual battle against him (never menus, previews or other Throne fights)
 function battleMusic(){
   if(land() === 'throne' && RUN.circuit === 'ruler' && RUN.blind === 2 && bossAt(RUN.ante) === 'ruler') return 'crownless';
-  return landMusic();
+  return MUSIC.tracks[land() + '-battle'] ? land() + '-battle' : landMusic();
 }
 function musicControls(id){
   return `<label class="mvol"><span>Music volume</span><input type="range" id="${id}" min="0" max="100" step="5" value="${Math.round(musicVol * 100)}" aria-label="Music volume"><b id="${id}v">${Math.round(musicVol * 100)}%</b></label>`;
@@ -3473,7 +3478,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 156;
+const GAME_VERSION = 157;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
