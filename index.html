@@ -3487,7 +3487,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 158;
+const GAME_VERSION = 159;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6375,6 +6375,7 @@ function gGenArmory(){
 const G_TABS = [['recruit', 'Recruit'], ['train', 'Train & Forge'], ['gear', 'Equipment'], ['recover', 'Recovery']];
 const gLifeBought = () => RUN.gLifeAt != null && RUN.gLifeAt === RUN.gArmAt;
 function gArmory(){
+  const shopPosition = shopScrollPosition();
   gArenaSync(false); gEquipClean();
   if(!RUN.shop || !RUN.shop.some(o => o.kind === 'forge')) gGenArmory();
   const tab = G_TABS.some(t => t[0] === RUN.gTab) ? RUN.gTab : 'recruit';
@@ -6440,6 +6441,7 @@ function gArmory(){
   setTimeout(laIntroShow, 350);   // v154
   if(RUN.gUI) setTimeout(() => { if(RUN && RUN.gUI && !document.querySelector('.modal')) gPickOpen(RUN.gUI.k, RUN.gUI.oi, RUN.gUI.ri); }, 0);   // a refresh during a choice reopens it
   else setTimeout(forgeResume, 0);
+  restoreShopScroll(shopPosition);
 }
 function gEligible(id){
   const only = id === 'tshield' ? 'RBNP' : G_EQUIP[id].only;
@@ -9798,11 +9800,29 @@ function trainingModal(after){
   bindTraining(m, draw);
 }
 function spend(x){ RUN.money -= x; RUN.stats = RUN.stats || {kingCaps:0, knightCaps:0, spent:0}; RUN.stats.spent += x; if(RUN.stats.spent >= 60) unlockAch('mm_spender'); }
+// A purchase redraws the same shop. Keep its viewport while updating prices,
+// stock and army panels; a fresh visit still starts at the top.
+function shopScrollPosition(){
+  return app.querySelector('.shopscr') ? {left:window.scrollX,top:window.scrollY} : null;
+}
+function restoreShopScroll(position){
+  if(position) window.scrollTo({...position,behavior:'instant'});
+}
+function renderShop(html){
+  const current=app.querySelector('.shopscr:not(.garm)');
+  if(!current){app.innerHTML=html;return;}
+  const template=document.createElement('template');template.innerHTML=html;
+  const next=template.content.querySelector('.shopscr');
+  const before=Array.from(current.children),after=Array.from(next.children);
+  if(before.length!==after.length){current.replaceChildren(...after);return;}
+  after.forEach((section,i)=>{if(section.outerHTML!==before[i].outerHTML)before[i].replaceWith(section);});
+}
 function shop(){
+  const shopPosition = shopScrollPosition();
   if(RUN && RUN.land && PACK !== RUN.land) setPack(RUN.land);   // tile names always follow the Land you are in
   sceneMusic('land');
   setLandBg(RUN && !RUN.gauntlet && land());
-  window.scrollTo(0, 0);
+  if(!shopPosition) window.scrollTo(0, 0);
   enterLand();
   setCircuitData(RUN && RUN.circuit);   // v133: also keeps the Circuit scene in step
   onTitle = false;
@@ -9846,7 +9866,7 @@ function shop(){
   };
   const recruitSec = secHTML(groups[1]), sections = groups.filter(g => g.key !== 'recruit').map(secHTML).join('');   // v154: Recruit comes first
   const L = lives(), full = L >= maxLives(), bought = lifeBoughtHere();
-  app.innerHTML = `<section class="screen shopscr">
+  renderShop(`<section class="screen shopscr">
     <div class="shophead">
       <div class="topbar"><button class="btn ghost backbtn" id="sback">‹ Back</button><span class="muted">Saved · ${PACKS.find(x => x.id === land()).name}</span></div>
       <div class="shoptitle"><h2>${RUN.gauntlet ? 'Armory' : UI.shop}</h2><span class="shopcash"><span class="money">$${RUN.money}</span>${hearts(L)}</span></div>
@@ -9863,7 +9883,7 @@ function shop(){
     <h3 class="ssec" style="--sc:#ff3d5a">Extra lives</h3>
     <div class="offer lifeo wide"><span class="tagline">Extra life · max ${maxLives()}</span><h3><span>Buy a life</span>${hearts(1, true)}</h3><p>A second chance. If you lose a round, you can retry instead of ending your run. <span class="muted">Applies to checkmate, stalemate, Concede, or running out of moves in a Blitz. One purchase per Land; each costs more than the last. You have ${L}.</span></p><button class="btn red" id="buylife" ${cash(lifeCost()) || full || bought ? 'disabled' : ''}>${full ? 'Lives full' : bought ? 'Life purchased this Land' : `$${lifeCost()}`}</button></div>
     <div class="shopfoot"><button class="btn ghost" id="reroll" ${cash(restockCost()) ? 'disabled' : ''}>${UI.restock === 'Restock' ? 'Restock shop' : UI.restock} · $${restockCost()}</button><button class="btn" id="next">${RUN.gauntlet ? `Wave ${RUN.gWave}` : 'Next round'}</button></div>
-  </section>`;
+  </section>`);
   bindRelicTips(app, k => { const r = R(RUN.relics[k]); RUN.money += Math.floor(r.cost/2); RUN.relics.splice(k,1); sfx.coin(); save(); shop(); });
   if(RUN.ev && RUN.ev.pend) setTimeout(evShow, 0);   // v139: a pending event comes first
   else setTimeout(forgeResume, 0);   // v138: reopen a Forge step that was open before a refresh
@@ -9888,6 +9908,7 @@ function shop(){
   $('#sback').onclick = () => { save(); title(); };
   $('#next').onclick = () => { RUN.shop = null; RUN.inShop = false; if(RUN.gauntlet){ save(); return gNextWave(); } blindSelect(); };
   coach('shop');
+  restoreShopScroll(shopPosition);
 }
 
 /* Image failure guard: a missing file must never show a broken-image icon, alt text, or a glow/mask
