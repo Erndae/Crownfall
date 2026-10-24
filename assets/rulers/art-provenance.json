@@ -1,0 +1,43 @@
+{
+  "generator": "Built-in image_gen tool",
+  "art_direction": "Adult anthropomorphic animal with upright humanlike body and hands; waist-up three-quarter portrait; hand-inked graphic-novel illustration and painterly shading; bold silhouette; transparent background; no text or watermark. Each species and outfit matches its land.",
+  "portraits": [
+    {
+      "file": "fox.webp",
+      "name": "Kingpin Vex",
+      "species": "Red fox",
+      "prompt": "Black streetwear, magenta crown graffiti, gold chain, crossed arms.",
+      "original": "exec-9eeece17-2d3c-4cae-aeae-f9af8c3caa52.png"
+    },
+    {
+      "file": "lion.webp",
+      "name": "King Aldric the Iron-Handed",
+      "species": "Lion",
+      "prompt": "Iron armor, burgundy royal cloak, iron circlet, crossed arms.",
+      "original": "exec-99d22b16-7784-4a15-af85-e144fbe92499.png"
+    },
+    {
+      "file": "owl.webp",
+      "name": "Athena, Queen of Olympus",
+      "species": "Barn owl",
+      "prompt": "Greek cream robes, bronze breastplate, olive diadem and blue sash.",
+      "original": "exec-f6c85a3b-4a33-43b4-8e7d-9a14d688b9c9.png"
+    },
+    {
+      "file": "raven.webp",
+      "name": "Morwen the Shadow Queen",
+      "species": "Raven",
+      "prompt": "Violet royal robes, crescent diadem, crystal amulet and magical light.",
+      "original": "exec-f930f6f0-f36e-413e-9682-c3d23e49f5a7.png"
+    },
+    {
+      "file": "stag.webp",
+      "name": "The Crownless King",
+      "species": "Stag",
+      "prompt": "Branching antlers, obsidian armor, ragged burgundy cloak, ember highlights, no crown.",
+      "original": "exec-3b0f6316-746a-4356-94a6-0a59e9322a55.png"
+    }
+  ],
+  "constraints": "No human faces; clearly recognisable animal species with humanoid bodies, clothing and hands. Isolated portrait with transparent alpha. No text, frame or watermark.",
+  "production": "Generated with built-in image_gen; originals retained in generated_images, project copies resized to 640x960 and encoded WebP without creative edits."
+}

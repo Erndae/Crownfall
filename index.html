@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="piece-designs.js?v=158"></script>
+<script src="character-style.js?v=158"></script>
+<script src="campaign-opponents.js?v=158"></script>
+<script src="campaign-dialogue.js?v=158"></script>
+<link rel="stylesheet" href="character-style.css?v=158">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1c1c1e">
@@ -17,7 +23,7 @@
 <title>Crownfall</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Permanent+Marker&family=Rubik:wght@400;500;700&family=MedievalSharp&family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Bungee&family=Permanent+Marker&family=Rubik:wght@400;500;700&family=MedievalSharp&family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&display=swap">
 <style>
 :root{
   color-scheme: dark;
@@ -2384,6 +2390,14 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 @media (max-height:700px){.dr-meter small:last-child{display:none}.dr-pre small{display:none}.dr-chip{padding:4px 7px;font-size:12px}.dr-form{width:min(100%,184px)}.dr-cap{font-size:11px}.dr-top h2{font-size:24px}.dr-army{gap:2px}}
 </style>
 
+<style id="crown-dice">
+/* Crown marks retain the standard one-to-six face positions. */
+.die .f u{width:13px;height:13px;border-radius:0;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat}
+</style>
+
+
+<link rel="stylesheet" href="city-board.css?v=158">
+<link rel="stylesheet" href="ruler-style.css?v=158">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2441,7 +2455,7 @@ function pieceSVG(t, side, e){
   const me = side !== 'en';
   const el = eList(e);
   const mat = el.length ? MAT[['crystal','iron','gold','fire','thorn'].find(x => el.includes(x))] : null;
-  const fill = mat ? mat.fill : me ? 'var(--mef,#ffe14d)' : 'var(--enf,#161616)';
+  const fill = me ? CrownfallCharacter.palette().fill : mat ? mat.fill : 'var(--enf,#161616)';
   const stroke = mat ? mat.stroke : me ? 'var(--mes,#111)' : 'var(--enemy,#ff3d9a)';
   let back = '', front = '';
   if(el.includes('fire')) back += '<g class="flame"><path d="M8 34 Q5 22 11 15 Q11 21 14 22 Q13 12 20 4 Q21 13 26 15 Q27 10 29 9 Q35 20 32 34 Z" fill="#ff5a1f" opacity=".9"/><path d="M12 34 Q10 26 14 21 Q15 25 17 25 Q17 17 21 12 Q23 19 26 21 Q30 27 28 34 Z" fill="#ffd23d"/></g>';
@@ -2450,7 +2464,7 @@ function pieceSVG(t, side, e){
   if(el.includes('iron')) front += '<g fill="#1b2230"><circle cx="12.5" cy="33" r="1.1"/><circle cx="20" cy="33" r="1.1"/><circle cx="27.5" cy="33" r="1.1"/></g><path d="M13 27 H27" stroke="#1b2230" stroke-width="1.4" stroke-dasharray="2 1.6"/>';
   if(el.includes('gold')) front += '<g><circle cx="32.5" cy="8" r="5.6" fill="#ffd23d" stroke="#4a2a00" stroke-width="1.5"/><text x="32.5" y="11.1" text-anchor="middle" font-size="8.5" font-weight="900" font-family="Arial Black,Arial" fill="#4a2a00">$</text></g>';
   const glow = el.length ? ` style="filter:var(--pcf) drop-shadow(0 0 3px ${ENCH[el[0]].col})"` : '';
-  return `<svg class="pc ${me?'me':'en'}${el.length ? ' ench' : ''}"${glow} viewBox="0 0 40 40" aria-hidden="true">${back}<g style="fill:${fill};stroke:${stroke}" stroke-width="2.1" stroke-linejoin="round">${SHAPE[t].replace('class="cut"', `style="stroke:${stroke};fill:none"`).replace('class="eye"', `style="fill:${stroke};stroke:none"`)}<rect x="9" y="30.5" width="22" height="5" rx="2"/></g>${front}</svg>`;
+  return `<svg class="pc ${me?'me':'en'}${el.length ? ' ench' : ''}"${glow} viewBox="0 0 40 40" aria-hidden="true">${back}${CrownfallCharacter.art(t,side,undefined,{fill,stroke})}${front}</svg>`;
 }
 
 /* ---------- special pieces ---------- */
@@ -2904,18 +2918,12 @@ const RULERS = {
   throne:   {name:'The Crownless King', title:'Ruler of the Fallen Throne', rules:['crown','tax','thief'], moveLimit:null, desc:'The target is 40% higher, every move that doesn’t capture costs $1, and your Knights can’t capture.',
              crowns:{easy:'Shard Crown', medium:'Obsidian Crown', hard:'The Crown of Crowns'}, gem:'#e0263f'},
 };
-/* ruler portraits: add art for other rulers here later (king-aldric, zeus, morwen, crownless-king) */
-RULERS.street.art = 'kingpin-vex.webp';
-RULERS.medieval.art = 'king-aldric.webp';
-RULERS.greek.art = 'athena.webp';
-RULERS.fantasy.art = 'morwen.webp';
-RULERS.throne.art = 'crownless-king.webp';
-RULERS.throne.artTop = '-2%'; RULERS.throne.artShift = '-60%'; // hood sits right of center in this artwork
-RULERS.fantasy.artTop = '2%'; // her crown spikes sit higher than the others' heads
+/* Animal land rulers; names and save identifiers retain their established identity. */
+Object.entries({street:['fox','Red fox'],medieval:['lion','Lion'],greek:['owl','Barn owl'],fantasy:['raven','Raven'],throne:['stag','Stag']}).forEach(([land,[animal,species]])=>{RULERS[land].art=`assets/rulers/${animal}.webp`;RULERS[land].animal=animal;RULERS[land].species=species;});
 function rulerFace(l, cls){ const r = RULERS[l]; if(!r || !r.art) return '';
   if(!landOpen(l)) return `<span class="rface sealed ${cls || ''}" aria-label="Unknown ruler"></span>`; // never reveal a sealed land's ruler
   const st = [r.artTop ? `top:${r.artTop}` : '', r.artShift ? `transform:translateX(${r.artShift})` : ''].filter(Boolean).join(';');
-  return `<span class="rface ${cls || ''}"><img src="${r.art}" alt="${r.name}"${st ? ` style="${st}"` : ''}></span>`; }
+  return `<span class="rface animal animal-${r.animal} ${cls || ''}"><img src="${r.art}" alt="${r.name}, humanoid ${r.species}"${st ? ` style="${st}"` : ''}></span>`; }
 const MINI_RULE = {downtown:'clock', rooftop:'crown', harbor:'thief', midnight:'tax'};
 const MINI_DESC = {clock:'Blitz: this round has a move limit.', crown:'The target score is 40% higher.', thief:'Your Knights cannot capture.', tax:'Every move that doesn’t capture costs $1.'};
 const MINIS = {
@@ -3190,7 +3198,8 @@ LEVELS.throne = {rounds:['Ashen Trial','Gauntlet','Throne Guard'], chips:['ASH',
   bosses:{clock:'The Hourglass Wraith', wall:'The Obsidian Wall', thief:'The Stablebane', march:'The Twin Shadows', tax:'The Tithe Collector', crown:'The Fallen Grandmaster'}};
 const LV = () => LEVELS[land()] || LEVELS.street;
 const roundName = i => LV().rounds[i];
-const bossName = id => id === 'ruler' ? RULER().name : id === 'mini' ? miniName() : LV().bosses[id] || (BOSSES.find(b => b.id === id) || {}).name;
+const bossRuleName = id => id === 'ruler' ? RULER().name : id === 'mini' ? miniName() : LV().bosses[id] || (BOSSES.find(b => b.id === id) || {}).name;
+const bossName = (id,stage=RUN?.ante) => id && id!=='ruler' && id!=='mini' && MODE==='campaign' && RUN && !RUN.gauntlet && !MATCH ? campaignOpponentName(RUN,stage)||bossRuleName(id) : bossRuleName(id);
 const STAGES = 6;
 const CIRCUIT_STAGES = 4, CIRCUIT_STAGE_IDX = [0, 1, 3, 4];
 const nStages = c => (c !== undefined ? c : RUN && RUN.circuit) === 'ruler' ? STAGES : CIRCUIT_STAGES;
@@ -3478,7 +3487,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 157;
+const GAME_VERSION = 158;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3491,11 +3500,11 @@ const RULE = x => ruleOf(bossId()).includes(x);
 // second move with a different piece, no recharge). B.shadow holds the charge, so save/CONTINUE remembers it.
 const MARCH_DBL = {street:['Double Dutch','Dana'], medieval:['Twin Strike','the Twin Knights'], greek:['Winged Step','Hermes'],
   fantasy:['Second Head','the Ogre'], throne:['Twin Eclipse','the Twin Shadows']};
-const marchDbl = () => (RUN && RUN.gauntlet ? ['Double Move', 'the enemy'] : MARCH_DBL[land()]) || ['Double Turn','the boss'];
+const marchDbl = () => (RUN && RUN.gauntlet ? ['Double Move', 'the enemy'] : MODE==='campaign' && RUN && !MATCH ? ['Double Turn',bossName('march')] : MARCH_DBL[land()]) || ['Double Turn','the boss'];
 const dblRule = () => RULE('shadow') || RULE('march');                 // bosses with a one-use double turn
 const dblLabel = () => RULE('march') && !RULE('shadow') ? marchDbl()[0] : 'Shadow Step';
 const dblWho = () => RULE('march') && !RULE('shadow') ? marchDbl()[1].replace(/^the /, 'The ') : 'Morwen';
-function bossObj(id){ if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit] || 'crown'; return {id, name:miniName(), desc:MINI_DESC[rule], mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } return BOSSES.find(b => b.id === id); }
+function bossObj(id){ if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit] || 'crown'; return {id, name:miniName(), desc:MINI_DESC[rule], mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), name:bossName(id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } const boss=BOSSES.find(b => b.id === id); return boss?{...boss,name:bossName(id)}:boss; }
 /* ---------- score targets ----------
    A new army grows fast, so it plays the original curve (this is all of Crown City Easy on a fresh save).
    Once an army has been through a few circuits its Training is capped and its pieces are customised, so its
@@ -3554,8 +3563,8 @@ function targetParts(i){
   let t = Math.min(prog, cap); if(fresh != null) t = Math.min(t, fresh); if(blitz != null) t = Math.min(t, blitz);
   t *= lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF();   // beta: army-size factor (beta 2: Blitz after Crown City uses ratio^1.5, was ratio^2.5)
   if(!lim && land() === 'street') t *= CC_TARGET[RUN.circuit] || 1;   // beta 2: Crown City share calibration
-  if(i === 2 && RUN.land === 'street') t *= CITY_BLITZ_TARGET[bossName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
-  if(i === 2 && RUN.land === 'street' && RUN.circuit === 'downtown' && bossName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
+  if(i === 2 && RUN.land === 'street') t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
+  if(i === 2 && RUN.land === 'street' && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
   return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), ppm:capacityPPM(), power:+armyPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
@@ -4151,7 +4160,7 @@ const ARCHE = {   // tag: the short pre-fight label (none = a recognisable but n
 const sigBase = a => a ? a.replace('+', '') : null;
 function bossSignature(P){
   if(!P || !P.boss || P.ruler) return null;
-  return SIG_BOSS[bossName(P.id)] || null;
+  return SIG_BOSS[bossRuleName(P.id)] || null;
 }
 // composition for an archetype at n pieces; prot (0-2) softens the signature itself while keeping its identity
 function signatureRoster(arche, n, prot){
@@ -4210,7 +4219,7 @@ function enemyProfile(){
   const cap = l === 'throne' ? ENEMY_ARMY.fullArmy : ENEMY_ARMY.maxPieces;   // beta: full 16-piece armies in the Fallen Throne
   const n = armySize();                                                       // see ARMY_SIZE / aiSlot
   const power = L.power + D.power, q = tier + (boss ? 1 : 0) + power;         // q = overall army quality
-  const persona = boss && id ? (PERSONA[bossName(id)] || {}) : {};
+  const persona = boss && id ? (PERSONA[bossRuleName(id)] || {}) : {};
   const style = persona.style || (Math.random() < 0.6 ? ENEMY_ARMY.landStyle[l] : pick(['aggressive','defensive','hunter','tricky','greedy']));
   const P = {land:l, tier, boss, id, ruler:id === 'ruler', n, power, q, style};
   P.sig = bossSignature(P);
@@ -4280,7 +4289,7 @@ const cpPick = (v, st) => Array.isArray(v) ? v[st] : v;
 // applied to an ordinary or boss army that has no signature army of its own (never Rulers)
 function cpApplyProfile(P){
   const c = cpFor(); if(!c){ return; } P.cp = {tr:c.tr, I:c.I}; if(!c.I) return;
-  const d = c.d, st = clamp(RUN.ante, 1, 4) - 1, persona = P.boss && P.id && (PERSONA[bossName(P.id)] || {}).style;
+  const d = c.d, st = clamp(RUN.ante, 1, 4) - 1, persona = P.boss && P.id && (PERSONA[bossRuleName(P.id)] || {}).style;
   if(d.st && !persona) P.style = cpPick(d.st, st);
   if(c.I >= 2 && RUN.blind >= 1 && d.sg && Math.random() < d.sg[0] * (c.I >= 3 ? 1.3 : 1)){ P.sig = pick(d.sg[1]); P.cp.sig = P.sig; return; }   // an existing signature army
   if(d.ln) P.lean = d.ln;
@@ -4345,7 +4354,7 @@ function salLayout(board, list, L){
 }
 const SAL_MODE = 'split6';
 SAL_LAYOUTS.split6 = SAL_LAYOUTS.split;   // beta 2 Skyline Sal layout ('b1' = Beta 1's)
-const isSal = P => P && P.boss && P.id && P.land === 'street' && bossName(P.id) === 'Skyline Sal';
+const isSal = P => P && P.boss && P.id && P.land === 'street' && bossRuleName(P.id) === 'Skyline Sal';
 function placeArmy(board, list, P){
   if(P && P.salL){ const sb = salLayout(board, list, P.salL); if(sb){ screenLines(sb); return sb; } }
   const b = board.slice(), m = Math.random() < 0.5, C = c => m ? 7 - c : c, at = (r, c) => r * 8 + C(c);
@@ -4833,7 +4842,9 @@ function storyLines(o){
 }
 const STYLE_TXT = {aggressive:'Aggressive: charges in and trades pieces', hunter:'King hunter: goes straight for your King', tricky:'Tricky: sets up forks and double attacks', greedy:'Greedy: grabs anything worth money', defensive:'Defensive: protects its pieces and waits for mistakes'};
 function curPersona(){ if(!RUN || !B || RUN.blind !== 2) return null; const id = bossId(); if(!id) return null; return personaOf(id); }
-function personaOf(id){ const n = bossName(id); if(PERSONA[n]) return storyLines({name:n, ...PERSONA[n], ruler:id === 'ruler'}); if(SIMPLE_TALK[n]) return storyLines({name:n, ...SIMPLE_TALK[n], simple:true}); return null; }
+function personaOf(id){ const n = bossName(id);
+  if(n && n!==bossRuleName(id)){const plan=campaignBossPlan(RUN);return storyLines({name:n,style:plan?.style||(PERSONA[bossRuleName(id)]||{}).style,...campaignBossVoice(plan)});}
+  if(PERSONA[n]) return storyLines({name:n, ...PERSONA[n], ruler:id === 'ruler'}); if(SIMPLE_TALK[n]) return storyLines({name:n, ...SIMPLE_TALK[n], simple:true}); return null; }
 function portrait(pp){
   if(pp.ruler) return rulerFace(land(), 'talk') || `<span class="spk-face ruler">${crownSVG(land(), 'hard', true)}</span>`;
   const c = CIR(); return `<span class="spk-face${pp.simple ? ' simple' : ''}" style="--fc:${pp.simple ? '#3a393c' : c.col}">${pieceSVG(pp.simple ? 'Q' : 'K','en')}</span>`;
@@ -5218,6 +5229,7 @@ function title(){
     ${inC && worldCrowns() ? `<p class="savebadge runnertag" style="color:#ffd23d;font-family:var(--tag);font-size:15px">${runnerTitle()}</p>` : ''}
     <button class="btn ghost landsbtn" id="lands">${inC ? `${crownRow(PACK)} Journey · ${worldCrowns()}/${WORLD_TOTAL}` : 'Campaign Journey'}</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" id="achb">${inC ? `Achievements ${Object.keys(ACH).filter(k => ACHS.some(a => a.id === k)).length}/${ACHS.length}` : 'Achievements'}</button><button class="btn ghost" id="how">How to play</button></div>
+    <button class="btn ghost character-menu" id="customCharacter"><span data-character-token="badge">${CrownfallCharacter.svg()}</span> Customize character</button>
     <p class="savebadge">${saveBadgeText()}</p>
     ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span></div>` : ''}
     <div class="setg three"><button class="btn ghost" id="mus">Music: ${musicOn?'On':'Off'}</button><button class="btn ghost" id="snd">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="spd">Speed: ${fast?'Fast':'Normal'}</button></div>
@@ -5227,6 +5239,7 @@ function title(){
   </section>`;
   { const c = $('#cont'); if(c) c.onclick = () => inC ? (!RUN ? draftResume() : B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect())) : goMode('campaign', 'cont'); }
   if(inC && !RUN && !getCarry() && draftGet() && !draftGet().seen && !window.__draftResumed){ window.__draftResumed = true; return teamIntro(); }   // v155: a refresh during "Meet your army" comes back to it
+  $('#customCharacter').onclick=()=>CrownfallCharacter.open();
   $('#new').onclick = () => inC ? (hasCampaign() ? newGameAsk() : startNewGame()) : goMode('campaign', 'new');   // NEW CAMPAIGN always replaces the whole campaign
   { const c = $('#gcont'); if(c) c.onclick = () => MODE === 'gauntlet' ? gContinue() : goMode('gauntlet', 'cont'); }
   $('#gnew').onclick = () => gs ? gNewAsk(gs) : (MODE === 'gauntlet' ? gNewRun() : goMode('gauntlet', 'new'));
@@ -5533,7 +5546,7 @@ function bossChips(id){
 }
 function bossDetails(boss){
   if(RUN && RUN.gauntlet && !MATCH) return gFoeDetails(boss);   // v152
-  const pp = personaOf(boss.id), a = SIG_BOSS[bossName(boss.id)], A = a && ARCHE[sigBase(a)], lim = moveLimitFor(parFor(), boss.id);
+  const pp = personaOf(boss.id), a = SIG_BOSS[bossRuleName(boss.id)], A = a && ARCHE[sigBase(a)], lim = moveLimitFor(parFor(), boss.id);
   const m = modal(`<p class="tr-kicker" style="margin:0">${boss.ruler ? 'Ruler' : boss.mini ? 'Rival · Circuit boss' : 'Boss'}</p><h2 style="margin:0">${bossName(boss.id)}</h2>
     <div class="cash" style="gap:8px;display:flex;flex-direction:column">
       <div><b style="font-family:var(--display);font-weight:400;color:#ffb3bd">Rules</b><br><span style="font-size:14px">${boss.desc}</span></div>
@@ -5550,7 +5563,7 @@ function stageProgress(){
   if(rulerRoad()) return `<div class="stprog ruler" role="group" aria-label="The Ruler’s Road, the final battle of this Land"><p><b>The Ruler’s Road · Final battle</b><span>Win to claim ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</span></p></div>`;
   const a = Math.min(RUN.ante, CIRCUIT_STAGES), role = STAGE_ROLE[a - 1] || '';
   const next = a < CIRCUIT_STAGES ? `Win to advance to Stage ${a + 1}` : `Win to clear ${CIR().name}`;
-  return `<div class="stprog" role="group" aria-label="Stage ${a} of ${CIRCUIT_STAGES}, ${role}. Current opponent: ${bossName(bossAt(a))}. ${next}.">
+  return `<div class="stprog" role="group" aria-label="Stage ${a} of ${CIRCUIT_STAGES}, ${role}. Current opponent: ${bossName(bossAt(a),a)}. ${next}.">
     <ol class="stpips" aria-hidden="true">${STAGE_ROLE.map((r, i) => `<li class="${i + 1 < a ? 'done' : i + 1 === a ? 'cur' : ''}"><i>${i + 1 < a ? '✓' : i + 1}</i><small>${r === 'Elite Challenge' ? 'Elite' : r === 'Circuit Boss' ? 'Boss' : r === 'Introduction' ? 'Intro' : r}</small></li>`).join('')}</ol>
     <p><b>Stage ${a} · ${role}</b><span>${next}</span></p></div>`;
 }
@@ -5627,7 +5640,7 @@ function blindSelect(){
       <span style="font-family:var(--display)">${i===2 ? bossName(boss.id) : roundName(i)}</span>
       <small>Score at least</small><b>${t(i).toLocaleString()}</b>
       <small>Reward $${bl.reward}</small>
-      ${i===2 ? `<div class="bchips">${bossChips(boss.id).map(c => `<small class="bsig rule">${c}</small>`).join('')}${(() => { const a = SIG_BOSS[bossName(boss.id)], t = a && ARCHE[sigBase(a)] && ARCHE[sigBase(a)].tag; return t ? `<small class="bsig">${t}</small>${DOUBLE_MARCH.has(sigBase(a)) ? '<small class="bsig dm">Double March</small>' : ''}` : ''; })()}</div>` : ''}
+      ${i===2 ? `<div class="bchips">${bossChips(boss.id).map(c => `<small class="bsig rule">${c}</small>`).join('')}${(() => { const a = SIG_BOSS[bossRuleName(boss.id)], t = a && ARCHE[sigBase(a)] && ARCHE[sigBase(a)].tag; return t ? `<small class="bsig">${t}</small>${DOUBLE_MARCH.has(sigBase(a)) ? '<small class="bsig dm">Double March</small>' : ''}` : ''; })()}</div>` : ''}
       ${i===2 && personaOf(boss.id) && personaOf(boss.id).style ? `<small class="bstyle">${STYLE_TXT[personaOf(boss.id).style].replace(/: (.)/, (m, c) => ' · ' + c.toUpperCase())}</small>` : ''}
       ${i===2 ? '<small class="bmore">Tap for rules</small>' : ''}
       ${i===2 && boss.ruler ? `<span class="prize">${crownSVG(land(), 'hard', true)}<small>${landWon(land()) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</small></span>` : ''}
@@ -5679,7 +5692,7 @@ function moveLimitFor(par, bossKey, baseOnly){
     const n = typeof m === 'number' ? m : m && typeof m.par === 'number' ? par + m.par : null;
     if(n != null) lim = lim == null ? n : Math.min(lim, n); }
   if(lim == null) return null;
-  const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossName(id)] || 0) : 0;
+  const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossRuleName(id)] || 0) : 0;
   return Math.max(1, lim + blitzBonus() + extra);
 }
 const blitzOn = () => !!(B && B.moveLimit);
@@ -7949,9 +7962,10 @@ function pieceInfo(p){
   if(p.side === 'me' && p.t === 'K' && !MATCH){                       // the Crownrunner
     const c = cmdState();
     el.className = 'pinfo kingp'; el.style.setProperty('--pc', 'var(--brass)');
-    el.innerHTML = `<span class="pi">${pieceSVG('K','me',p.e)}</span><div class="pt"><b>You <span class="lvtag">King</span></b>
+    el.innerHTML = `<span class="pi">${pieceSVG('K','me',p.e)}</span><div class="pt"><b><span data-character-name>You</span> <span class="lvtag">King</span></b>
       <span class="cs">World Crowns ${baseCrowns()}/${WORLD_TOTAL}</span>
       <span class="cs">${c.max ? `Crown Command <span class="cmdpips">${cmdPips(c)}</span> ${c.left}/${c.max}` : 'Crown Command · <b>Locked</b>: claim a World Crown'}</span></div>${cmdBtn()}`;
+    el.querySelector('[data-character-name]').textContent=CrownfallCharacter.get().name;
     bindCmd(); return;
   }
   if(p.side === 'me'){
@@ -9143,7 +9157,7 @@ function circuitCleared(l, cid, fresh, rebuilt){
   ccm.classList.add('ccmodal');
 }
 /* ---------- the standard ending (modular: a future true ending can branch here) ---------- */
-const ENDING_ART = 'crownless-king-crowned.webp'; // only ever shown inside playEnding()
+const ENDING_ART = 'assets/rulers/stag.webp'; // only ever shown inside playEnding()
 /* ---------- endings ----------
    Only the standard ending exists. A future hidden ending registers in ENDINGS under its own type
    (e.g. ENDINGS.true) with its own trigger; nothing about it is exposed to the player yet. */
