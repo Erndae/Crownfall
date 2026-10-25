@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=163"></script>
-<script src="piece-designs.js?v=163"></script>
-<script src="character-style.js?v=163"></script>
-<script src="campaign-opponents.js?v=163"></script>
-<script src="campaign-dialogue.js?v=163"></script>
-<link rel="stylesheet" href="character-style.css?v=163">
+<script src="gameplay-polish.js?v=164"></script>
+<script src="piece-designs.js?v=164"></script>
+<script src="character-style.js?v=164"></script>
+<script src="campaign-opponents.js?v=164"></script>
+<script src="campaign-dialogue.js?v=164"></script>
+<link rel="stylesheet" href="character-style.css?v=164">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2403,9 +2403,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=163">
-<link rel="stylesheet" href="ruler-style.css?v=163">
-<link rel="stylesheet" href="gameplay-polish.css?v=163">
+<link rel="stylesheet" href="city-board.css?v=164">
+<link rel="stylesheet" href="ruler-style.css?v=164">
+<link rel="stylesheet" href="gameplay-polish.css?v=164">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3496,7 +3496,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 163;
+const GAME_VERSION = 164;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6712,33 +6712,41 @@ function encounterHTML(planned=false){
   return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
 }
 function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
-function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn ghost" id="confirmMoves">Move confirmation: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">On: tap a destination to inspect points and threats, then tap it again or press Move. Off: legal destinations move immediately.</p><button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}movePreview=null;e.target.textContent='Move confirmation: '+(on?'On':'Off');};}
+function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn ghost" id="confirmMoves">Move confirmation: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">On: place your piece, then tap ✓ to confirm or ✕ to cancel. Your move only counts after confirmation. Off: legal destinations move immediately.</p><button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}cancelMovePreview();e.target.textContent='Move confirmation: '+(on?'On':'Off');};}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
   const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to);
   let points=sc?.total||0;if(victim&&p.charge)points=Math.round(points*1.5);
-  movePreview={from,to,board:B.board};drawBoard();
-  const el=$('#pinfo');if(!el)return;el.className='pinfo move-preview';
+  movePreview={from,to,board:B.board,position:after};drawBoard();
+  const el=$('#pinfo');if(!el)return;pieceInfo(null);el.style.setProperty('--confirm-height',Math.max(52,el.getBoundingClientRect().height)+'px');el.className='pinfo move-preview';
   const scoreText=sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
-  el.innerHTML=`<div class="preview-copy"><b>${TYPE[p.t].name} → ${sqName(to)}${victim?' · capture':''}</b><span>${scoreText}</span><small class="${risk?'preview-risk':'preview-safe'}">${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate?' · crate costs up to $2':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}</small>${victim&&B.score+points>=B.target?'<small>Target capture must survive the reply.</small>':''}</div><button class="btn" id="commitPreview">Move</button><button class="preview-cancel" id="cancelPreview" aria-label="Cancel move preview">×</button>`;
-  el.querySelector('#commitPreview').onclick=()=>tapSquare(to);
-  el.querySelector('#cancelPreview').onclick=()=>{movePreview=null;drawBoard();pieceInfo(sel===null?null:B.board[sel]);};
+  const detail=`${scoreText}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate?' · crate costs up to $2':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
+  el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate?' · −$2':''}${!victim&&RULE('tax')?' · −$1':''}</span><span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
+  el.querySelector('#commitPreview').onclick=commitMovePreview;
+  el.querySelector('#cancelPreview').onclick=cancelMovePreview;
+}
+function cancelMovePreview(){movePreview=null;sel=null;drawBoard();pieceInfo(null);}
+async function commitMovePreview(){
+  const preview=movePreview;
+  if(!preview||!B||busy||B.done||B.board!==preview.board||sel!==preview.from||pending!==null||swapMode||trapMode||cmdMode||gambitMode||!legalMoves(preview.from).includes(preview.to)){cancelMovePreview();return;}
+  movePreview=null;pieceInfo(null);await doMove(preview.from,preview.to);
 }
 function lossHTML(review){const esc=CrownfallPolish.escape;return `<div class="loss-review"><b>${esc(review.title)}</b><p>${esc(review.tip)}</p>${review.note?`<p class="last-turn">Last exchange: ${esc(review.note)}</p>`:''}</div>`;}
 function lossBoardHTML(log){const sn=log?.at(-1);if(!sn?.s)return '';let html='';for(let i=0;i<64;i++){const ch=sn.s[i],me=ch&&ch===ch.toUpperCase();html+=`<div class="sq ${(Math.floor(i/8)+i%8)%2?'d':'l'}${i===sn.t?' lastte':''}">${ch&&ch!=='.'?pieceSVG(ch.toUpperCase(),me?'me':'en'):''}</div>`;}return `<details><summary>Review final position</summary><div class="board loss-final">${html}</div></details>`;}
 function drawBoard(){
-  if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)) movePreview=null;
+  if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)){movePreview=null;pieceInfo(null);}
   const el = $('#board'); if(!el) return;
   boardSides(el);
-  const threats = new Set(attacksOn(B.board, 'en'));
-  const legal = sel !== null ? legalMoves(sel) : [];
+  const displayBoard=movePreview?.position||B.board;
+  const threats = new Set(attacksOn(displayBoard, 'en'));
+  const legal = !movePreview&&sel !== null ? legalMoves(sel) : [];
   const cmdEl = cmdMode && cmdPick === null ? cmdEligible(cmdMode) : [], advT = cmdMode && cmdPick !== null ? cmdTargets(cmdMode, cmdPick) : [];
   let h = '';
   for(let i=0;i<64;i++){
-    const [r,c] = rc(i), p = B.board[i];
+    const [r,c] = rc(i), p = displayBoard[i];
     const cls = ['sq', (r+c)%2 ? 'd' : 'l'];
     if(i === sel) cls.push('sel');
-    if(movePreview && i===movePreview.to)cls.push('preview-target');
+    if(movePreview && (i===movePreview.from||i===movePreview.to))cls.push('preview-target');
     if(i === swapA) cls.push('swapA');
     if(B.scout && i === B.scout.from) cls.push('scoutF'); if(B.scout && i === B.scout.to) cls.push('scoutT');
     if(gambitMode && p && p.side === 'me' && p.t !== 'K') cls.push(gambitCheck(i) ? 'gbad' : 'gok');
@@ -6747,9 +6755,9 @@ function drawBoard(){
     if(cmdMode){ if(cmdMode !== 'shadowstrike' && inCmdRadius(i)) cls.push('cmdzone'); if(cmdPick === null && cmdEl.includes(i)) cls.push('cmdok'); if(i === cmdPick) cls.push('sel'); }
 
     if(p && p.side === 'me' && threats.has(i)) cls.push('threat');
-    if(p && p.t === 'K' && inCheck(B.board, p.side)) cls.push('threat', 'chk');
+    if(p && p.t === 'K' && inCheck(displayBoard, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
-    if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(B.board, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
+    if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: you lose up to $2; enemy entry gives you $2" title="Crate trap · you −$2 / enemy +$2 to you"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
     if(B.trapSq && B.trapSq.includes(i)) inner += '<span class="trapmk"></span>';
     if(trapMode && (!p || p.side === 'me') && !(B.trapSq || []).includes(i)) inner += '<span class="ring trapring"></span>';
@@ -6845,7 +6853,7 @@ async function tapSquare(i){
   }
   if(!busy && mateNow()) return;                                            // v156
   if(sel !== null && legalMoves(sel).includes(i)){
-    if(confirmMoves() && !(movePreview && movePreview.from===sel && movePreview.to===i && movePreview.board===B.board)){previewMove(sel,i);return;}
+    if(confirmMoves()){previewMove(sel,i);return;}
     const from=sel;movePreview=null;pieceInfo(null);await doMove(from,i);return;
   }
   if(p && p.side === 'me'){ sel = sel === i ? null : i; sel === null ? sfx.tick() : sfx.pick(); drawBoard(); pieceInfo(sel === null ? null : p);

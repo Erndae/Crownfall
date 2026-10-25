@@ -15,7 +15,7 @@ for(const sig of ['knightRush','phalanx','nightRaid','bishopCourt','twinQueens',
 assert.equal(p.savings(4,'downtown'),0);assert.equal(p.savings(25,'downtown'),5);assert.equal(p.savings(1000,'downtown'),5);assert.equal(p.savings(1000,'midnight'),6);assert.equal(p.savings(-20,'midnight'),0);
 assert(game.includes('interest = CrownfallPolish.savings(RUN.money,RUN.circuit)'));
 assert(game.includes('train:[8, 14, 24, 36, 52]'));
-assert(game.includes('previewMove(sel,i);return;'));assert(game.includes('movePreview.board===B.board'));
+assert(game.includes('previewMove(sel,i);return;'));assert(game.includes('B.board!==preview.board'));
 assert(game.includes('P.sig=plan.signature;P.style=plan.style'));assert(game.includes("enSafe('crate',()=>springDockCrate(to))"));
 assert(game.includes("m.dataset.lossReason=why"));assert(game.includes('review.index:L.length-1'));
 console.log('PASS: real training gains, goal/hold states, formation tips, focused loss reviews, escaped messages and capped campaign savings.');

@@ -37,3 +37,11 @@ The original flat piece silhouettes, rounded bases, bold team outlines and initi
 - Defeat panels explain the outcome and focus the replay on the last relevant exchange, while preserving life-loss/checkpoint retries. Crown Match uses the same review; the Gauntlet ending includes a final-position review.
 
 Validation: `node validate-gameplay-polish.mjs`, `node audit-balance.mjs`, and the existing `validate-main-design.mjs`, `validate-character.mjs` and `validate-gameplay-v160.mjs` scripts. UI integration uses `validate-polish-integration.mjs`; install `happy-dom` as a development-only dependency to run it. Its deterministic positions exercise real legality, scoring and UI handlers while animation, sound and the enemy reply are stubbed. It also checks 10 real cross-land opening deployments.
+
+## v164 — compact move confirmation
+
+A tentative move now appears directly on the board. The existing info row provides a compact cancel (✕) and confirm (✓) pair with 44px touch targets. Only the confirm button commits the move; repeated destination taps keep it pending. Cancel restores the original position without changing points, money or move counts. The row stays at its measured idle height, keeps labels on one line, and does not reduce or shift the board. Confirmation remains optional in the goal panel.
+
+Validation includes real-handler checks for tentative rendering, explicit confirmation, cancellation, stale positions and the quick-move preference.
+
+Browser layout checks at 320×568, 390×844, 430×932 and 768×1024 verify unchanged board dimensions and position, no horizontal overflow, and fully visible 44px confirm/cancel buttons.

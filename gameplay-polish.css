@@ -1,11 +1,14 @@
 /* Reuse the existing HUD and piece-info space so the board stays full width. */
 .pbar.goal-button{display:block;width:100%;padding:0;text-align:right;cursor:pointer;color:var(--text);font:inherit;min-height:22px}
 .pbar.goal-button .ptgt{font-size:11px;letter-spacing:.02em;padding-inline:5px;white-space:nowrap}
-.pinfo.move-preview{display:flex;gap:8px;align-items:center;padding:7px 10px;min-height:62px;box-sizing:border-box}
-.move-preview .preview-copy{flex:1;min-width:0;font:12px/1.35 var(--body);color:var(--text)}
-.move-preview .preview-copy b{display:block;font-size:14px}.move-preview .preview-copy small{display:block;color:var(--dim);font-size:11px}
-.move-preview .preview-copy .preview-risk{color:#ffb6b6}.move-preview .preview-copy .preview-safe{color:#b9dfc2}
-.move-preview .btn{padding:9px 12px;min-height:42px;font-size:14px}.move-preview .preview-cancel{background:none;border:0;color:var(--text);min-height:42px;min-width:32px;font-size:22px}
+/* Fixed to the idle info row: confirmation never borrows height from the board. */
+.pinfo.move-preview{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;gap:8px;align-items:center;height:var(--confirm-height,58px)!important;min-height:var(--confirm-height,58px)!important;max-height:var(--confirm-height,58px)!important;padding:1px 10px!important;box-sizing:border-box;animation:none}
+.move-preview .preview-copy{min-width:0;overflow:hidden;font:12px/1.3 var(--body);color:var(--text)}
+.move-preview .preview-copy b,.move-preview .preview-copy > span:not(.sr-only){display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.move-preview .preview-copy b{font-size:15px}.move-preview .preview-copy > span{color:var(--dim)}
+.move-preview .move-confirm{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:2px solid #0d0d0d;border-radius:5px;background:#45464a;color:#fff;font:bold 25px/1 Arial;cursor:pointer;touch-action:manipulation}
+.move-preview .move-confirm.accept{background:#74a849;color:#fff}.move-preview .move-confirm:focus-visible{outline:3px solid var(--brass);outline-offset:1px}
+.move-preview .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .sq.preview-target{box-shadow:inset 0 0 0 3px #e8c889!important}.sq .dot.risk{background:#ff7c88!important;box-shadow:0 0 0 2px #371d25!important}
 .sq .preview-warning{position:absolute;right:2px;top:1px;font:bold 11px Arial;color:#ffb1b8;text-shadow:0 1px 2px #111;z-index:4;pointer-events:none}
 .encounter-brief{color:var(--dim);font:12px/1.45 var(--body);margin:8px 0}.encounter-brief b{color:var(--text)}
@@ -15,6 +18,6 @@
 .tprow .train-gain{display:block;color:var(--chips);font-size:11px;line-height:1.35;margin-top:3px}.tprow .trained-now{display:block;color:#b5dbbd;font-size:11px}
 .store-explain,.hazard-explain,.loss-review{background:var(--bg-2);border-left:3px solid var(--brass);padding:10px 12px;font:13px/1.5 var(--body);color:var(--text)}
 .loss-review{margin:8px 0}.loss-review b,.hazard-explain b{display:block}.loss-review p{font-size:13px;margin:5px 0}.loss-review .last-turn{font-size:12px;color:var(--dim)}
-@media(max-width:360px){.move-preview .preview-copy{font-size:11px}.move-preview .btn{padding-inline:8px}.pbar.goal-button .ptgt{font-size:10px}}
+@media(max-width:360px){.pbar.goal-button .ptgt{font-size:10px}}
 
 .training-help{border:0;background:none;text-decoration:underline;color:var(--text);font:12px var(--body);min-height:40px;padding:5px 8px}.loss-final{width:100%;margin-top:10px}
