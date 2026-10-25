@@ -55,3 +55,7 @@ Browser checks cover every piece type on both sides, with and without multiple e
 ## v166 — environments for every Campaign land
 
 Iron Kingdom battles now stand against the torchlit fortress, Olympian Court against its temples and waterfalls, Shattered Realm against its floating ruins, and Fallen Throne against its ruined citadel. Each uses its own existing land illustration beneath a light readability shade. The old flat circuit scenery is hidden during these battles; Crown City retains its illustrated street environment. Fixed background layers preserve board dimensions, selection controls and bottom actions. All five environment images remain available in the offline cache.
+
+## v167 — optional move confirmation in the pause menu
+
+Confirm Move is now an accessible On/Off switch in the Campaign, Gauntlet and Crown Match pause menus. It defaults to Off unless the player has explicitly enabled it, and remembers their choice on this device. Turning it off cancels any tentative move without spending a turn. The objective panel focuses on battle rules.

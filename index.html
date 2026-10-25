@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=166"></script>
-<script src="piece-designs.js?v=166"></script>
-<script src="character-style.js?v=166"></script>
-<script src="campaign-opponents.js?v=166"></script>
-<script src="campaign-dialogue.js?v=166"></script>
-<link rel="stylesheet" href="character-style.css?v=166">
+<script src="gameplay-polish.js?v=167"></script>
+<script src="piece-designs.js?v=167"></script>
+<script src="character-style.js?v=167"></script>
+<script src="campaign-opponents.js?v=167"></script>
+<script src="campaign-dialogue.js?v=167"></script>
+<link rel="stylesheet" href="character-style.css?v=167">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2403,9 +2403,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=166">
-<link rel="stylesheet" href="ruler-style.css?v=166">
-<link rel="stylesheet" href="gameplay-polish.css?v=166">
+<link rel="stylesheet" href="city-board.css?v=167">
+<link rel="stylesheet" href="ruler-style.css?v=167">
+<link rel="stylesheet" href="gameplay-polish.css?v=167">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3496,7 +3496,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 166;
+const GAME_VERSION = 167;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5070,12 +5070,14 @@ function matchMenu(){
     <p class="muted" style="margin:0">${matchDiff().name} · AI ${matchDiff().rating} · target ${B.target.toLocaleString()}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" id="snd2">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="mus2">Music: ${musicOn?'On':'Off'}</button></div>
     ${musicControls('mvol2')}
+    ${confirmMoveControl()}
     <button class="btn ghost" id="expl">How scoring works</button>
     <button class="btn" id="back">Back to the match</button>
     <button class="btn ghost" id="ttl" style="font-size:14px">Save and go to main menu</button>
     ${B && !B.done && !B.won ? `<button class="btn ghost concede" id="concede"><b>Concede match</b><small>Counts as a defeat. No Campaign effect.</small></button>` : ''}`, '#back');
   m.querySelector('#mus2').onclick = e => { setMusic(!musicOn); e.target.textContent = 'Music: ' + (musicOn?'On':'Off'); };
   bindMusicControls(m, 'mvol2');
+  bindConfirmMoves(m);
   m.querySelector('#snd2').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
   m.querySelector('#expl').onclick = () => { m.remove(); explainScore(); };
   m.querySelector('#ttl').onclick = () => { m.remove(); save(); title(); };
@@ -6704,7 +6706,9 @@ async function reinforceShow(sq){
 const lightSide = () => { if(!B) return null; if(B.light === 'me' || B.light === 'en') return B.light;
   const r = B.roll; return r && r.state === 'done' && (r.first === 'me' || r.first === 'en') && !document.querySelector('.rollmodal') ? r.first : null; };
 function boardSides(el){ const ls = lightSide(); for(const x of [el, document.getElementById('pinfo')]) if(x){ x.classList.toggle('lme', ls === 'me'); x.classList.toggle('len', ls === 'en'); } }
-function confirmMoves(){try{return localStorage.getItem('crownfall-move-confirm')!=='off';}catch{return true;}}
+function confirmMoves(){try{return localStorage.getItem('crownfall-move-confirm')==='on';}catch{return false;}}
+function confirmMoveControl(){return `<button class="btn ghost" id="confirmMoves" role="switch" aria-checked="${confirmMoves()}">Confirm Move: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">When on, tap ✓ to confirm your move or ✕ to cancel.</p>`;}
+function bindConfirmMoves(m){m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}cancelMovePreview();e.currentTarget.textContent='Confirm Move: '+(on?'On':'Off');e.currentTarget.setAttribute('aria-checked',String(confirmMoves()));};}
 function goalText(){return CrownfallPolish.objective({score:B?.score,target:B?.target,pending:B?.pendingWin,mateOnly:finalPhase()&&!B?.ckFinal,hold:B?.ckFinal&&B.score>=B.target&&B.moveCount<=Math.max(B.ckFinalAt,B.ckHoldAt??-1),moves:B?.moveLimit?B.moves:null});}
 function encounterHTML(planned=false){
   const plan=planned&&RUN&&!RUN.gauntlet?campaignBossPlan(RUN):null;
@@ -6712,7 +6716,7 @@ function encounterHTML(planned=false){
   return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
 }
 function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
-function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn ghost" id="confirmMoves">Move confirmation: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">On: place your piece, then tap ✓ to confirm or ✕ to cancel. Your move only counts after confirmation. Off: legal destinations move immediately.</p><button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}cancelMovePreview();e.target.textContent='Move confirmation: '+(on?'On':'Off');};}
+function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
   const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to);
@@ -8327,6 +8331,7 @@ function gameMenu(){
     <p class="savebadge" style="text-align:center;margin:-4px 0 0">${saveBadgeText()}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" id="snd2">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="mus2">Music: ${musicOn?'On':'Off'}</button></div>
     ${musicControls('mvol2')}
+    ${confirmMoveControl()}
     <button class="btn ghost" id="chat2">Piece chatter: ${laOn() ? 'On' : 'Off'}</button>
     ${RUN && RUN.gauntlet ? '' : `<button class="btn ghost" id="sty2">Journey · ${worldCrowns()}/${WORLD_TOTAL}</button>`}
     <button class="btn ghost" id="expl">How scoring works</button>
@@ -8338,6 +8343,7 @@ function gameMenu(){
   m.querySelector('#chat2').onclick = e => { const on = !laOn(); try{ localStorage.setItem('crownfall-chatter', on ? 'on' : 'off'); }catch(_){} e.target.textContent = 'Piece chatter: ' + (on ? 'On' : 'Off'); if(!on) document.querySelectorAll('.lachat').forEach(x => x.remove()); };
   m.querySelector('#mus2').onclick = e => { setMusic(!musicOn); e.target.textContent = 'Music: ' + (musicOn?'On':'Off'); };
   bindMusicControls(m, 'mvol2');
+  bindConfirmMoves(m);
   { const sj = m.querySelector('#sty2'); if(sj) sj.onclick = () => { m.remove(); landsScreen(); }; }
   m.querySelector('#expl').onclick = () => { m.remove(); explainScore(); };
   m.querySelector('#snd2').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
