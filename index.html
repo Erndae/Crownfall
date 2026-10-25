@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="piece-designs.js?v=158"></script>
-<script src="character-style.js?v=158"></script>
-<script src="campaign-opponents.js?v=158"></script>
-<script src="campaign-dialogue.js?v=158"></script>
-<link rel="stylesheet" href="character-style.css?v=158">
+<script src="piece-designs.js?v=160"></script>
+<script src="character-style.js?v=160"></script>
+<script src="campaign-opponents.js?v=160"></script>
+<script src="campaign-dialogue.js?v=160"></script>
+<link rel="stylesheet" href="character-style.css?v=160">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1553,7 +1553,10 @@ section.screen:has(> h1.logoimg) .bests{margin-block:-2px}
 .vict.land .vring{opacity:0;transform:scale(.86);transition:opacity .5s ease,transform .7s cubic-bezier(.2,1.4,.4,1)}
 .vict.land.b1 .vring{opacity:1;transform:none}
 .vict.land .vsig{opacity:1!important;transform:none!important}
-.vict.land[data-land="street"] .vring::before{background:repeating-linear-gradient(45deg,#ff3d9a 0 10px,#0d0d0d 10px 20px);box-shadow:0 0 34px rgba(255,61,154,.55),6px 6px 0 #0d0d0d;transform:rotate(-2deg)}
+.vict.land[data-land="street"] .vring{padding:0;border-radius:5px}
+.vict.land[data-land="street"] .vring::before{display:none}
+.vict.land[data-land="street"] .vsig{width:min(300px,76vw);aspect-ratio:3/2;border:1px solid #8d765140;border-radius:5px;box-shadow:0 9px 24px #0007}
+.vict.land[data-land="street"] .vsig img{object-fit:contain}
 .vict.land[data-land="medieval"] .vring::before{border-radius:10px;background:radial-gradient(circle,#f0c060 0 2px,transparent 2.6px) 0 0/16px 16px,linear-gradient(135deg,#8a8f96,#3a3d42 40%,#b5bac0 60%,#4a4d52);box-shadow:inset 0 0 0 2px #1d1a17,0 0 30px rgba(232,116,42,.5)}
 .vict.land[data-land="greek"] .vring{border-radius:50%;padding:12px}
 .vict.land[data-land="greek"] .vring::before{border-radius:50%;background:radial-gradient(circle,transparent 63%,#e2c170 64% 67%,#1b3a6b 68% 70%,#e2c170 71% 74%,transparent 75%);box-shadow:0 0 40px rgba(226,193,112,.55)}
@@ -2390,14 +2393,17 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 @media (max-height:700px){.dr-meter small:last-child{display:none}.dr-pre small{display:none}.dr-chip{padding:4px 7px;font-size:12px}.dr-form{width:min(100%,184px)}.dr-cap{font-size:11px}.dr-top h2{font-size:24px}.dr-army{gap:2px}}
 </style>
 
+<style id="dock-crates">
+.dock-crate{position:absolute;inset:10%;pointer-events:none;z-index:1}.dock-crate svg{width:100%;height:100%;filter:drop-shadow(0 2px 1px #0008)}.sq:has(.dock-crate){outline:2px dashed #e2ad57;outline-offset:-3px}.sq:has(.dock-crate) .pc{position:relative;z-index:2}
+</style>
 <style id="crown-dice">
 /* Crown marks retain the standard one-to-six face positions. */
 .die .f u{width:13px;height:13px;border-radius:0;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=158">
-<link rel="stylesheet" href="ruler-style.css?v=158">
+<link rel="stylesheet" href="city-board.css?v=160">
+<link rel="stylesheet" href="ruler-style.css?v=160">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2455,8 +2461,8 @@ function pieceSVG(t, side, e){
   const me = side !== 'en';
   const el = eList(e);
   const mat = el.length ? MAT[['crystal','iron','gold','fire','thorn'].find(x => el.includes(x))] : null;
-  const fill = me ? CrownfallCharacter.palette().fill : mat ? mat.fill : 'var(--enf,#161616)';
-  const stroke = mat ? mat.stroke : me ? 'var(--mes,#111)' : 'var(--enemy,#ff3d9a)';
+  const fill = me ? CrownfallCharacter.palette().fill : mat ? mat.fill : '#30283e';
+  const stroke = mat ? mat.stroke : me ? '#6a512c' : '#17111f';
   let back = '', front = '';
   if(el.includes('fire')) back += '<g class="flame"><path d="M8 34 Q5 22 11 15 Q11 21 14 22 Q13 12 20 4 Q21 13 26 15 Q27 10 29 9 Q35 20 32 34 Z" fill="#ff5a1f" opacity=".9"/><path d="M12 34 Q10 26 14 21 Q15 25 17 25 Q17 17 21 12 Q23 19 26 21 Q30 27 28 34 Z" fill="#ffd23d"/></g>';
   if(el.includes('thorn')) back += '<g fill="#1f8a3a" stroke="#0b3a17" stroke-width="1" stroke-linejoin="round"><path d="M9 33 L3 30 L9 30Z"/><path d="M31 33 L37 30 L31 30Z"/><path d="M10 26 L4 22 L11 23Z"/><path d="M30 26 L36 22 L29 23Z"/><path d="M13 19 L9 13 L15 17Z"/><path d="M27 19 L31 13 L25 17Z"/></g>';
@@ -2699,7 +2705,7 @@ function relicIcon(r){
 const BOSSES = [
   {id:'clock', name:'The Blitz Master', desc:'Blitz: this round has a move limit.', moveLimit:{par:-2}},
   {id:'wall', name:'The Fortress', desc:'Enemy pawns are worth 0 Material.'},
-  {id:'thief', name:'The Stable Keeper', desc:'Your Knights cannot capture.'},
+  {id:'thief', name:'The Harbor Guard', desc:'Standard chess rules.'},
   {id:'march', name:'The Double Mover', desc:'Once per battle, this boss may make two moves before you can respond.'},
   {id:'tax', name:'The Collector', desc:'Every move that doesn\'t capture costs $1.'},
   {id:'crown', name:'The Grandmaster', desc:'The target score is 40% higher.'},
@@ -2911,11 +2917,11 @@ const RULERS = {
              crowns:{easy:'Spray-Paint Crown', medium:'Chrome Crown', hard:'Diamond Crown'}, gem:'#ff3d9a'},
   medieval: {name:'King Aldric the Iron-Handed', title:'Ruler of the Realm', rules:['wall','crown'], moveLimit:null, desc:'Enemy pawns are worth 0 Material, and the target is 40% higher.',
              crowns:{easy:'Iron Circlet', medium:'Silver Diadem', hard:'Golden Crown of Aldric'}, gem:'#c8322a'},
-  greek:    {name:'Athena, Queen of Olympus', short:'Athena', title:'Ruler of the Heavens', rules:['thief'], moveLimit:null, desc:'Your Knights can’t capture.',
+  greek:    {name:'Athena, Queen of Olympus', short:'Athena', title:'Ruler of the Heavens', rules:[], moveLimit:null, desc:'Outplay Athena’s army using standard chess moves.',
              crowns:{easy:'Olive Wreath', medium:'Laurel of Victory', hard:'Crown of Olympus'}, gem:'#3d7bff'},
   fantasy:  {name:'Morwen the Shadow Queen', title:'Ruler of the Enchanted Realm', rules:['shadow'], moveLimit:null, desc:'Shadow Step: once per battle, Morwen may move twice before you can respond. She cannot use it before her third turn.',
              crowns:{easy:'Moonstone Tiara', medium:'Starlight Circlet', hard:'Crown of Shadows'}, gem:'#b36bff'},
-  throne:   {name:'The Crownless King', title:'Ruler of the Fallen Throne', rules:['crown','tax','thief'], moveLimit:null, desc:'The target is 40% higher, every move that doesn’t capture costs $1, and your Knights can’t capture.',
+  throne:   {name:'The Crownless King', title:'Ruler of the Fallen Throne', rules:['crown','tax'], moveLimit:null, desc:'The target is 40% higher and every move that doesn’t capture costs $1.',
              crowns:{easy:'Shard Crown', medium:'Obsidian Crown', hard:'The Crown of Crowns'}, gem:'#e0263f'},
 };
 /* Animal land rulers; names and save identifiers retain their established identity. */
@@ -2924,8 +2930,8 @@ function rulerFace(l, cls){ const r = RULERS[l]; if(!r || !r.art) return '';
   if(!landOpen(l)) return `<span class="rface sealed ${cls || ''}" aria-label="Unknown ruler"></span>`; // never reveal a sealed land's ruler
   const st = [r.artTop ? `top:${r.artTop}` : '', r.artShift ? `transform:translateX(${r.artShift})` : ''].filter(Boolean).join(';');
   return `<span class="rface animal animal-${r.animal} ${cls || ''}"><img src="${r.art}" alt="${r.name}, humanoid ${r.species}"${st ? ` style="${st}"` : ''}></span>`; }
-const MINI_RULE = {downtown:'clock', rooftop:'crown', harbor:'thief', midnight:'tax'};
-const MINI_DESC = {clock:'Blitz: this round has a move limit.', crown:'The target score is 40% higher.', thief:'Your Knights cannot capture.', tax:'Every move that doesn’t capture costs $1.'};
+const MINI_RULE = {downtown:'clock', rooftop:'crown', harbor:null, midnight:'tax'};
+const MINI_DESC = {clock:'Blitz: this round has a move limit.', crown:'The target score is 40% higher.', tax:'Every move that doesn’t capture costs $1.'};
 const MINIS = {
   street:   {downtown:'Rush Hour Rex', rooftop:'Skyline Sal', harbor:'Dockmaster Dee', midnight:'Night Owl Nico'},
   medieval: {downtown:'Sir Swiftblade', rooftop:'Prince Garran the Red', harbor:'Bran Horse-Lord', midnight:'Master Corvin'},
@@ -3487,13 +3493,14 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 159;
+const GAME_VERSION = 160;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
 const bossId = () => RUN.blind === 2 ? bossAt(RUN.ante) : null;
 const miniName = () => ((MINIS[land()] || MINIS.street)[RUN.circuit]) || 'The Circuit Boss';
-const ruleOf = id => id === 'ruler' ? RULER().rules : id === 'mini' ? [MINI_RULE[RUN.circuit] || 'crown', ...(RUN.gauntlet && RUN.gExtra ? [RUN.gExtra] : [])] : id ? [id] : [];   // (v152: a late Gauntlet boss wave may add a second rule)
+// Ignore the retired rule in old Campaign and Gauntlet saves too.
+const ruleOf = id => (id === 'ruler' ? RULER().rules : id === 'mini' ? [MINI_RULE[RUN.circuit], ...(RUN.gauntlet && RUN.gExtra ? [RUN.gExtra] : [])] : id ? [id] : []).filter(r => r && r !== 'thief');   // (v152: a late Gauntlet boss wave may add a second rule)
 const RULE = x => ruleOf(bossId()).includes(x);
 // Legacy Double Mover bosses ('march'): no longer two moves every turn. Each keeps its identity as a
 // one-use double turn per battle, run by the same rules as Morwen's Shadow Step (1 charge, not before turn 3,
@@ -3504,7 +3511,7 @@ const marchDbl = () => (RUN && RUN.gauntlet ? ['Double Move', 'the enemy'] : MOD
 const dblRule = () => RULE('shadow') || RULE('march');                 // bosses with a one-use double turn
 const dblLabel = () => RULE('march') && !RULE('shadow') ? marchDbl()[0] : 'Shadow Step';
 const dblWho = () => RULE('march') && !RULE('shadow') ? marchDbl()[1].replace(/^the /, 'The ') : 'Morwen';
-function bossObj(id){ if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit] || 'crown'; return {id, name:miniName(), desc:MINI_DESC[rule], mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), name:bossName(id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } const boss=BOSSES.find(b => b.id === id); return boss?{...boss,name:bossName(id)}:boss; }
+function bossObj(id){ if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit]; return {id, name:miniName(), desc:MINI_DESC[rule] || 'Standard chess rules.', mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), name:bossName(id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } const boss=BOSSES.find(b => b.id === id); return boss?{...boss,name:bossName(id)}:boss; }
 /* ---------- score targets ----------
    A new army grows fast, so it plays the original curve (this is all of Crown City Easy on a fresh save).
    Once an army has been through a few circuits its Training is capped and its pieces are customised, so its
@@ -3771,7 +3778,6 @@ const CFAI = (() => {
       const v = s[t];
       if(v){ if((v & ME) === want) return false;                            // own piece
         if((v & 7) === K) return false;                                     // kings are never captured
-        if(me && ctx.thief && (s[f] & 7) === N) return false;               // boss rule: your Knights can't capture
         if(!me && (v & 96) && armorHolds(t)){ if(!capsOnly && (s[f] & 7) !== K) out.push(f | t << 6 | 4 << 12); return false; }   // an attack on Armor bounces (a move, never a capture); a King's is a root special (knockback)
         if(!me && (v & THN) && (s[f] & 7) === K) return false;              // a King never takes a Thorns piece
         out.push(f | t << 6 | 1 << 12); return false; }
@@ -4013,12 +4019,12 @@ const CFAI = (() => {
   }
 
   /* ---------- root: choose a move ----------
-     board: game board (array of {t, side, e, sh}); opts: {side:'en'|'me', rating, march, sub, thief, promoRow,
+     board: game board (array of {t, side, e, sh}); opts: {side:'en'|'me', rating, march, sub, promoRow,
      noCap, ref, seen(posKey) → bool, style, bias(from,to) → cp, rng} */
   function choose(board, opts){
     const E0 = profile(opts.rating), rng = opts.rng || Math.random;
     const s = fromGame(board), me = opts.side === 'me';
-    const ctx = {march: !!opts.march, thief: !!opts.thief, promoRow: opts.promoRow || 0, dm: !!opts.dm, spec:{}};
+    const ctx = {march: !!opts.march, promoRow: opts.promoRow || 0, dm: !!opts.dm, spec:{}};
     const E = {...E0, promoRow: ctx.promoRow, ref: Math.max(2000, opts.ref || 8000), passEn: 1, passMe: 1, ksEn: 1, ksMe: 1, ahead: 1, behindPress: 1, staleDraw: !me && gStaleDraw()};
     // advantage assessment from the chooser's side: real material on the board
     const mat = side => { let v = 0; for(let i = 0; i < 64; i++){ const x = s[i]; if(x && ((x & ME) !== 0) === side && (x & 7) !== K) v += VAL[x & 7]; } return v; };
@@ -4074,19 +4080,19 @@ const CFAI = (() => {
   // static evaluation of a game board from the enemy's side, in centipawns (for tests and assessment)
   function evalGame(board, rating, ref){ const E = {...profile(rating || 1700), promoRow:0, ref: ref || 8000, passEn:1, passMe:1, ksEn:1, ksMe:1, ahead:1, behindPress:1}; return evaluate(fromGame(board), E); }
   // does the side to move have a mate in one? (spawn safety)
-  function mateInOne(board, side, o){ const s = fromGame(board), me = side === 'me', ctx = {thief: !!(o && o.thief), promoRow: (o && o.promoRow) || 0};
+  function mateInOne(board, side, o){ const s = fromGame(board), me = side === 'me', ctx = {promoRow: (o && o.promoRow) || 0};
     return legal(s, me, ctx, false).some(m => { const ns = make(s, m); return inCheck(ns, !me) && !legal(ns, !me, ctx, false).length; }); }
   const keyOf = s => { let k = ''; for(let i = 0; i < 64; i++){ const x = s[i]; k += !x ? '.' : (x & ME) ? C2T[x & 7] : C2T[x & 7].toLowerCase(); } return k; };
   const material = board => board.reduce((a, p) => a + (p && p.t !== 'K' ? VAL[T2C[p.t]] : 0), 0);
   // game-board helpers for tests and simulations
-  function legalGame(board, side, o){ const s = fromGame(board), ctx = {thief: !!(o && o.thief), promoRow: (o && o.promoRow) || 0};
+  function legalGame(board, side, o){ const s = fromGame(board), ctx = {promoRow: (o && o.promoRow) || 0};
     return legal(s, side === 'me', ctx, false).map(m => [m & 63, (m >> 6) & 63]); }
   function checkGame(board, side){ return inCheck(fromGame(board), side === 'me'); }
-  function armorAfter(board, f, t, o){ const s = fromGame(board), me = board[f] && board[f].side === 'me', ctx = {thief: !!(o && o.thief), promoRow: (o && o.promoRow) || 0};
+  function armorAfter(board, f, t, o){ const s = fromGame(board), me = board[f] && board[f].side === 'me', ctx = {promoRow: (o && o.promoRow) || 0};
     const m = legal(s, me, ctx, false).find(m => (m & 63) === f && ((m >> 6) & 63) === t); if(m == null) return null;
     const ns = make(s, m), out = {}; for(let i = 0; i < 64; i++) if(ns[i] & ME && (ns[i] & 7) !== K) out[i] = (ns[i] >> 5) & 3; return out; }
   // the in-place search path (make / unmake), for the same move: layers after, and the board restored after undo
-  function armorAfterSearch(board, f, t){ const s = fromGame(board), me = board[f] && board[f].side === 'me', ctx = {march:false, thief:false, promoRow:0, spec:{}};
+  function armorAfterSearch(board, f, t){ const s = fromGame(board), me = board[f] && board[f].side === 'me', ctx = {march:false, promoRow:0, spec:{}};
     const m = legal(s, me, ctx, false).find(m => (m & 63) === f && ((m >> 6) & 63) === t); if(m == null) return null;
     const E = {...profile(1000), promoRow:0, ref:8000, passEn:1, passMe:1, ksEn:1, ksMe:1, ahead:1, behindPress:1};
     const before = s.join(','), S = searcher(ctx, E, s); S.mk(m, 0); const out = {}; for(let i = 0; i < 64; i++) if(s[i] & ME && (s[i] & 7) !== K) out[i] = (s[i] >> 5) & 3;
@@ -4458,7 +4464,7 @@ function armyOK(b, expect, formation){
   if(en.some(i => b[i].t !== 'P' && b[i].t !== 'K' && (!formation || b[i].t === 'N') && !movesFor(b, i).length)) return false;   // no buried pieces (a full formation's back rank may wait)
   { const mine = new Set(attacksOn(b, 'me')), theirs = new Set(attacksOn(b, 'en'));
     if(en.some(i => mine.has(i) && ('QR'.includes(b[i].t) || (!theirs.has(i) && !(formation === 'pawns' && b[i].t === 'P'))))) return false; }   // no enemy Queen/Rook, and nothing undefended, hangs at the start (a pawn mass may leave a loose pawn)
-  if(CFAI.mateInOne(b, 'me', {thief:RULE('thief'), promoRow:RUN && has('promo') ? 2 : 0})) return false;   // no mate in one waiting for you
+  if(CFAI.mateInOne(b, 'me', {promoRow:RUN && has('promo') ? 2 : 0})) return false;   // no mate in one waiting for you
   if(CFAI.mateInOne(b, 'en', {})) return false;                                      // v156: nor one waiting for the enemy
   if(en.some(i => b[i].t === 'P' && b[i + 8] && b[i + 8].side === 'en' && !(formation && b[i + 8].t === 'P'))) return false;   // no pawn blocked by its own army
   if(openGateOn() && ((window.__gateForce && !openGate.fixing) || openingMate(startArmor(b)))){ openGate.rejects++; openGate.last = true; return false; }   // Fallen Throne: no free mate once the opening is finished (v119)
@@ -4488,7 +4494,7 @@ function openingMate(b){
     B.board = b; crInit(); const cr = B.cr;                                   // castling rights exactly as this fight will start
     for(let i = 0; i < 64; i++){ const q = b[i]; if(!q || q.side !== 'me') continue;
       B.board = b; B.cr = cr; B.ep = [];
-      let ms = legalFor(b, i); if(RULE('thief') && q.t === 'N') ms = ms.filter(x => !b[x]);
+      let ms = legalFor(b, i);
       for(const t of ms){ const v = b[t]; if(v && v.side === 'en' && armorHolds(b, t)) continue;   // an Armor bounce moves nothing
         for(const pt of (isPromo(b, i, t) ? PROMO_TYPES : [undefined])){
           const nb = applyMove(b, i, t, pt);
@@ -4696,8 +4702,7 @@ function legalFor(b, i){ const p = b[i]; if(!p) return [];
       const nb = b.slice(); nb[t] = {...v, sh:v.sh - 1}; return !inCheck(nb, p.side); }   // any other attacker stays put: legal only if that leaves its King safe
     return !(v && v.t === 'K') && !inCheck(applyMove(b, i, t), p.side); }); }
 function anyLegal(b, side){ for(let i=0;i<64;i++){ const p = b[i]; if(p && p.side === side && legalFor(b, i).length) return true; } return false; }
-// Can the player act under the game's own rules (not just chess)? e.g. when only Knights could answer a check
-// but the boss rule says Knights can't capture. A swap that frees a move counts as a way out.
+// A legal move or a swap that frees a move counts as a way out.
 function canPlay(){
   const any = () => B.board.some((p, i) => p && p.side === 'me' && legalMoves(i).length);
   if(any()) return true;
@@ -4712,7 +4717,6 @@ function canPlay(){
 function legalMoves(i){
   const p = B.board[i]; if(!p || p.side !== 'me') return [];
   let m = legalFor(B.board, i);
-  if(RULE('thief') && p.t === 'N') m = m.filter(x => !B.board[x]);
   return m;
 }
 
@@ -4722,7 +4726,7 @@ function legalMoves(i){
 const PERSONA = {
   'Rush Hour Rex': {style:'aggressive', intro:'Clock’s ticking, rookie. You’re already late.', capture:['Too slow!','Beep beep. Out of my lane.'], hurt:['Lucky break. Won’t happen twice.','Hey! That was my ride!'], check:'Ever been stuck in traffic? Now you are.', lose:'Red light... I never stop at red lights...', win:'Rush hour always wins.'},
   'Skyline Sal': {style:'hunter', intro:'Up here, only one king stands. Guess which.', capture:['Long way down, huh?','Clearing the roof.'], hurt:['You climb pretty good for a ground kid.','Watch your step up here.'], check:'Nowhere to run on a rooftop.', lose:'Guess the view’s all yours now...', win:'King of the skyline. Still.'},
-  'Dockmaster Dee': {style:'tricky', intro:'Every crate on this dock is a trap. Pick one.', capture:['Hooked ya.','Another one for the cargo hold.'], hurt:['Rough seas, that’s all.','Knew I should’ve tied that down.'], check:'Your king’s taking on water.', lose:'Ship’s sunk... take the dock.', win:'Tide’s out. So are you.'},
+  'Dockmaster Dee': {style:'tricky', intro:'Control the open files, and you control the docks.', capture:['Hooked ya.','Another one for the cargo hold.'], hurt:['Rough seas, that’s all.','Knew I should’ve tied that down.'], check:'Your king’s taking on water.', lose:'Ship’s sunk... take the dock.', win:'Tide’s out. So are you.'},
   'Night Owl Nico': {style:'greedy', intro:'Everything’s got a price after midnight. Yours is everything.', capture:['Sold!','I’ll take that. Thanks.'], hurt:['You break it, you bought it.','That one was on sale anyway.'], check:'Pay up or pack up.', lose:'Market’s closed... for me.', win:'Pleasure doing business.'},
   'Kingpin Vex': {style:'aggressive', intro:'You made it through my whole city? Cute. Now kneel to Kingpin Vex.', capture:['This is my city.','Nobody takes from Vex.'], hurt:['You’ll pay for that. Everybody pays.','Big mistake, kid.'], check:'Look around. Every corner is mine.', lose:'The crown... it’s yours. For now.', win:'Crown City has one king. Me.'},
 
@@ -4753,13 +4757,13 @@ const PERSONA = {
 const SIMPLE_TALK = {
   "Speedy Rico": {intro:"You only get so many moves. Better make them count.", capture:["Gone in a flash!"], hurt:["Whoa, slow down!"], check:"Gone in a flash!", lose:"Outpaced... for once.", win:"Too slow, too bad."},
   "Brickwall Benny": {intro:"Your little pawns ain’t worth nothin’ against my wall.", capture:["Bricked!"], hurt:["Hey, that’s load-bearing!"], check:"Bricked!", lose:"The wall... came down.", win:"Nobody gets through Benny."},
-  "Joyride Jimmy": {intro:"I boosted your horses. Good luck without ’em.", capture:["Vroom! Took that one for a spin."], hurt:["Scratched my paint job!"], check:"Vroom! Took that one for a spin.", lose:"Crashed and burned...", win:"Joyride’s over. For you."},
+  "Joyride Jimmy": {intro:"Keep up. I know every shortcut on this board.", capture:["Vroom! Took that one for a spin."], hurt:["Scratched my paint job!"], check:"Vroom! Took that one for a spin.", lose:"Crashed and burned...", win:"Joyride’s over. For you."},
   "Double Dutch Dana": {intro:"Keep your rhythm. I only need one opening to move twice.", capture:["Double time!"], hurt:["Tripped me up..."], check:"Double time!", lose:"Missed a beat...", win:"Couldn’t keep the rhythm, huh?"},
   "Landlord Lou": {intro:"Every move costs rent, pal. Pay up.", capture:["Evicted!"], hurt:["That’s coming out of your deposit."], check:"Evicted!", lose:"Fine... keep the apartment.", win:"Rent’s due. Forever."},
   "Big Boss Mack": {intro:"You wanna make it to the top? Go through Big Boss Mack.", capture:["That’s how the boss does it."], hurt:["Nobody touches the boss!"], check:"That’s how the boss does it.", lose:"Guess you’re the boss now...", win:"Mack stays on top."},
   "The Hourglass Knight": {intro:"The sands run thin for you, squire.", capture:["Your time is up."], hurt:["A crack in the glass!"], check:"Your time is up.", lose:"My sands... have run out.", win:"Time bows to no one."},
   "The Iron Baron": {intro:"Your peasants mean nothing in my lands.", capture:["Crushed under iron."], hurt:["You dent my armor?!"], check:"Crushed under iron.", lose:"The baron... yields.", win:"Iron rules the Baron’s lands."},
-  "The Horse Thief": {intro:"I took your horses in the night. Heh heh.", capture:["Snatched!"], hurt:["Oi! Hands off!"], check:"Snatched!", lose:"Caught red-handed...", win:"Another stable emptied."},
+  "The Horse Thief": {intro:"Leave one piece unguarded and I’ll find it.", capture:["Snatched!"], hurt:["Oi! Hands off!"], check:"Snatched!", lose:"Caught red-handed...", win:"Another stable emptied."},
   "The Twin Knights": {intro:"Two blades. One opening. That’s all we need.", capture:["Strike and strike again!"], hurt:["Brother, help!"], check:"Strike and strike again!", lose:"Both of us... bested.", win:"Two always beat one."},
   "The Tax Lord": {intro:"Every idle step owes the crown a coin.", capture:["Collected."], hurt:["Tax evasion! Guards!"], check:"Collected.", lose:"The ledger is closed...", win:"Your debts are paid in full."},
   "The High King": {intro:"Before the Throne, you face the High King.", capture:["Kneel before your king."], hurt:["You strike a king?!"], check:"Kneel before your king.", lose:"A king... dethroned.", win:"Long live the High King."},
@@ -4810,6 +4814,7 @@ function repLine(pp){
 }
 // lines that change with the story so far
 function storyLines(o){
+  if(o.name === 'Dockmaster Dee' && B && B.crates?.length) o.intro = 'Watch the marked crates. Land on one and the trap costs you up to $2.';
   const n = worldCrowns();
   if(o.name === 'Athena, Queen of Olympus' && n >= 2){ o.intro = `${n} crowns. You think you are collecting them. Ask yourself who arranged the board.`; o.lose = 'Keep collecting them, Crownrunner. See what answers you awaken.'; }
   if(o.ruler && o.name !== 'The Crownless King' && n === WORLD_TOTAL - 1 && !landWon(land())){
@@ -5540,7 +5545,8 @@ function bossChips(id){
     if(r === 'clock'){ if(lim) out.push(`Blitz · ${lim} moves`); }
     else if(r === 'march') out.push(`${marchDbl()[0]} · 1`);
     else if(r === 'shadow') out.push('Shadow Step · 1');
-    else out.push({wall:'Pawns worth 0', thief:'No Knight captures', tax:'$1 per quiet move', crown:'Target +40%'}[r] || r); }
+    else out.push({wall:'Pawns worth 0', tax:'$1 per quiet move', crown:'Target +40%'}[r] || r); }
+  if(id === 'mini' && RUN && !RUN.gauntlet && RUN.land === 'street' && RUN.circuit === 'harbor' && (!B || B.crates?.length)) out.push('Crate traps · up to $2');
   if(lim && !ruleOf(id).includes('clock')) out.unshift(`Blitz · ${lim} moves`);
   return out;
 }
@@ -5746,6 +5752,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   evStartFight();   // v139: next-fight event effects (once)
   B.roll = window.__noRoll ? {state:'done', first:'me', me:6, en:1, ties:[]} : {state:'pending'};   // Initiative Roll: who moves first (once per fight)   // Crown Command: full every fight
   B.trapSq = []; B.trapsLeft = has('trap') ? 1 : 0;
+  B.crates = dockCrates(B.board);
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
   if(has('aegis')){ const bi = aegisIdx(B.board); if(bi >= 0) B.board[bi].sh = Math.max(B.board[bi].sh || 0, 2); }   // (the same piece the Fallen Throne opening check armed)
   if(!MATCH && RUN.evFx && RUN.evFx.armor){ const ei = evArmorIdx(B.board, RUN.evFx.armor); if(ei >= 0) B.board[ei].sh = Math.max(B.board[ei].sh || 0, 1); delete RUN.evFx.armor; }   // v139 event Armor: next fight only, no stacking
@@ -6066,7 +6073,7 @@ const G_SIGS = ['pawnWave', 'knightPack', 'knightRush', 'rookFortress', 'nightRa
 const G_TIERS = [{id:'pit', name:'The Fighting Pit', tok:10}, {id:'grand', name:'The Grand Arena', tok:12}, {id:'eternal', name:'The Eternal Arena', tok:14}];
 const G_BOSS_TOK = 8, G_MATE_TOK = 3;                 // Arena Tokens: a cleared wave pays its tier's reward (+8 boss wave, +3 checkmate)
 const G_MOVE_CARDS = ['hustler', 'blitzer'];   // v153: move-limited Challenges never appear in The Gauntlet (it has no move limits)
-const G_RULE_TAG = {wall:'Iron Wall', thief:'Stable Lock', march:'Double Movers', tax:'Toll Collectors', crown:'High Stakes'};
+const G_RULE_TAG = {wall:'Iron Wall', march:'Double Movers', tax:'Toll Collectors', crown:'High Stakes'};
 const gWave = () => (RUN && RUN.gWave) || 1;
 const gBossWave = w => w % 5 === 0;
 const gTier = w => w >= 26 ? G_TIERS[2] : w >= 11 ? G_TIERS[1] : G_TIERS[0];
@@ -6210,7 +6217,7 @@ function gPrepWave(){
   RUN.land = L; RUN.circuit = c; RUN.tier = tierFor(c); RUN.blind = 2; RUN.ante = boss ? 4 : 1 + Math.floor(Math.random() * 3);
   RUN.bosses = [pick(rules), pick(rules), pick(rules), 'mini'];
   RUN.gExtra = null;                                                            // v152: from wave 45 boss waves may combine two rules (always from 70)
-  if(boss && w >= 45 && Math.random() < Math.min(1, (w - 40) / 30)){ const mr = MINI_RULE[c] || 'crown'; RUN.gExtra = pick(['wall', 'thief', 'tax', 'march'].filter(x => x !== mr)); }
+  if(boss && w >= 45 && Math.random() < Math.min(1, (w - 40) / 30)){ const mr = MINI_RULE[c] || 'crown'; RUN.gExtra = pick(['wall', 'tax', 'march'].filter(x => x !== mr)); }
   RUN.gWaveSet = w; RUN.fightTarget = null; RUN.inShop = false; RUN.shop = null; RUN.gEntry = null; delete RUN.gRetry;
   setPack(L); save();
 }
@@ -6708,6 +6715,7 @@ function drawBoard(){
     if(p && p.t === 'K' && inCheck(B.board, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(B.board, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
+    if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: landing here costs up to $2" title="Crate trap · up to $2"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
     if(B.trapSq && B.trapSq.includes(i)) inner += '<span class="trapmk"></span>';
     if(trapMode && (!p || p.side === 'me') && !(B.trapSq || []).includes(i)) inner += '<span class="ring trapring"></span>';
     if(p && (eList(p.e).length > 1 || eList(p.e).some(x => !MAT[x]))) inner += `<span class="edots">${eList(p.e).map(x => `<i style="background:${ENCH[x].col}"></i>`).join('')}</span>`;
@@ -6721,7 +6729,7 @@ function drawBoard(){
     }
     if(advT.includes(i)) inner += p ? '<span class="ring"></span>' : '<span class="dot"></span>';
     if(c === 0) inner += `<span class="coord">${8-r}</span>`;
-    h += `<div class="${cls.join(' ')}" data-i="${i}">${inner}</div>`;
+    h += `<div class="${cls.join(' ')}" data-i="${i}"${(B.crates || []).includes(i) ? ' aria-label="Crate trap on '+sqName(i)+': landing costs up to $2"' : ''}>${inner}</div>`;
   }
   el.innerHTML = h;
   el.querySelectorAll('.sq').forEach(s => s.onclick = () => tapSquare(+s.dataset.i));
@@ -7069,6 +7077,21 @@ async function resumePromo(){
   if(pp.kind === 'strike') B.cmdMove = 'strike';
   return doMove(pp.from, pp.to, t);
 }
+// Dock crates are visible one-use hazards, saved with the battle. Legacy battles
+// get no retroactive hazards; Kings and all other pieces keep their normal moves.
+function dockCrates(board){
+  if(MATCH || !RUN || RUN.gauntlet || RUN.land !== 'street' || RUN.circuit !== 'harbor' || bossId() !== 'mini') return [];
+  return [18,21,34,37].filter(i => !board[i]).slice(0,3);
+}
+function springDockCrate(at){
+  if(!B || !B.board[at] || B.board[at].side !== 'me' || !(B.crates || []).includes(at)) return false;
+  B.crates = B.crates.filter(i => i !== at);
+  const cost = Math.min(2,Math.max(0,RUN.money)); RUN.money -= cost;
+  pop(at,cost ? `Crate trap! −$${cost}` : 'Crate trap sprung','fxm'); sfx.ambush();
+  logPos(`Crate trap on ${sqName(at)}: lost $${cost}. The crate is cleared.`,at,at,'fx');
+  showTip(`<b>Crate trap sprung</b><br>${cost ? `You lost $${cost}.` : 'You had no cash to lose.'} Your piece stays on the board. This crate is now cleared.`);
+  return true;
+}
 async function doMove(from, to, pt){
   if(!pt && isPromo(B.board, from, to)){ busy = true; pt = await askPromo(from, to, B.cmdMove === 'strike' ? 'strike' : 'move'); }
   busy = true; sel = null;
@@ -7133,6 +7156,7 @@ async function doMove(from, to, pt){
     if(RULE('tax')){ RUN.money = Math.max(0, RUN.money - 1); pop(to, '-$1', 'fxm'); }
     $('#hand').textContent = 'Quiet move';
   }
+  springDockCrate(to);
   chalAfterMove(mover, victim);
   updateHud();
   if(enemyMated()){ save(); busy = false; return checkmateWin(); }      // v156: saved first, so a refresh comes back to the mate
@@ -7174,7 +7198,7 @@ function tacResolve(){
 }
 function scoutThreat(){
   const rating = (B.ai && B.ai.rating) || aiRating();
-  const o = {side:'en', rating, march:false, sub:0, extra:specialMoves('en'), thief:RULE('thief'), promoRow:has('promo') ? 2 : 0, noCap:B.noCap > 0, ref:B.aiRef || CFAI.material(B.board), style:aiStyle(), sig:B.ai && B.ai.sig, dm:doubleMarch(), rng:() => 0.5};
+  const o = {side:'en', rating, march:false, sub:0, extra:specialMoves('en'), promoRow:has('promo') ? 2 : 0, noCap:B.noCap > 0, ref:B.aiRef || CFAI.material(B.board), style:aiStyle(), sig:B.ai && B.ai.sig, dm:doubleMarch(), rng:() => 0.5};
   let r, dbl = false;
   if(dblRule() && shadowReady()){ const d = shadowDecide(o); r = d.r; dbl = d.use; window.__shadow && window.__shadow.pop(); }
   else r = CFAI.choose(B.board, o);
@@ -7442,7 +7466,7 @@ function promoPick(from, to, side, board){
   for(const t of PROMO_TYPES){
     const nb = applyMove(B0, from, to, t); let v;
     if(!anyLegal(nb, opp)) v = inCheck(nb, opp) ? 1e7 : 5e6;
-    else { let r = null; try{ r = CFAI.choose(nb, {side:opp, rating:1300, rng:() => 0.5, thief:RULE('thief'), promoRow:has('promo') ? 2 : 0, ref:B.aiRef || CFAI.material(nb)}); }catch(e){}
+    else { let r = null; try{ r = CFAI.choose(nb, {side:opp, rating:1300, rng:() => 0.5, promoRow:has('promo') ? 2 : 0, ref:B.aiRef || CFAI.material(nb)}); }catch(e){}
       v = r ? -r.score * (opp === 'me' ? 1 : 1) : 0; }
     (window.__promo = window.__promo || []).push({side, t, v:Math.round(v)});
     if(!best || v > best.v) best = {t, v}; }
@@ -7456,7 +7480,7 @@ function wisdomMove(){
   if(!legal.length) return null;
   for(const [f, t] of legal) for(const pt of isPromo(B.board, f, t) ? PROMO_TYPES : [undefined]){ const nb = applyMove(B.board, f, t, pt); if(inCheck(nb, 'en') && !anyLegal(nb, 'en')) return {from:f, to:t, mate:true, pt}; }
   let r = null;
-  try{ r = CFAI.choose(B.board, {side:'me', rating:AI_MAX, extra:specialMoves('me'), thief:RULE('thief'), promoRow:has('promo') ? 2 : 0, ref:B.aiRef || CFAI.material(B.board), rng:() => 0.5}); }catch(e){ r = null; }
+  try{ r = CFAI.choose(B.board, {side:'me', rating:AI_MAX, extra:specialMoves('me'), promoRow:has('promo') ? 2 : 0, ref:B.aiRef || CFAI.material(B.board), rng:() => 0.5}); }catch(e){ r = null; }
   if(r && legal.some(([f, t]) => f === r.from && t === r.to)) return {from:r.from, to:r.to, pt:isPromo(B.board, r.from, r.to) ? promoPick(r.from, r.to, 'me') : undefined};
   // fallback: the safest best-scoring capture, else the first legal move
   let best = null; for(const [f, t] of legal){ const s = scoreCapture(f, t), nb = applyMove(B.board, f, t), risk = attacksOn(nb, 'en').includes(t) ? TYPE[B.board[f].t].val : 0, v = (s ? s.total : 0) - risk; if(!best || v > best.v) best = {from:f, to:t, v}; }
@@ -7665,7 +7689,6 @@ function bestReply(nb){
   let best = 0;
   const enAtt = new Set(attacksOn(nb, 'en'));
   for(let i=0;i<64;i++){ const p = nb[i]; if(!p || p.side !== 'me') continue;
-    if(RULE('thief') && p.t === 'N') continue;
     for(const t of movesFor(nb, i, true)){ const v = nb[t]; if(!v || v.t === 'K') continue;
       let gain = pv(v.t);
       if(enAtt.has(t)){ const after = applyMove(nb, i, t); if(attacksOn(after, 'en').includes(t)) gain -= pv(p.t) * (hasE(p,'thorn') ? 0.4 : 0.9); }
@@ -7768,7 +7791,7 @@ function enemyPlan(sub){
     best = worst; setTimeout(() => { const at = best.to; pop(at, 'Blunder!', 'fxx'); }, 50);
   } else if(cands.length){
     const rating = (B.ai && B.ai.rating) || aiRating();
-    const o = {side:'en', rating, march:false, sub, thief:RULE('thief'), promoRow:has('promo') ? 2 : 0, extra:specialMoves('en'),
+    const o = {side:'en', rating, march:false, sub, promoRow:has('promo') ? 2 : 0, extra:specialMoves('en'),
       noCap:B.noCap > 0, ref:B.aiRef || CFAI.material(B.board), seen:k => !!(B.seenEn && B.seenEn[k]), style:aiStyle(), sig:B.ai && B.ai.sig, dm:doubleMarch()};
     let r;
     if(dblRule() && sub === 1) r = CFAI.choose(B.board, {...o, exclude:B.shadowFirst});        // Shadow Step: a different piece
@@ -8095,8 +8118,8 @@ function chalStart(id){
   if(RUN && RUN.gauntlet && G_MOVE_CARDS.includes(id)){ showTip('<b>No move limits in The Gauntlet</b><br>This Challenge can’t be played here. The card stays in your hand.'); return false; }
   if(chalOn() && B.challenge.circuit && !B.challenge.used && !B.challenge.wg) B.challenge = null;   // (v141: a wager's chosen Challenge stays)   // v134: a Challenge card replaces an untouched free Circuit Challenge
   if(chalOn()){ showTip('<b>Challenge already active</b><br>Finish or fail your current challenge first.'); sfx.bad(); return false; }
-  if(id === 'recruiter' && (RULE('thief') || !B.board.some(q => q && q.side === 'me' && q.t === 'N'))){
-    showTip(`<b>Need a Knight</b><br>${RULE('thief') ? 'Your Knights can’t capture this round.' : 'You need a Knight on the board to take this challenge.'} The card stays in your hand.`); sfx.bad(); return false; }
+  if(id === 'recruiter' && !B.board.some(q => q && q.side === 'me' && q.t === 'N')){
+    showTip(`<b>Need a Knight</b><br>You need a Knight on the board to take this challenge. The card stays in your hand.`); sfx.bad(); return false; }
   B.challenge = {id, used:0, caps:0, kcaps:0}; save();
   chalToast(`${C(id).name}`, CHALLENGES[id].goal + ' · ' + CHALLENGES[id].reward, 'go');
   return true;
@@ -8957,7 +8980,7 @@ const EV_TXT = {
   recruit:[['Crew for Hire','Two locals want in on your crew.'], ['Mercenary Camp','Sellswords at the roadside offer their service.'], ['Hoplite Volunteers','Volunteers from the city offer to march with you.'], ['Lost Soldiers','Two lost soldiers from another realm ask to join you.'], ['Ashen Deserters','Deserters from the throne’s army ask for a new banner.']],
 };
 const EV_ECHO = {   // v143: the five Crown Echoes carry the Crownrunner mystery (Continue only, no reward)
-  street:  ['Graffiti Crown',['Under layers of paint, a crown is scratched into the wall.','It was here before the graffiti.','Someone crossed this city carrying the same mark.']],
+  street:  ['The City’s Challenge',['A spray-painted crown marks the wall beside the market.','Beneath it: “Beat Vex. Claim Crown City.”','The challenge is clear. Finish the circuits, then face Kingpin Vex.']],
   medieval:['The Old Banner',['The banner lists the challengers who crossed the King’s Road.','The oldest names have been worn away.','Beside each one is the same crown-shaped mark.']],
   greek:   ['The Oracle’s Silence',['The Oracle studies your Crowns for a long time.','“Ask me how to win, and I will answer.”','“Ask me what happens after, and I will not.”']],
   fantasy: ['Crown Resonance',['Your Crowns begin to pulse together.','For a moment you see a road you have never walked. Four figures are ahead of you.','You blink. The road is gone.']],
