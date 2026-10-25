@@ -45,3 +45,9 @@ A tentative move now appears directly on the board. The existing info row provid
 Validation includes real-handler checks for tentative rendering, explicit confirmation, cancellation, stale positions and the quick-move preference.
 
 Browser layout checks at 320×568, 390×844, 430×932 and 768×1024 verify unchanged board dimensions and position, no horizontal overflow, and fully visible 44px confirm/cancel buttons.
+
+## v165 — stable piece information and bottom controls
+
+Idle, player-piece, enemy-piece, King and confirmation views now share a fixed 58px info row. Names, scoring and enhancement badges fit within three compact lines, and the Command button remains fully visible. Selection no longer takes space from the board. Bottom actions retain their height, with room for their shadows above the screen edge.
+
+Browser checks cover every piece type on both sides, with and without multiple enhancements, at 320×568, 390×844, 430×932 and 768×1024. They verify unchanged board dimensions/position, vertically contained piece details, bottom controls and working confirm/cancel.

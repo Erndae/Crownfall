@@ -1,6 +1,19 @@
 /* Reuse the existing HUD and piece-info space so the board stays full width. */
 .pbar.goal-button{display:block;width:100%;padding:0;text-align:right;cursor:pointer;color:var(--text);font:inherit;min-height:22px}
 .pbar.goal-button .ptgt{font-size:11px;letter-spacing:.02em;padding-inline:5px;white-space:nowrap}
+/* Every piece-info state shares one reserved row; selection cannot resize the board. */
+.play .pinfo{height:58px!important;min-height:58px!important;max-height:58px!important;flex:0 0 58px;box-sizing:border-box;padding:4px 8px!important;animation:none}
+.play .pinfo .pi,.play .pinfo .pi svg{width:38px;height:38px}
+.play .pinfo .pt{flex:1;min-width:0;gap:0;overflow:hidden;justify-content:center}
+.play .pinfo .pt > b{font-size:13px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.play .pinfo .pt > span{font-size:11px;line-height:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.play .pinfo .pt > .ab{display:block!important;-webkit-line-clamp:unset;font-size:10.5px;line-height:14px}
+.play .pinfo .pt > .pws{display:flex!important;align-items:center;min-height:14px}
+.play .pinfo .pw{padding:0 3px;border-width:1px;font-size:10px!important;line-height:12px}
+.play .pinfo.idle > .muted{font-size:11px;line-height:14px}
+.play .pinfo .cmdbtn{height:44px;min-height:44px;max-height:44px;box-sizing:border-box}
+.play .actions{flex:none;min-height:44px}
+.play{padding-bottom:10px!important}
 /* Fixed to the idle info row: confirmation never borrows height from the board. */
 .pinfo.move-preview{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;gap:8px;align-items:center;height:var(--confirm-height,58px)!important;min-height:var(--confirm-height,58px)!important;max-height:var(--confirm-height,58px)!important;padding:1px 10px!important;box-sizing:border-box;animation:none}
 .move-preview .preview-copy{min-width:0;overflow:hidden;font:12px/1.3 var(--body);color:var(--text)}
