@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="piece-designs.js?v=162"></script>
-<script src="character-style.js?v=162"></script>
-<script src="campaign-opponents.js?v=162"></script>
-<script src="campaign-dialogue.js?v=162"></script>
-<link rel="stylesheet" href="character-style.css?v=162">
+<script src="gameplay-polish.js?v=163"></script>
+<script src="piece-designs.js?v=163"></script>
+<script src="character-style.js?v=163"></script>
+<script src="campaign-opponents.js?v=163"></script>
+<script src="campaign-dialogue.js?v=163"></script>
+<link rel="stylesheet" href="character-style.css?v=163">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,8 +2403,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=162">
-<link rel="stylesheet" href="ruler-style.css?v=162">
+<link rel="stylesheet" href="city-board.css?v=163">
+<link rel="stylesheet" href="ruler-style.css?v=163">
+<link rel="stylesheet" href="gameplay-polish.css?v=163">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3494,7 +3496,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 162;
+const GAME_VERSION = 163;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4230,6 +4232,10 @@ function enemyProfile(){
   const style = persona.style || (Math.random() < 0.6 ? ENEMY_ARMY.landStyle[l] : pick(['aggressive','defensive','hunter','tricky','greedy']));
   const P = {land:l, tier, boss, id, ruler:id === 'ruler', n, power, q, style};
   P.sig = bossSignature(P);
+  if(!MATCH && !RUN.gauntlet && boss && !P.ruler){
+    const plan=campaignBossPlan(RUN);
+    if(plan?.signature && ARCHE[sigBase(plan.signature)]){P.sig=plan.signature;P.style=plan.style;}
+  }
   if(RUN.gauntlet && !P.sig && !P.ruler){ const w = gWave(); if(w >= 8 && Math.random() < (w > 41 ? Math.min(0.65, 0.45 + 0.01 * (w - 41)) : Math.min(0.45, 0.04 * (w - 6)))) P.sig = pick(G_SIGS.filter(a => w >= 12 || a !== 'twinQueens')); }   // v151: the Gauntlet's surprise armies
   if(!P.sig && !P.ruler) cpApplyProfile(P);   // v134 Circuit gameplay identity
   return P;
@@ -4815,7 +4821,7 @@ function repLine(pp){
 }
 // lines that change with the story so far
 function storyLines(o){
-  if(o.name === 'Dockmaster Dee' && B && B.crates?.length) o.intro = 'Watch the marked crates. Land on one and the trap costs you up to $2.';
+  if(o.name === 'Dockmaster Dee' && B && B.crates?.length) o.intro = 'The marked crates are rigged. You lose up to $2; lure my pieces onto them to recover $2.';
   const n = worldCrowns();
   if(o.name === 'Athena, Queen of Olympus' && n >= 2){ o.intro = `${n} crowns. You think you are collecting them. Ask yourself who arranged the board.`; o.lose = 'Keep collecting them, Crownrunner. See what answers you awaken.'; }
   if(o.ruler && o.name !== 'The Crownless King' && n === WORLD_TOTAL - 1 && !landWon(land())){
@@ -4849,7 +4855,7 @@ function storyLines(o){
 const STYLE_TXT = {aggressive:'Aggressive: charges in and trades pieces', hunter:'King hunter: goes straight for your King', tricky:'Tricky: sets up forks and double attacks', greedy:'Greedy: grabs anything worth money', defensive:'Defensive: protects its pieces and waits for mistakes'};
 function curPersona(){ if(!RUN || !B || RUN.blind !== 2) return null; const id = bossId(); if(!id) return null; return personaOf(id); }
 function personaOf(id){ const n = bossName(id);
-  if(n && n!==bossRuleName(id)){const plan=campaignBossPlan(RUN);return storyLines({name:n,style:plan?.style||(PERSONA[bossRuleName(id)]||{}).style,...campaignBossVoice(plan)});}
+  if(n && n!==bossRuleName(id)){const planned=campaignBossPlan(RUN),plan=B?.ai&&app.classList.contains('play')?{...planned,signature:B.ai.sig,style:B.ai.style}:planned;return storyLines({name:n,style:plan?.style||(PERSONA[bossRuleName(id)]||{}).style,...campaignBossVoice(plan)});}
   if(PERSONA[n]) return storyLines({name:n, ...PERSONA[n], ruler:id === 'ruler'}); if(SIMPLE_TALK[n]) return storyLines({name:n, ...SIMPLE_TALK[n], simple:true}); return null; }
 function portrait(pp){
   if(pp.ruler) return rulerFace(land(), 'talk') || `<span class="spk-face ruler">${crownSVG(land(), 'hard', true)}</span>`;
@@ -5053,6 +5059,7 @@ function matchResultShow(){
     <div class="kv"><span>${r.win ? 'Victory' : 'Result'}</span><b>${r.win ? r.how : (MATCH_HOW[r.how] || r.how)}</b></div>
     <button class="btn" id="mre">Rematch</button><button class="btn ghost" id="mdif">Change difficulty</button><button class="btn ghost" id="mpeek">View the board</button><button class="btn ghost" id="mhome">Main menu</button>`, null);
   m.classList.add('mresult');
+  if(!r.win)m.dataset.lossReason=r.how;
   addPeek(m, log);
   m.querySelector('#mre').onclick = () => { m.remove(); matchStart(r.diff); };
   m.querySelector('#mdif').onclick = () => { m.remove(); matchSetup(); };
@@ -5453,7 +5460,7 @@ function fullGuide(){
 // Flags live in the existing 'crownfall-tips' object: intro, score, brilliance, damage, swap, card, crown, journey,
 // plus shop/promo/armor/trap/circuit (older contextual tips), skipped (Skip tutorial) and v2 (migration done).
 const COACH = {
-  score:      {pri:10, target:'.pbar, .pscore .sc', text:() => ['Capture to score', `Capture enemy pieces to build your score. Reach the target of <b>${B ? B.target.toLocaleString() : ''}</b> to clear the stage.`]},
+  score:      {pri:10, target:'.pbar, .pscore .sc', text:() => ['Capture to score', `Capture enemy pieces to build your score. Reach the target of <b>${B ? B.target.toLocaleString() : ''}</b> or checkmate the enemy King. A capture that reaches the target must survive the reply. Tap the goal bar for details.`]},
   brilliance: {pri:9,  target:'#expC, #expM',      text:() => ['Material × Brilliance', `The piece you capture sets the base value. Stronger plays can multiply what you earn.`]},
   damage:     {pri:8,  target:'.pscore .sc',        text:() => ['Protect your score', `Enemy captures can take points away. Your score can fall, but never below 0.`]},
   crown:      {pri:7,  target:null,                 text:() => ['World Crowns', `Each Land has one World Crown: defeat its Ruler to claim it. Collect all 4 to unlock The Fallen Throne.`]},
@@ -5554,7 +5561,7 @@ function bossChips(id){
 function bossDetails(boss){
   if(RUN && RUN.gauntlet && !MATCH) return gFoeDetails(boss);   // v152
   const pp = personaOf(boss.id), a = SIG_BOSS[bossRuleName(boss.id)], A = a && ARCHE[sigBase(a)], lim = moveLimitFor(parFor(), boss.id);
-  const m = modal(`<p class="tr-kicker" style="margin:0">${boss.ruler ? 'Ruler' : boss.mini ? 'Rival · Circuit boss' : 'Boss'}</p><h2 style="margin:0">${bossName(boss.id)}</h2>
+  const m = modal(`<p class="tr-kicker" style="margin:0">${boss.ruler ? 'Ruler' : boss.mini ? 'Rival · Circuit boss' : 'Boss'}</p><h2 style="margin:0">${bossName(boss.id)}</h2>${encounterHTML(true)}
     <div class="cash" style="gap:8px;display:flex;flex-direction:column">
       <div><b style="font-family:var(--display);font-weight:400;color:#ffb3bd">Rules</b><br><span style="font-size:14px">${boss.desc}</span></div>
       ${lim ? `<div><b style="font-family:var(--display);font-weight:400;color:#ff3d9a">Blitz</b><br><span style="font-size:14px">Reach the target within ${lim} moves.</span></div>` : ''}
@@ -5727,7 +5734,7 @@ function oppEntrance(boss, tier){
   const el = document.createElement('div'); el.className = `oppin ${tier}`; el.setAttribute('aria-hidden', 'true');
   const pp = curPersona(), line = pp ? ((Array.isArray(pp.intro) ? pick(pp.intro) : pp.intro) || repLine(pp)) : '';   // v154: the opening line lives on the card
   if(line) B.introSaid = 1;
-  el.innerHTML = `<small class="oland">${PACKS.find(x => x.id === land()).name} · ${CIR().name}</small><b>${bossName(boss.id)}</b><span class="otags"><i class="otag">${tier === 'rival' ? 'Rival' : 'Boss'}</i>${sigChip()}${mech ? `<small class="mchip">${mech}</small>` : ''}</span>${line ? `<q class="oline">${line}</q>` : ''}<small class="otap">Tap to continue</small>`;
+  el.innerHTML = `<small class="oland">${PACKS.find(x => x.id === land()).name} · ${CIR().name}</small><b>${bossName(boss.id)}</b><span class="otags"><i class="otag">${tier === 'rival' ? 'Rival' : 'Boss'}</i>${sigChip()}${mech ? `<small class="mchip">${mech}</small>` : ''}</span>${line ? `<q class="oline">${line}</q>` : ''}${encounterHTML()}${hazardHTML(true)}<small class="otap">Tap to continue</small>`;
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
@@ -5766,8 +5773,10 @@ function startBlind(){ try{ laClear(); }catch(e){}
 }
 
 /* ---------- blind play ---------- */
+let movePreview = null, lastTraining = null;
 let sel = null, swapMode = false, swapA = null, busy = false, pending = null, trapMode = false, tacSwap = false, gambitMode = false;
 function playBlind(resumed){
+  movePreview = null;
   defeatLock = false; if(B) delete B.defeatPending;
   setLandBg(null);
   enterLand();
@@ -5787,7 +5796,7 @@ function playBlind(resumed){
       <div class="sc"><small>Score</small><b id="score">${B.score.toLocaleString()}</b></div>
       <button class="cbox chips" id="expC"><small>Material</small><span id="cc">0</span></button><span class="x">×</span><button class="cbox mult" id="expM"><small>Brilliance</small><span id="cm">×0</span><em class="combo" id="combo"></em></button>
     </div>
-    <div class="pbar"><i id="pbar" style="width:${Math.min(100,B.score/B.target*100)}%"></i><span class="ptgt">Target <b>${B.target.toLocaleString()}</b></span></div>
+    <button type="button" class="pbar goal-button" id="goalInfo" aria-label="Win conditions and move preview settings"><i id="pbar" style="width:${Math.min(100,B.score/B.target*100)}%"></i><span class="ptgt" id="goalLabel">${goalText()}</span></button>
     <div class="handrow"><span class="hand" id="hand">Tap a piece, then a target</span><span class="mood" id="mood"><i></i><span id="moodTxt">Enemy waiting</span></span></div>
     ${MATCH ? '' : relicRow()}
     <div class="boardArea"><div class="boardWrap" id="bw"><div class="bdecor" id="bdecor"></div><div class="board" id="board"></div><div class="fxl" id="fxl"></div></div></div>
@@ -5795,6 +5804,7 @@ function playBlind(resumed){
     <div class="actions ${MATCH ? 'mact' : 'four'} ${RUN.relics.includes('trap') ? 'five' : ''}"><button class="btn blue" id="swapBtn">Swap (${B.swaps})</button>${RUN.relics.includes('trap') ? `<button class="btn trapbtn" id="trapBtn">Trap (${B.trapsLeft || 0})</button>` : ''}<span id="cardSlots" style="display:contents"></span><button class="btn ghost" id="quit">Menu</button></div>`;
   bindRelicTips(app);
   $('#expC').onclick = $('#expM').onclick = () => explainScore();
+  $('#goalInfo').onclick = battleInfo;
   finalPhaseHud();   // a saved Final Phase comes back as it was
   chalHud();         // and so does an active challenge
   showCombo();
@@ -6522,16 +6532,16 @@ function gRecordRun(run, why){
   return out;
 }
 function gEnd(why){
-  sfx.lose(); const rec = gRecordRun(RUN, why); clearRun();           // recorded and cleared before anything is shown: a refresh can't revive the run
-  gEndScreen(rec, why);
+  sfx.lose(); const lastLog=B&&B.log,rec = gRecordRun(RUN, why); clearRun();           // recorded and cleared before anything is shown: a refresh can't revive the run
+  gEndScreen(rec, why, lastLog);
 }
-function gEndScreen(rec, why){
+function gEndScreen(rec, why, lastLog){
   leaveBoard(); onTitle = false; sceneMusic('menu'); setLandBg(null); setCircuitData('');
   const nm = x => x ? `${x.n} · ${TYPE[x.t] ? TYPE[x.t].name : x.t}` : '—';
   const star = rec.mvp && rec.mvp.c > 0 ? {k:'Most valuable character', x:rec.mvp} : rec.survivor ? {k:'Last survivor', x:rec.survivor} : null;
   app.innerHTML = `<section class="screen gend">
     <p class="gend-k">The Gauntlet has ended</p>
-    <p class="muted" style="text-align:center;margin:0">${why || ''}</p>
+    <p class="muted" style="text-align:center;margin:0">${why || ''}</p>${lossHTML(CrownfallPolish.loss(why,lastLog||[]))}${lossBoardHTML(lastLog)}
     ${rec.newPB ? '<p class="gend-pb">New personal best!</p>' : ''}
     <div class="gend-big"><small>Waves cleared</small><b>${rec.cleared}</b></div>
     <div class="gend-pbrow">Personal best <b>${rec.pb}</b></div>
@@ -6694,7 +6704,30 @@ async function reinforceShow(sq){
 const lightSide = () => { if(!B) return null; if(B.light === 'me' || B.light === 'en') return B.light;
   const r = B.roll; return r && r.state === 'done' && (r.first === 'me' || r.first === 'en') && !document.querySelector('.rollmodal') ? r.first : null; };
 function boardSides(el){ const ls = lightSide(); for(const x of [el, document.getElementById('pinfo')]) if(x){ x.classList.toggle('lme', ls === 'me'); x.classList.toggle('len', ls === 'en'); } }
+function confirmMoves(){try{return localStorage.getItem('crownfall-move-confirm')!=='off';}catch{return true;}}
+function goalText(){return CrownfallPolish.objective({score:B?.score,target:B?.target,pending:B?.pendingWin,mateOnly:finalPhase()&&!B?.ckFinal,hold:B?.ckFinal&&B.score>=B.target&&B.moveCount<=Math.max(B.ckFinalAt,B.ckHoldAt??-1),moves:B?.moveLimit?B.moves:null});}
+function encounterHTML(planned=false){
+  const plan=planned&&RUN&&!RUN.gauntlet?campaignBossPlan(RUN):null;
+  const f=CrownfallPolish.formation(plan?.signature||B?.ai?.sig,plan?.style||B?.ai?.style);
+  return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
+}
+function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
+function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn ghost" id="confirmMoves">Move confirmation: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">On: tap a destination to inspect points and threats, then tap it again or press Move. Off: legal destinations move immediately.</p><button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}movePreview=null;e.target.textContent='Move confirmation: '+(on?'On':'Off');};}
+function previewMove(from,to){
+  if(!B||busy||!legalMoves(from).includes(to))return;
+  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to);
+  let points=sc?.total||0;if(victim&&p.charge)points=Math.round(points*1.5);
+  movePreview={from,to,board:B.board};drawBoard();
+  const el=$('#pinfo');if(!el)return;el.className='pinfo move-preview';
+  const scoreText=sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
+  el.innerHTML=`<div class="preview-copy"><b>${TYPE[p.t].name} → ${sqName(to)}${victim?' · capture':''}</b><span>${scoreText}</span><small class="${risk?'preview-risk':'preview-safe'}">${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate?' · crate costs up to $2':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}</small>${victim&&B.score+points>=B.target?'<small>Target capture must survive the reply.</small>':''}</div><button class="btn" id="commitPreview">Move</button><button class="preview-cancel" id="cancelPreview" aria-label="Cancel move preview">×</button>`;
+  el.querySelector('#commitPreview').onclick=()=>tapSquare(to);
+  el.querySelector('#cancelPreview').onclick=()=>{movePreview=null;drawBoard();pieceInfo(sel===null?null:B.board[sel]);};
+}
+function lossHTML(review){const esc=CrownfallPolish.escape;return `<div class="loss-review"><b>${esc(review.title)}</b><p>${esc(review.tip)}</p>${review.note?`<p class="last-turn">Last exchange: ${esc(review.note)}</p>`:''}</div>`;}
+function lossBoardHTML(log){const sn=log?.at(-1);if(!sn?.s)return '';let html='';for(let i=0;i<64;i++){const ch=sn.s[i],me=ch&&ch===ch.toUpperCase();html+=`<div class="sq ${(Math.floor(i/8)+i%8)%2?'d':'l'}${i===sn.t?' lastte':''}">${ch&&ch!=='.'?pieceSVG(ch.toUpperCase(),me?'me':'en'):''}</div>`;}return `<details><summary>Review final position</summary><div class="board loss-final">${html}</div></details>`;}
 function drawBoard(){
+  if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)) movePreview=null;
   const el = $('#board'); if(!el) return;
   boardSides(el);
   const threats = new Set(attacksOn(B.board, 'en'));
@@ -6705,6 +6738,7 @@ function drawBoard(){
     const [r,c] = rc(i), p = B.board[i];
     const cls = ['sq', (r+c)%2 ? 'd' : 'l'];
     if(i === sel) cls.push('sel');
+    if(movePreview && i===movePreview.to)cls.push('preview-target');
     if(i === swapA) cls.push('swapA');
     if(B.scout && i === B.scout.from) cls.push('scoutF'); if(B.scout && i === B.scout.to) cls.push('scoutT');
     if(gambitMode && p && p.side === 'me' && p.t !== 'K') cls.push(gambitCheck(i) ? 'gbad' : 'gok');
@@ -6716,7 +6750,7 @@ function drawBoard(){
     if(p && p.t === 'K' && inCheck(B.board, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(B.board, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
-    if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: landing here costs up to $2" title="Crate trap · up to $2"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
+    if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: you lose up to $2; enemy entry gives you $2" title="Crate trap · you −$2 / enemy +$2 to you"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
     if(B.trapSq && B.trapSq.includes(i)) inner += '<span class="trapmk"></span>';
     if(trapMode && (!p || p.side === 'me') && !(B.trapSq || []).includes(i)) inner += '<span class="ring trapring"></span>';
     if(p && (eList(p.e).length > 1 || eList(p.e).some(x => !MAT[x]))) inner += `<span class="edots">${eList(p.e).map(x => `<i style="background:${ENCH[x].col}"></i>`).join('')}</span>`;
@@ -6726,11 +6760,12 @@ function drawBoard(){
       const nb = applyMove(B.board, sel, i); const risk = attacksOn(nb, 'en').includes(i);
       const sc = scoreCapture(sel, i);
       inner += p || epVictim(B.board, sel, i) ? `<span class="ring ${risk?'risk':''}"></span>${p ? '' : '<span class="eptag">En passant</span>'}` : `<span class="dot ${risk?'risk':''}"></span>`;
-      if(sc) inner += `<span class="pv">${sc.check ? '+' : ''}${sc.total.toLocaleString()}</span>`;
+      if(sc) inner += `<span class="pv">+${sc.total.toLocaleString()}</span>`;
+      if(risk)inner += '<span class="preview-warning" aria-label="Attacked destination">!</span>';
     }
     if(advT.includes(i)) inner += p ? '<span class="ring"></span>' : '<span class="dot"></span>';
     if(c === 0) inner += `<span class="coord">${8-r}</span>`;
-    h += `<div class="${cls.join(' ')}" data-i="${i}"${(B.crates || []).includes(i) ? ' aria-label="Crate trap on '+sqName(i)+': landing costs up to $2"' : ''}>${inner}</div>`;
+    h += `<div class="${cls.join(' ')}" data-i="${i}"${(B.crates || []).includes(i) ? ' aria-label="Crate trap on '+sqName(i)+': you lose up to $2; enemy entry gives you $2"' : ''}>${inner}</div>`;
   }
   el.innerHTML = h;
   el.querySelectorAll('.sq').forEach(s => s.onclick = () => tapSquare(+s.dataset.i));
@@ -6749,6 +6784,7 @@ function updateHud(){
   $('#pbar').style.width = Math.min(100, B.score/B.target*100) + '%';
   if(finalPhase()) finalPhaseHud();
   chalHud();
+  const goal=$('#goalLabel');if(goal)goal.textContent=goalText();
 }
 function toggleTrap(){
   if(busy || !B || B.done) return;
@@ -6808,7 +6844,10 @@ async function tapSquare(i){
     return;
   }
   if(!busy && mateNow()) return;                                            // v156
-  if(sel !== null && legalMoves(sel).includes(i)){ pieceInfo(null); await doMove(sel, i); return; }
+  if(sel !== null && legalMoves(sel).includes(i)){
+    if(confirmMoves() && !(movePreview && movePreview.from===sel && movePreview.to===i && movePreview.board===B.board)){previewMove(sel,i);return;}
+    const from=sel;movePreview=null;pieceInfo(null);await doMove(from,i);return;
+  }
   if(p && p.side === 'me'){ sel = sel === i ? null : i; sel === null ? sfx.tick() : sfx.pick(); drawBoard(); pieceInfo(sel === null ? null : p);
     if(sel !== null && p.e) $('#hand').innerHTML = `${eNames(p.e)} ${TYPE[p.t].name}`;
     return; }
@@ -7081,12 +7120,16 @@ async function resumePromo(){
 // Dock crates are visible one-use hazards, saved with the battle. Legacy battles
 // get no retroactive hazards; Kings and all other pieces keep their normal moves.
 function dockCrates(board){
-  if(MATCH || !RUN || RUN.gauntlet || RUN.land !== 'street' || RUN.circuit !== 'harbor' || bossId() !== 'mini') return [];
-  return [18,21,34,37].filter(i => !board[i]).slice(0,3);
+  if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'harbor' || RUN.ante<2) return [];
+  return [18,21,34,37].filter(i => !board[i]).slice(0,RUN.ante===4?3:2);
 }
 function springDockCrate(at){
-  if(!B || !B.board[at] || B.board[at].side !== 'me' || !(B.crates || []).includes(at)) return false;
+  if(!B || !B.board[at] || !(B.crates || []).includes(at)) return false;
   B.crates = B.crates.filter(i => i !== at);
+  if(B.board[at].side==='en'){
+    RUN.money+=2;pop(at,'Enemy sprung crate · +$2','fxg');sfx.coin();
+    logPos(`Enemy sprung the crate on ${sqName(at)}. You recovered $2.`,at,at,'fx');return true;
+  }
   const cost = Math.min(2,Math.max(0,RUN.money)); RUN.money -= cost;
   pop(at,cost ? `Crate trap! −$${cost}` : 'Crate trap sprung','fxm'); sfx.ambush();
   logPos(`Crate trap on ${sqName(at)}: lost $${cost}. The crate is cleared.`,at,at,'fx');
@@ -7870,6 +7913,7 @@ async function enemyExec(plan, sub){
   await enSafe('ep', () => epAfter('en', from, to, wasPawn));
   if(wasPawn && Math.abs(to - from) === 16 && (from >> 3) !== 1){ (window.__dm = window.__dm || []).push([from, to]); setTimeout(() => pop(to, 'Double March', 'fxx'), 300); }
   if(ecastle) await enSafe('castle fx', () => { logPos('Enemy castles', from, to, 'en'); pop(to, 'Castles', 'fxx'); });
+  await enSafe('crate',()=>springDockCrate(to));
   // 2. Thorns: the attacker falls with the piece it took
   const thorns = !!(lost && hasE(lost, 'thorn'));
   if(thorns){ B.board[to] = null; if(attackerType === 'K'){ B.kingFell = true; B.trapHit = true; }
@@ -8865,7 +8909,7 @@ function winBlind(){
   const endingWin = RUN.blind === 2 && RUN.ante === nStages() && !RUN.won && RUN.circuit === 'ruler' && land() === 'throne';
   if(MM.want === 'crownless' && !endingWin) setMusicContext('silence');   // from here on nothing (including Score Damage) can undo the win
   if(!endingWin) sfx.win();   // the Crownless King's fall is not a triumph
-  const bl = BLINDS[RUN.blind], reward = RUN.debt ? 0 : bl.reward, blitzLeft = blitzOn() ? Math.max(0, B.moves) : 0, movesBonus = blitzLeft * (B.hustle ? 2 : 1), interest = Math.min(isC('midnight') ? 12 : 10, 2 * Math.floor(RUN.money/5)), piggy = RUN.relics.reduce((s,id)=>s+(R(id).endMoney||0),0);
+  const bl = BLINDS[RUN.blind], reward = RUN.debt ? 0 : bl.reward, blitzLeft = blitzOn() ? Math.max(0, B.moves) : 0, movesBonus = blitzLeft * (B.hustle ? 2 : 1), interest = CrownfallPolish.savings(RUN.money,RUN.circuit), piggy = RUN.relics.reduce((s,id)=>s+(R(id).endMoney||0),0);
   const debtNote = RUN.debt; RUN.debt = false;
   const kx = {gain:0, from:1, to:1};             // v142: King XP retired (nothing is awarded or shown)
   if((B.moveCount || 99) <= 4) unlockAch('dt_speed');
@@ -8893,7 +8937,7 @@ function winBlind(){
     <div class="cash">
       <div class="kv"><span>${RUN.circuit === 'ruler' ? 'Ruler reward' : 'Stage reward'}${debtNote ? ` (${C('loanshark').name} took it)` : ''}</span><b class="money">$${reward}</b></div>
       ${blitzOn() ? `<div class="kv"><span>${blitzLeft} moves left ($${B.hustle ? 2 : 1} each)</span><b class="money">$${movesBonus}</b></div>` : `<div class="kv"><span>Moves used</span><b>${B.moveCount != null ? B.moveCount : B.movesStart - B.moves}</b></div>`}
-      <div class="kv"><span>Savings bonus ($2 per $5 saved, max $${isC('midnight') ? 12 : 10})</span><b class="money">$${interest}</b></div>
+      <div class="kv"><span>Savings bonus ($1 per $5 saved, max $${isC('midnight') ? 6 : 5})</span><b class="money">$${interest}</b></div>
       ${piggy ? `<div class="kv"><span>Piggy Bank</span><b class="money">$${piggy}</b></div>` : ''}
       ${mateBonus ? `<div class="kv"><span>Checkmate bonus</span><b class="money">$${mateBonus}</b></div>` : ''}
       ${chal.cash ? `<div class="kv"><span>Challenge · ${chal.name}${chal.swap ? ' · +1 Swap next round' : ''}</span><b class="money">$${chal.cash}</b></div>` : ''}
@@ -9442,12 +9486,14 @@ function fourthReveal(l){
   })();
 }
 function addPeek(m, log){
-  const b = m && m.querySelector('#peek'); if(!b) return;
+  const b = m && (m.querySelector('#peek')||m.querySelector('#mpeek')); if(!b) return;
   const L = log && log.length > 1 ? log : null;
-  b.textContent = L ? 'Review the round' : 'View the board';
+  const review=m.dataset.lossReason?CrownfallPolish.loss(m.dataset.lossReason,L||[]):null;
+  if(review){const heading=m.querySelector('h2');if(heading)heading.insertAdjacentHTML('afterend',lossHTML(review));}
+  b.textContent = L ? review&&review.index>=0?'Review the last exchange':'Review the round' : 'View the board';
   b.onclick = () => {
     m.style.display = 'none'; document.body.classList.add('peeking');
-    let k = L ? L.length - 1 : 0, timer = null;
+    let k = L ? review&&review.index>=0?review.index:L.length-1 : 0, timer = null;
     const bar = document.createElement('div'); bar.className = 'peekbar' + (L ? ' replay' : '');
     bar.innerHTML = L ? `<div class="rnote" id="rnote"></div><div class="rctl"><button class="btn ghost" id="rfirst" aria-label="First move">«</button><button class="btn ghost" id="rprev" aria-label="Previous move">‹</button><span class="rcount" id="rcount"></span><button class="btn ghost" id="rnext" aria-label="Next move">›</button><button class="btn ghost" id="rplay">Play</button><button class="btn" id="unpeek">Done</button></div>`
       : '<span>Final position</span><button class="btn" id="unpeek">Back to results</button>';
@@ -9491,6 +9537,7 @@ function loseLife(why){
   const m = modal(`${quote}<h2 style="color:var(--mult)">You lost a life</h2><p>${why}</p>
     <div class="lifebox">${hearts(RUN.lives, true)}<span>${evNote ? evNote + ' ' : ''}${RUN.lives} ${RUN.lives === 1 ? 'life' : 'lives'} left. ${RUN.gauntlet ? 'Your army, equipment and Arena Tokens are safe.' : `Your army, ${UI.tiles.toLowerCase()} and money are safe.`} Lose them all and ${RUN.gauntlet ? 'the Gauntlet run ends' : `you return to ${RUN.ante >= 3 && RUN.circuit !== 'ruler' ? 'this circuit’s halfway checkpoint (Stage 3)' : RUN.circuit === 'ruler' ? 'Stage 3 of the last circuit' : 'the start of this circuit'}`}.</span></div>
     <button class="btn" id="retry">Try the round again</button><button class="btn ghost" id="peek">Review the round</button><button class="btn ghost" id="home">Save and go to title screen</button>`, null);
+  m.dataset.lossReason=why;
   addPeek(m, log);
   m.querySelector('#retry').onclick = () => { m.remove(); startBlind(); };
   m.querySelector('#home').onclick = () => { m.remove(); title(); };
@@ -9546,6 +9593,7 @@ function gameOver(why){ try{ laClear(); }catch(e){}
     <div class="kv"><span>Reached</span><b>Stage ${reached}: ${stageName(reached)}</b></div>
     <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>
     <button class="btn" id="again">Restart circuit${rulerFall ? ' ' + cName : ''}</button><button class="btn ghost" id="peek">View the board</button><button class="btn ghost" id="home">Title screen</button>`, null);
+  gm.dataset.lossReason=why;
   addPeek(gm, log);
   gm.querySelector('#again').onclick = () => { gm.remove(); setPack(gl); newRun(restartC); landIntro(PACK); blindSelect(); };
   gm.querySelector('#home').onclick = () => { gm.remove(); title(); };
@@ -9571,6 +9619,7 @@ function midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid){
     <div class="kv"><span>Reached</span><b>${rulerFall ? 'The Ruler' : `Stage ${reached}: ${stageName(reached)}`}</b></div>
     <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>
     <button class="btn" id="again">Return to Stage 3</button><button class="btn ghost" id="peek">View the board</button><button class="btn ghost" id="home">Title screen</button>`, null);
+  gm.dataset.lossReason=why;
   addPeek(gm, log);
   gm.querySelector('#again').onclick = () => { gm.remove(); setPack(gl); blindSelect(); };
   gm.querySelector('#home').onclick = () => { gm.remove(); title(); };
@@ -9779,7 +9828,7 @@ function replaceCard(newId, onDone, after){
    small buys (tiles, recruits, cards) keep their own costs; these are the escalating money sinks. */
 const STORE_PRICES = {
   restock:[5, 8, 12, 16],   // within one shop visit; back to the first price at the next shop
-  train:[10, 15, 25, 35, 50],   // by the piece type's current level: Lv.1→2, 2→3, 3→4, 4→5, 5→6
+  train:[8, 14, 24, 36, 52],   // by the piece type's current level: Lv.1→2, 2→3, 3→4, 4→5, 5→6
   forge:[10, 15, 20],       // by how many powers the chosen piece already has (MAX_POWERS is the limit)
   life:[25, 35, 50],        // by lives bought with this army; at most one purchase per Land visit
 };
@@ -9807,13 +9856,14 @@ function buyTraining(t){
   if(t === 'K') return false;
   if(a.run){ spend(c); gBuy('train'); RUN.lv[t] = effLv(t) + 1; normLv(RUN); if(RUN.evFx && RUN.evFx.trainOff){ delete RUN.evFx.trainOff; if(window.__eLog) window.__eLog.push({k:'evdisc', kind:'train'}); } checkMoneyAch(); save(); }
   else { const cy = a.carry; cy.money -= c; cy.lv = Object.assign({P:1,N:1,B:1,R:1,Q:1,K:1}, cy.lv); cy.lv[t] = armyLv(a, t) + 1; setCarry(cy); }
+  lastTraining={type:t,level:armyLv(trainArmy(),t),cost:c};
   sfx.coin(); return true;
 }
 function trainPanelHTML(inShop){
   const a = trainArmy(); if(!a) return '';
   return `<div class="trainpanel">${inShop ? '' : `<div class="tphead"><b>${UI.training}</b><span class="money">$${a.money}</span></div>`}
-    ${TRAIN_TYPES.filter(t => armyOwns(a, t)).map(t => { const L = armyLv(a, t), max = L >= LV_MAX, c = armyTrainCost(a, t), poor = !max && a.money < c;
-      return `<div class="tprow${max ? ' max' : ''}"><span class="tpi">${pieceSVG(t,'me')}</span><span class="tpn"><b>${TYPE[t].name}</b><small>${max ? `Lv.${LV_MAX} · MAX` : `Lv.${L} → Lv.${L+1} · +${TYPE[t].lc} Material, +${TYPE[t].lm} Brilliance`}</small></span>
+    ${TRAIN_TYPES.filter(t => armyOwns(a, t)).map(t => { const L = armyLv(a, t), max = L >= LV_MAX, c = armyTrainCost(a, t), poor = !max && a.money < c, gain=CrownfallPolish.training(TYPE[t],L);
+      return `<div class="tprow${max ? ' max' : ''}" data-shop-anchor="training-${t}"><span class="tpi">${pieceSVG(t,'me')}</span><span class="tpn"><b>${TYPE[t].name}</b><small>${max ? `Lv.${LV_MAX} · MAX` : `Lv.${L} → Lv.${L+1} · Material ${gain.chips} → ${gain.nextChips} · Brilliance ${gain.mult} → ${gain.nextMult}`}</small>${max?'':`<small class="train-gain">Base capture ${gain.before} → ${gain.after} points</small>`}${lastTraining?.type===t&&lastTraining.level===L?`<small class="trained-now">Upgraded to Lv.${L} · $${lastTraining.cost}</small>`:''}</span>
         ${max ? '<button class="btn blue" disabled>MAX LEVEL</button>' : `<button class="btn blue" data-train="${t}" ${poor ? 'disabled' : ''}>${poor ? `Need $${c}` : `Train · $${c}`}</button>`}</div>`; }).join('')}
   </div>`;
 }
@@ -9827,10 +9877,16 @@ function spend(x){ RUN.money -= x; RUN.stats = RUN.stats || {kingCaps:0, knightC
 // A purchase redraws the same shop. Keep its viewport while updating prices,
 // stock and army panels; a fresh visit still starts at the top.
 function shopScrollPosition(){
-  return app.querySelector('.shopscr') ? {left:window.scrollX,top:window.scrollY} : null;
+  const shop=app.querySelector('.shopscr');if(!shop)return null;
+  const header=shop.querySelector('.shophead'),edge=header?Math.max(0,header.getBoundingClientRect().bottom):0;
+  const anchor=Array.from(shop.querySelectorAll('[data-shop-anchor]')).find(el=>{const r=el.getBoundingClientRect();return r.height>0&&r.top>=edge&&r.top<window.innerHeight;});
+  return {left:window.scrollX,top:window.scrollY,key:anchor?.dataset.shopAnchor,offset:anchor?.getBoundingClientRect().top};
 }
 function restoreShopScroll(position){
-  if(position) window.scrollTo({...position,behavior:'instant'});
+  if(!position)return;
+  const anchor=position.key&&Array.from(app.querySelectorAll('[data-shop-anchor]')).find(el=>el.dataset.shopAnchor===position.key);
+  const top=anchor?window.scrollY+anchor.getBoundingClientRect().top-position.offset:position.top;
+  window.scrollTo({left:position.left,top:Math.max(0,top),behavior:'instant'});
 }
 function renderShop(html){
   const current=app.querySelector('.shopscr:not(.garm)');
@@ -9859,7 +9915,7 @@ function shop(){
   const plain = h => h.replace(/<[^>]+>/g, '');
   const offerHTML = (o, k, wide) => {
     const W = wide ? ' wide' : '';
-    if(o.sold) return `<div class="offer sold${W}"><h3>Sold</h3></div>`;
+    if(o.sold){const name=o.kind==='piece'?TYPE[o.t].name:o.kind==='relic'?R(o.id).name:o.kind==='card'?C(o.id).name:UI.forge;return `<div class="offer sold${W}"><h3>${name}</h3><small>Purchased ✓</small></div>`;}
     if(o.kind === 'relic'){ const r = R(o.id); return `<div class="offer tileo ${r.r}${W}"><span class="tagline">${r.r} ${UI.tile}</span><h3>${r.name}<span class="tileprev"><span class="relics" style="display:block"><span class="relic ${r.r}" style="display:flex;align-items:center;justify-content:center;position:relative">${relicIcon(r)}<span class="fx fx${r.fc}">${r.fx}</span></span></span></span></h3><p>${r.desc}</p><button class="btn" data-buy="${k}" ${cash(offerCost(o)) || RUN.relics.length >= 5 ? 'disabled' : ''}>$${offerCost(o)}</button></div>`; }
     if(o.kind === 'piece'){ const pc = offerCost(o); return `<div class="offer piece${W}" ${o.e ? `style="border-color:${ENCH[o.e].col}"` : o.premium ? 'style="border-color:#ffd23d"' : ''}><span class="tagline">${o.premium ? 'Rare · Queen for hire' : o.e ? UI.special : UI.recruit}</span><h3>${o.e ? `<span style="color:${ENCH[o.e].col}">${ENCH[o.e].name}</span> ` : ''}${TYPE[o.t].name}${pieceSVG(o.t,'me',o.e)}</h3><p>${o.e ? ENCH[o.e].desc : `Add a ${TYPE[o.t].name} to your army.`}</p><button class="btn" data-buy="${k}" ${cash(pc) || !betaCan(o.t) ? 'disabled' : ''}>${betaCan(o.t) ? `$${pc}` : betaTotal() >= Math.min(16, betaLand()[1]) ? 'Army full' : !paceOK() ? 'Used' : 'Type limit'}</button></div>`; }
     if(o.kind === 'forge') return `<div class="offer forge wide"><span class="tagline">${UI.forge} · shop upgrade</span><h3><span>${UI.forgeAct}</span><span class="kind perm">Permanent</span></h3><p>Pick a piece (not the King), then choose 1 of 3 enhancements. Up to ${MAX_POWERS} per piece; a full piece can <b>Reforge</b>: swap one for a new one ($${price(STORE_PRICES.forge[2])}).</p>${forgeFrom() == null ? '<button class="btn" disabled>No pieces to enhance</button>' : `<button class="btn" data-buy="${k}" ${cash(offerCost(o)) ? 'disabled' : ''}>from $${offerCost(o)} · pick a piece</button>`}</div>`;
@@ -9885,8 +9941,8 @@ function shop(){
     items.forEach(x => { const o = x.o, text = o.sold ? '' : o.kind === 'relic' ? plain(R(o.id).desc) : o.kind === 'piece' && o.e ? plain(ENCH[o.e].desc) : '';
       x.wide = text.length > 88 || !['relic','piece'].includes(o.kind); });
     const half = items.filter(x => !x.wide); if(half.length % 2) half[half.length - 1].wide = true;
-    const html = items.map(({o, k, wide}) => offerHTML(o, k, wide)).join('');
-    return `<h3 class="ssec" style="--sc:${g.col}">${g.label}${g.key === 'recruit' ? ` <small class="armycap">Army ${armyCapTxt()}</small>` : ''}</h3>${g.key === 'recruit' ? recruitNote(items) : ''}${html ? `<div class="shopgrid">${html}</div>` : ''}`;
+    const html = items.map(({o, k, wide}) => offerHTML(o, k, wide).replace('<div class="offer',`<div data-shop-anchor="offer-${k}" class="offer`)).join('');
+    return `<h3 class="ssec" data-shop-anchor="section-${g.key}" style="--sc:${g.col}">${g.label}${g.key === 'recruit' ? ` <small class="armycap">Army ${armyCapTxt()}</small>` : ''}</h3>${g.key === 'recruit' ? recruitNote(items) : ''}${html ? `<div class="shopgrid">${html}</div>` : ''}`;
   };
   const recruitSec = secHTML(groups[1]), sections = groups.filter(g => g.key !== 'recruit').map(secHTML).join('');   // v154: Recruit comes first
   const L = lives(), full = L >= maxLives(), bought = lifeBoughtHere();
@@ -9902,7 +9958,7 @@ function shop(){
       ${armyStrip()}
     </div>
     ${recruitSec}
-    <h3 class="ssec" style="--sc:#19b5ff">${UI.training}</h3>${trainPanelHTML(true)}
+    <h3 class="ssec" data-shop-anchor="section-training" style="--sc:#19b5ff">${UI.training} <button type="button" class="training-help" id="trainingHelp">How it works</button></h3>${trainPanelHTML(true)}
     ${sections}
     <h3 class="ssec" style="--sc:#ff3d5a">Extra lives</h3>
     <div class="offer lifeo wide"><span class="tagline">Extra life · max ${maxLives()}</span><h3><span>Buy a life</span>${hearts(1, true)}</h3><p>A second chance. If you lose a round, you can retry instead of ending your run. <span class="muted">Applies to checkmate, stalemate, Concede, or running out of moves in a Blitz. One purchase per Land; each costs more than the last. You have ${L}.</span></p><button class="btn red" id="buylife" ${cash(lifeCost()) || full || bought ? 'disabled' : ''}>${full ? 'Lives full' : bought ? 'Life purchased this Land' : `$${lifeCost()}`}</button></div>
@@ -9913,7 +9969,8 @@ function shop(){
   else setTimeout(forgeResume, 0);   // v138: reopen a Forge step that was open before a refresh
   app.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => {
     const o = RUN.shop[+b.dataset.buy];
-    const cost = offerCost(o);
+    if(!o||o.sold)return;
+    const cost = offerCost(o);if(!Number.isFinite(cost)||RUN.money<cost)return;
     if(o.kind === 'relic'){ spend(cost); RUN.relics.push(o.id); }
     else if(o.kind === 'piece'){ if(!betaCan(o.t)) return; spend(cost); recruitAdd(o.e ? `${o.t}:${o.e}` : o.t); if(o.t === 'Q'){ RUN.qBought = (RUN.qBought || 0) + 1; qlog('shop'); } checkSpell(); }
     else if(o.kind === 'forge'){ forgePick(o); return; }
@@ -9926,6 +9983,7 @@ function shop(){
   });
   app.querySelectorAll('[data-own]').forEach(b => b.onclick = () => ownedCard(+b.dataset.own));
   bindTraining(app, shop);
+  const trainingHelp=app.querySelector('#trainingHelp');if(trainingHelp){trainingHelp.onclick=()=>showTip('<b>Train every piece of this type</b><br>The before/after score is Material × Brilliance before captured-piece value, checks, relics and other bonuses. The benefit begins next fight.');}
   bindArmy(app, true); setTimeout(laIntroShow, 350);   // v154
   $('#reroll').onclick = () => { const c = restockCost(); if(RUN.money < c) return; RUN.money -= c; RUN.restocks = (RUN.restocks || 0) + 1; genShop(); sfx.coin(); shop(); };
   $('#buylife').onclick = () => { if(RUN.money < lifeCost() || lives() >= maxLives() || lifeBoughtHere()) return; spend(lifeCost()); RUN.lives = lives() + 1; RUN.livesBought = (RUN.livesBought || 0) + 1; RUN.lifeLand = land(); sfx.win(); save(); shop(); showTip(`<b>+1 life</b><br>You now have ${RUN.lives}.`); };

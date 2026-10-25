@@ -1,0 +1,31 @@
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const c=vm.createContext({window:{}});vm.runInContext(readFileSync('gameplay-polish.js','utf8'),c);const p=c.window.CrownfallPolish,game=readFileSync('index.html','utf8');
+assert.equal(p.training({chips:10,mult:3,lc:10,lm:1},1).before,30);assert.equal(p.training({chips:10,mult:3,lc:10,lm:1},1).after,80);
+assert.equal(p.training({chips:40,mult:2,lc:20,lm:1},2).after,320);
+assert.match(p.objective({score:10,target:1000}),/Checkmate or 1,000/);
+assert.match(p.objective({score:1000,target:1000,pending:true}),/survive/);
+assert.match(p.objective({target:1000,moves:2}),/2 moves left/);
+assert.equal(p.objective({target:1000,mateOnly:true}),'Final phase · checkmate the King');
+const log=[{k:'fx',f:-1,t:-1,n:'Start'},{k:'me',f:60,t:52,n:'King to e2'},{k:'en',f:0,t:4,n:'Rook to e8, check'},{k:'fx',f:4,t:4,n:'Armor breaks'}];
+assert.equal(p.loss('Checkmate. Your King is trapped.',log).index,2);assert.match(p.loss('Out of moves',log).tip,/move preview/);assert.equal(p.loss('Out of moves',log).index,1);
+assert.equal(p.loss('CONCEDED',[]).index,-1);assert.equal(p.escape('<img onerror="x">'),'&lt;img onerror=&quot;x&quot;&gt;');
+for(const sig of ['knightRush','phalanx','nightRaid','bishopCourt','twinQueens','mirror','rookFortress','knightPack+','royalGuard','merchant','bishopGuard','pawnWave','promotionHorde'])assert(p.formation(sig).tip.length>30);
+assert.equal(p.savings(4,'downtown'),0);assert.equal(p.savings(25,'downtown'),5);assert.equal(p.savings(1000,'downtown'),5);assert.equal(p.savings(1000,'midnight'),6);assert.equal(p.savings(-20,'midnight'),0);
+assert(game.includes('interest = CrownfallPolish.savings(RUN.money,RUN.circuit)'));
+assert(game.includes('train:[8, 14, 24, 36, 52]'));
+assert(game.includes('previewMove(sel,i);return;'));assert(game.includes('movePreview.board===B.board'));
+assert(game.includes('P.sig=plan.signature;P.style=plan.style'));assert(game.includes("enSafe('crate',()=>springDockCrate(to))"));
+assert(game.includes("m.dataset.lossReason=why"));assert(game.includes('review.index:L.length-1'));
+console.log('PASS: real training gains, goal/hold states, formation tips, focused loss reviews, escaped messages and capped campaign savings.');
+// A shrinking sold receipt must keep the following visible item at its old
+// viewport offset rather than merely restoring an obsolete absolute scrollY.
+let itemTop=200;
+const anchor={dataset:{shopAnchor:'training-P'},getBoundingClientRect:()=>({top:itemTop,height:60})};
+const shop={querySelector:()=>({getBoundingClientRect:()=>({bottom:120})}),querySelectorAll:()=>[anchor]};
+const viewport={scrollX:0,scrollY:700,innerHeight:844,scrollTo(p){this.scrollY=p.top;}};
+const scroll=vm.createContext({window:viewport,app:{querySelector:()=>shop,querySelectorAll:()=>[anchor]}});
+vm.runInContext(game.slice(game.indexOf('function shopScrollPosition('),game.indexOf('function renderShop(')),scroll);
+const position=vm.runInContext('shopScrollPosition()',scroll);itemTop=160;scroll.position=position;vm.runInContext('restoreShopScroll(position)',scroll);assert.equal(viewport.scrollY,660);
+console.log('PASS: shop keeps a visible item anchored when purchased cards collapse.');
