@@ -59,3 +59,25 @@ body[data-pack="street"] .mood{background:#1b282be6;border:1px solid #6c776b!imp
 .training-play .sq.l .coord{color:#243036;text-shadow:none}
 @media(max-height:700px){#app.training-play{gap:7px;padding-top:7px}.training-note{min-height:70px;padding:8px 11px;font-size:12px}.training-head h2{font-size:24px}.training-score{padding:6px 10px}}
 @media(prefers-reduced-motion:reduce){.city-welcome *, .training-play *{animation:none!important;transition:none!important}}
+
+/* v166: every Campaign land has its own illustrated environment behind the board.
+   Fixed paint layers do not participate in the battle's reserved layout. */
+body[data-pack="medieval"]{--land-environment:url('iron-kingdom.webp');--land-ground:#17120e;--land-focus:62% center}
+body[data-pack="greek"]{--land-environment:url('olympian-court.webp');--land-ground:#151a22;--land-focus:64% center}
+body[data-pack="fantasy"]{--land-environment:url('shattered-realm.webp');--land-ground:#161020;--land-focus:65% center}
+body[data-pack="throne"]{--land-environment:url('fallen-throne.webp');--land-ground:#181115;--land-focus:64% center}
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]):has(#app.play){
+ background:var(--land-ground)!important;
+}
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]):has(#app.play)::before{
+ content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:linear-gradient(180deg,#080c1266,#080c1226 42%,#080c1273),var(--land-environment) var(--land-focus)/cover no-repeat!important;
+ opacity:1!important;animation:none!important;transform:none!important;
+}
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]):has(#app.play)::after{display:none!important}
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]) #app.play{
+ position:relative;z-index:1;background:transparent!important;
+}
+/* Retire the flat wall/forge silhouettes that used to obscure the landscape. */
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]):has(#app.play) #cscene,
+body:is([data-pack="medieval"],[data-pack="greek"],[data-pack="fantasy"],[data-pack="throne"]) #app.play .cs-stage{display:none!important}
