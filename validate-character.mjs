@@ -8,7 +8,7 @@ for(const palette of ['gold','ivory','coral','mint','sky','lilac'])for(const cro
 assert.equal(drawings.size,96);
 const library=new Set();for(const pieceSet of ['sculpted','street','crystal','wild','relic','classic'])for(const type of ['K','Q','R','B','N','P']){const v={pieceSet,size:'large',finish:'polished'};library.add(api.piece(type,v));assert(api.art(type,'me',v).includes('data-piece-design="'+pieceSet+'"'));}
 assert.equal(library.size,36);api.save({pieceSet:'street',pieces:{N:'wild',R:'crystal',P:'invalid',X:'wild'},size:'grand',finish:'duo'});assert.equal(api.designId('N'),'wild');assert.equal(api.designId('R'),'crystal');assert.equal(api.designId('P'),'street');assert.equal(Object.keys(api.get().pieces).length,2);assert(api.art('N').includes('scale(1.12)'));
-values.set('crownrunner-character-v1',JSON.stringify({name:'Old Runner',palette:'mint',crown:'street',crest:'star'}));assert.equal(api.get().name,'Old Runner');assert.equal(api.get().palette,'mint');assert.equal(api.get().pieceSet,'sculpted');assert.equal(values.size,3);assert.equal(values.get('campaign-save'),'untouched');assert.equal(values.get('gauntlet-save'),'untouched');
+values.set('crownrunner-character-v1',JSON.stringify({name:'Old Runner',palette:'mint',crown:'street',crest:'star'}));assert.equal(api.get().name,'Old Runner');assert.equal(api.get().palette,'mint');assert.equal(api.get().pieceSet,'classic');assert.equal(values.size,3);assert.equal(values.get('campaign-save'),'untouched');assert.equal(values.get('gauntlet-save'),'untouched');
 api.save({name:'\u0000   ',palette:'__proto__',crown:'<script>',crest:'unknown'});assert.equal(api.get().name,'Crownrunner');assert.equal(api.get().palette,'gold');assert.equal(api.get().crown,'classic');assert.equal(api.get().crest,'none');
 values.set('crownrunner-character-v1','broken JSON');assert.equal(api.get().name,'Crownrunner');const count=events.length;blocked=true;assert.equal(api.save({name:'Unsaved'}),false);assert.equal(events.length,count);
 console.log('PASS: 36 piece designs, mixed sets, sizes, finishes, old-profile migration, 96 King combinations, normalized profiles, persistent selection, corrupt-storage fallback, failed-save handling, and untouched Campaign/Gauntlet data.');
@@ -39,3 +39,12 @@ api.open();dialog.querySelector('#armyStyle').onchange({target:{value:'classic'}
 assert.equal(api.get().pieceSet,'classic');assert.equal(api.get().size,'grand');assert.equal(Object.keys(api.get().pieces).length,0);assert(dialog.closed);
 for(const t of 'KQRBNP')assert.equal(api.art(t,'en'),enemy[t]);
 console.log('PASS: enemy appearance stays fixed across every player set, size and finish; compact editor previews, Cancel, Save and legacy mixed-set clearing work.');
+// The readable original set replaces old Sculpted/Comic ink defaults once;
+// a later explicit alternate-set choice is preserved.
+blocked=false;
+values.set('crownrunner-character-v1',JSON.stringify({name:'Saved Runner',pieceSet:'sculpted',palette:'mint',size:'grand',pieces:{N:'sculpted',R:'crystal'}}));
+assert.equal(api.get().pieceSet,'classic');assert.equal(api.get().pieces.N,'classic');assert.equal(api.get().pieces.R,'crystal');assert.equal(api.get().palette,'mint');assert.equal(api.get().size,'grand');
+assert(api.art('P').includes('data-piece-render="original"'));
+api.save({...api.get(),pieceSet:'sculpted',pieces:{}});assert.equal(api.get().pieceSet,'sculpted');
+assert.equal(api.art('N','en'),enemy.N,'Enemy set remains independent after legacy-profile migration');
+console.log('PASS: readable original pieces restore automatically for old profiles; colors, sizes and explicit future choices are retained.');

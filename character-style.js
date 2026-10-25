@@ -2,23 +2,32 @@
 (()=>{
  'use strict';
  const KEY='crownrunner-character-v1';
- const palettes={gold:{name:'Gold',fill:'#ffd342',accent:'#c68c25'},ivory:{name:'Ivory',fill:'#f0e5cf',accent:'#d8c6a3'},coral:{name:'Coral',fill:'#ffad94',accent:'#f28283'},mint:{name:'Mint',fill:'#9de0be',accent:'#70cbb0'},sky:{name:'Sky',fill:'#9bd5f1',accent:'#6cbada'},lilac:{name:'Lilac',fill:'#cfb5f3',accent:'#b193df'}};
+ const palettes={gold:{name:'Gold',fill:'#ffe14d',accent:'#e7bc76'},ivory:{name:'Ivory',fill:'#f0e5cf',accent:'#d8c6a3'},coral:{name:'Coral',fill:'#ffad94',accent:'#f28283'},mint:{name:'Mint',fill:'#9de0be',accent:'#70cbb0'},sky:{name:'Sky',fill:'#9bd5f1',accent:'#6cbada'},lilac:{name:'Lilac',fill:'#cfb5f3',accent:'#b193df'}};
  const crowns={classic:{name:'Classic',shape:'<path d="M19 9V7Q15 9 15.5 6.5Q15.5 4.5 19 6V4Q16.5 1 20 1Q23.5 1 21 4V6Q24.5 4.5 24.5 6.5Q25 9 21 7V9Z"/>'},street:{name:'Street',shape:'<path d="M12 9L16 13L20 7L24 13L28 9L26 17H14Z"/><path d="M20 3V7M17.5 4.5H22.5" fill="none"/>'},regal:{name:'Regal',shape:'<path d="M12 10L15 14L17 9L20 14L23 9L25 14L28 10L26 18H14Z"/><path d="M20 3V10M17 5H23" fill="none"/>'},runic:{name:'Runic',shape:'<path d="M20 3L25 8L20 15L15 8ZM12 11L15 15H25L28 11L26 19H14Z"/>'}};
  const crests={none:{name:'None',shape:''},diamond:{name:'Diamond',shape:'M20 22L23 26L20 29L17 26Z'},bolt:{name:'Spark',shape:'M21 21L17 26H20L19 30L24 24H21Z'},star:{name:'Star',shape:'M20 21L21.3 24L24.5 24.4L22 26.5L22.7 29.5L20 28L17.3 29.5L18 26.5L15.5 24.4L18.7 24Z'}};
  const designs=window.CrownfallPieceDesigns;
  const sizes={compact:{name:'Compact',scale:.82},balanced:{name:'Balanced',scale:.94},large:{name:'Large',scale:1.04},grand:{name:'Grand',scale:1.12}};
  const finishes={matte:{name:'Matte'},polished:{name:'Polished'},duo:{name:'Two-tone'}};
  const types={K:'King',Q:'Queen',R:'Rook',B:'Bishop',N:'Knight',P:'Pawn'};
- const defaults={name:'Crownrunner',palette:'gold',crown:'classic',crest:'none',pieceSet:'sculpted',size:'large',finish:'polished',pieces:{}};
- const clean=value=>{const v=value&&typeof value==='object'?value:{},pieces={};for(const t of Object.keys(types))if(v.pieces&&Object.hasOwn(designs.sets,v.pieces[t]))pieces[t]=v.pieces[t];return {name:typeof v.name==='string'?v.name.replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,20)||defaults.name:defaults.name,palette:Object.hasOwn(palettes,v.palette)?v.palette:defaults.palette,crown:Object.hasOwn(crowns,v.crown)?v.crown:defaults.crown,crest:Object.hasOwn(crests,v.crest)?v.crest:defaults.crest,pieceSet:Object.hasOwn(designs.sets,v.pieceSet)?v.pieceSet:defaults.pieceSet,size:Object.hasOwn(sizes,v.size)?v.size:defaults.size,finish:Object.hasOwn(finishes,v.finish)?v.finish:defaults.finish,pieces};};
- const get=()=>{try{return clean(JSON.parse(localStorage.getItem(KEY)||'null'));}catch{return {...defaults};}};
+ const defaults={name:'Crownrunner',palette:'gold',crown:'classic',crest:'none',pieceSet:'classic',size:'large',finish:'polished',pieces:{}};
+ const clean=value=>{const v=value&&typeof value==='object'?value:{},pieces={};for(const t of Object.keys(types))if(v.pieces&&Object.hasOwn(designs.sets,v.pieces[t]))pieces[t]=v.pieces[t];return {styleVersion:162,name:typeof v.name==='string'?v.name.replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,20)||defaults.name:defaults.name,palette:Object.hasOwn(palettes,v.palette)?v.palette:defaults.palette,crown:Object.hasOwn(crowns,v.crown)?v.crown:defaults.crown,crest:Object.hasOwn(crests,v.crest)?v.crest:defaults.crest,pieceSet:Object.hasOwn(designs.sets,v.pieceSet)?v.pieceSet:defaults.pieceSet,size:Object.hasOwn(sizes,v.size)?v.size:defaults.size,finish:Object.hasOwn(finishes,v.finish)?v.finish:defaults.finish,pieces};};
+ // Existing Comic ink/Sculpted profiles return to the readable original set once.
+ // A later explicit style selection is kept, along with colors and King details.
+ const get=()=>{try{const raw=JSON.parse(localStorage.getItem(KEY)||'null'),p=clean(raw);if(raw&&raw.styleVersion!==162){if(!raw.pieceSet||raw.pieceSet==='sculpted')p.pieceSet='classic';for(const t in p.pieces)if(p.pieces[t]==='sculpted')p.pieces[t]='classic';}return p;}catch{return clean(null);}};
+
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const designId=(t,v=get())=>{const p=clean(v);return p.pieces[t]||p.pieceSet;};
  const shape=(v=get())=>crowns[clean(v).crown].shape+designs.kingBody(designId('K',v));
  const crest=(v=get())=>{const c=crests[clean(v).crest];return c.shape?`<path d="${c.shape}" fill="#25313a" stroke="none"/>`:'';};
  // Approved Comic ink: classic silhouettes, flat color, hard-edged shadows.
  function art(t,side='me',value=get(),material={}){
-  const me=side!=='en',p=clean(me?value:{...defaults,pieceSet:'sculpted',size:'balanced',finish:'polished'}),id=designId(t,p),color=palettes[p.palette],fill=material.fill||(me?color.fill:'#7964b5'),stroke='#16111e',scale=sizes[p.size].scale;
+  const me=side!=='en',p=clean(me?value:{...defaults,pieceSet:'classic',size:'balanced',finish:'matte'}),id=designId(t,p),color=palettes[p.palette],fill=material.fill||(me?color.fill:'#7964b5'),stroke='#16111e',scale=sizes[p.size].scale;
+  if(id==='classic'){
+   const ink=material.stroke||(me?'#111':'#ff3d9a'),paint=material.fill||(me?color.fill:'#161616');
+   const silhouette=t==='K'&&me&&p.crown!=='classic'?crowns[p.crown].shape+designs.kingBody('classic'):designs.original(t);
+   const shape=silhouette.replace('class="cut"',`style="stroke:${ink};fill:none"`).replace('class="eye"',`style="fill:${ink};stroke:none"`);
+   return `<g class="piece-sculpture original-pieces" transform="translate(20 20) scale(${scale}) translate(-20 -20)" data-piece-design="classic" data-piece-render="original"><g style="fill:${paint};stroke:${ink}" stroke-width="2.1" stroke-linejoin="round">${shape}<rect x="9" y="30.5" width="22" height="5" rx="2"/></g>${t==='K'&&me?crest(p):''}</g>`;
+  }
   const outline=t==='K'?(me?crowns[p.crown].shape:crowns.classic.shape)+designs.kingBody(id):designs.outline(id,t),base=designs.base(id);
   const key=['comic',me?'me':'en',id,t,p.palette,p.crown,p.crest,p.finish,fill].join('-').replace(/[^a-z0-9-]/gi,'');
   const shade=me?color.accent:'#403266',shine=me?'#fff0b0':'#c9abe8',baseFill=p.finish==='duo'?shade:fill;
