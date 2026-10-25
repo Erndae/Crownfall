@@ -19,5 +19,5 @@
 /* A single small editor; detailed controls stay closed until requested. */
 .look-select{display:flex;align-items:center;justify-content:space-between;gap:14px;font:13px var(--body,Arial,sans-serif);margin:12px 0;color:#e8dfcc}.look-select select{width:56%;min-height:44px;padding:8px 10px;border:1px solid #74827c;border-radius:6px;background:#20333b;color:#f2e6ce;font:14px var(--body,Arial,sans-serif)}.look-colors .character-colors{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}.look-colors .character-option{flex-direction:column;gap:5px;font-size:9px;min-height:49px}.look-colors .character-swatch{width:22px;height:22px}.look-more{border-top:1px solid #596d6a;margin-top:14px}.look-more summary,.look-individual summary{padding:14px 0;font:13px var(--body,Arial,sans-serif);color:#e5d8bc;cursor:pointer}.look-more .character-name{margin:14px 0}.mixed-look-note{font:11px/1.4 var(--body,Arial,sans-serif);color:#d6c5a0}.look-individual{margin-bottom:10px}.character-form>.piece-hint{margin:7px 0 13px}.character-form .army-style-preview{margin-bottom:0}
 
-/* Carved silhouettes use fine edges and depth rather than sticker outlines. */
+/* Comic ink uses crisp contours, flat color and hard-edged shadows. */
 body #board .pc:not(.ench),body #pinfo .pc:not(.ench){filter:drop-shadow(0 1px .3px #d6c9ae88) drop-shadow(0 2px 1px #0009)!important}

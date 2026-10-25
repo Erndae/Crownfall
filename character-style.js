@@ -2,7 +2,7 @@
 (()=>{
  'use strict';
  const KEY='crownrunner-character-v1';
- const palettes={gold:{name:'Gold',fill:'#edcf8e',accent:'#c39b59'},ivory:{name:'Ivory',fill:'#f0e5cf',accent:'#d8c6a3'},coral:{name:'Coral',fill:'#ffad94',accent:'#f28283'},mint:{name:'Mint',fill:'#9de0be',accent:'#70cbb0'},sky:{name:'Sky',fill:'#9bd5f1',accent:'#6cbada'},lilac:{name:'Lilac',fill:'#cfb5f3',accent:'#b193df'}};
+ const palettes={gold:{name:'Gold',fill:'#ffd342',accent:'#c68c25'},ivory:{name:'Ivory',fill:'#f0e5cf',accent:'#d8c6a3'},coral:{name:'Coral',fill:'#ffad94',accent:'#f28283'},mint:{name:'Mint',fill:'#9de0be',accent:'#70cbb0'},sky:{name:'Sky',fill:'#9bd5f1',accent:'#6cbada'},lilac:{name:'Lilac',fill:'#cfb5f3',accent:'#b193df'}};
  const crowns={classic:{name:'Classic',shape:'<path d="M19 9V7Q15 9 15.5 6.5Q15.5 4.5 19 6V4Q16.5 1 20 1Q23.5 1 21 4V6Q24.5 4.5 24.5 6.5Q25 9 21 7V9Z"/>'},street:{name:'Street',shape:'<path d="M12 9L16 13L20 7L24 13L28 9L26 17H14Z"/><path d="M20 3V7M17.5 4.5H22.5" fill="none"/>'},regal:{name:'Regal',shape:'<path d="M12 10L15 14L17 9L20 14L23 9L25 14L28 10L26 18H14Z"/><path d="M20 3V10M17 5H23" fill="none"/>'},runic:{name:'Runic',shape:'<path d="M20 3L25 8L20 15L15 8ZM12 11L15 15H25L28 11L26 19H14Z"/>'}};
  const crests={none:{name:'None',shape:''},diamond:{name:'Diamond',shape:'M20 22L23 26L20 29L17 26Z'},bolt:{name:'Spark',shape:'M21 21L17 26H20L19 30L24 24H21Z'},star:{name:'Star',shape:'M20 21L21.3 24L24.5 24.4L22 26.5L22.7 29.5L20 28L17.3 29.5L18 26.5L15.5 24.4L18.7 24Z'}};
  const designs=window.CrownfallPieceDesigns;
@@ -16,15 +16,15 @@
  const designId=(t,v=get())=>{const p=clean(v);return p.pieces[t]||p.pieceSet;};
  const shape=(v=get())=>crowns[clean(v).crown].shape+designs.kingBody(designId('K',v));
  const crest=(v=get())=>{const c=crests[clean(v).crest];return c.shape?`<path d="${c.shape}" fill="#25313a" stroke="none"/>`:'';};
+ // Approved Comic ink: classic silhouettes, flat color, hard-edged shadows.
  function art(t,side='me',value=get(),material={}){
-  const me=side!=='en',p=clean(me?value:{...defaults,pieceSet:'sculpted',size:'balanced',finish:'polished'}),id=designId(t,p),color=palettes[p.palette],fill=material.fill||(me?color.fill:'#30283e'),stroke=me?'#6a512c':'#17111f',scale=sizes[p.size].scale;
-  const outline=t==='K'?(me?crowns[p.crown].shape:crowns.classic.shape)+designs.kingBody(id):designs.outline(id,t);
-  const carved=id==='sculpted',key='carved-'+(me?'me':'en')+'-'+fill.replace(/[^a-z0-9]/gi,''),light=me?(p.palette==='gold'?'#fff2c9':'#f9f3e8'):'#786783',shade=me?(p.palette==='gold'?'#b78d4e':color.accent):'#181323';
-  const gradient=carved?`<defs><linearGradient id="${key}" x1="0" y1="0" x2="1" y2=".25"><stop stop-color="${shade}"/><stop offset=".3" stop-color="${fill}"/><stop offset=".48" stop-color="${light}"/><stop offset=".64" stop-color="${fill}"/><stop offset="1" stop-color="${shade}"/></linearGradient></defs>`:'';
-  const paint=carved?`url(#${key})`:fill;
-  const baseFill=p.finish==='duo'?(me?color.accent:'#562f46'):paint;
-  const sheen=p.finish==='polished'?`<path d="M12 33H27M17 25L16 28" fill="none" stroke="${me?'#fff9df':'#e6a7bd'}" stroke-width="1.1" opacity=".65"/>`:'';
-  return `${gradient}<g class="piece-sculpture" transform="translate(20 20) scale(${scale}) translate(-20 -20)" data-piece-design="${id}"><g style="fill:${paint};stroke:${stroke}" stroke-width="${carved?.75:1.5}" stroke-linejoin="round">${outline}</g><g style="fill:${baseFill};stroke:${stroke}" stroke-width="${carved?.75:1.5}" stroke-linejoin="round">${designs.base(id)}</g><g style="color:${me?'#947442':'#aa93ad'}">${designs.details(id,t)}</g>${sheen}${t==='K'&&me?crest(p):''}</g>`;
+  const me=side!=='en',p=clean(me?value:{...defaults,pieceSet:'sculpted',size:'balanced',finish:'polished'}),id=designId(t,p),color=palettes[p.palette],fill=material.fill||(me?color.fill:'#7964b5'),stroke='#16111e',scale=sizes[p.size].scale;
+  const outline=t==='K'?(me?crowns[p.crown].shape:crowns.classic.shape)+designs.kingBody(id):designs.outline(id,t),base=designs.base(id);
+  const key=['comic',me?'me':'en',id,t,p.palette,p.crown,p.crest,p.finish,fill].join('-').replace(/[^a-z0-9-]/gi,'');
+  const shade=me?color.accent:'#403266',shine=me?'#fff0b0':'#c9abe8',baseFill=p.finish==='duo'?shade:fill;
+  const shadow=`<path d="M25 0H40V40H8L12 33H27L23 28L25 24L24 19L28 16L24 14Z" fill="${shade}"/>`;
+  const highlight=p.finish==='matte'?'':`<path d="M15 12L17 10M16 25L17.5 22M12 33H24" fill="none" stroke="${shine}" stroke-width="1.7" stroke-linecap="round"/>`;
+  return `<defs><clipPath id="${key}"><g>${outline}${base}</g></clipPath></defs><g class="piece-sculpture comic-ink" transform="translate(20 20) scale(${scale}) translate(-20 -20)" data-piece-design="${id}" data-piece-render="comic-ink"><g fill="${fill}" stroke="${stroke}" stroke-width="1.65" stroke-linejoin="round">${outline}</g><g fill="${baseFill}" stroke="${stroke}" stroke-width="1.65" stroke-linejoin="round">${base}</g><g clip-path="url(#${key})">${shadow}${highlight}</g><g fill="none" stroke="${stroke}" stroke-width="1.65" stroke-linejoin="miter">${outline}${base}</g>${t==='N'?`<circle cx="23" cy="12.5" r="1.05" fill="${stroke}"/>`:''}${t==='K'&&me?crest(p):''}</g>`;
  }
  const piece=(t,v=get(),map=false)=>`<svg xmlns="http://www.w3.org/2000/svg" class="character-piece${map?' king-piece':''}" data-piece-type="${t}" viewBox="0 0 40 40" ${map?'x="-19" y="-19" width="38" height="38"':'width="80" height="80"'} aria-hidden="true">${art(t,'me',v)}</svg>`;
  const svg=(v=get(),map=false)=>piece('K',v,map);

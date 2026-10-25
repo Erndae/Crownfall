@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="piece-designs.js?v=160"></script>
-<script src="character-style.js?v=160"></script>
-<script src="campaign-opponents.js?v=160"></script>
-<script src="campaign-dialogue.js?v=160"></script>
-<link rel="stylesheet" href="character-style.css?v=160">
+<script src="piece-designs.js?v=161"></script>
+<script src="character-style.js?v=161"></script>
+<script src="campaign-opponents.js?v=161"></script>
+<script src="campaign-dialogue.js?v=161"></script>
+<link rel="stylesheet" href="character-style.css?v=161">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,8 +2402,8 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=160">
-<link rel="stylesheet" href="ruler-style.css?v=160">
+<link rel="stylesheet" href="city-board.css?v=161">
+<link rel="stylesheet" href="ruler-style.css?v=161">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2461,7 +2461,7 @@ function pieceSVG(t, side, e){
   const me = side !== 'en';
   const el = eList(e);
   const mat = el.length ? MAT[['crystal','iron','gold','fire','thorn'].find(x => el.includes(x))] : null;
-  const fill = me ? CrownfallCharacter.palette().fill : mat ? mat.fill : '#30283e';
+  const fill = me ? CrownfallCharacter.palette().fill : mat ? mat.fill : '#7964b5';
   const stroke = mat ? mat.stroke : me ? '#6a512c' : '#17111f';
   let back = '', front = '';
   if(el.includes('fire')) back += '<g class="flame"><path d="M8 34 Q5 22 11 15 Q11 21 14 22 Q13 12 20 4 Q21 13 26 15 Q27 10 29 9 Q35 20 32 34 Z" fill="#ff5a1f" opacity=".9"/><path d="M12 34 Q10 26 14 21 Q15 25 17 25 Q17 17 21 12 Q23 19 26 21 Q30 27 28 34 Z" fill="#ffd23d"/></g>';
@@ -3493,7 +3493,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 160;
+const GAME_VERSION = 161;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
