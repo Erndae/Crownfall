@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const game=readFileSync('index.html','utf8');
 const between=(start,end)=>game.slice(game.indexOf(start),game.indexOf(end,game.indexOf(start)));
 const c=vm.createContext({AI_MAX:1700,RUN:{circuit:'harbor',land:'street',gExtra:'thief',gauntlet:true,money:9},B:null,MATCH:null,MINI_RULE:{harbor:null},RULER:()=>({rules:['thief','tax']}),bossId:()=> 'mini',console,performance});
-vm.runInContext(between('const ruleOf =','// Legacy Double Mover'),c);
+vm.runInContext(between('function introRuleFree(', 'function enterLand(')+between('const ruleOf =','// Legacy Double Mover'),c);
 assert.equal(vm.runInContext("ruleOf('thief').length",c),0);
 assert.equal(vm.runInContext("ruleOf('mini').length",c),0);
 assert.equal(vm.runInContext("ruleOf('ruler').join(',')",c),'tax');

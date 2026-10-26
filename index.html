@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=167"></script>
-<script src="piece-designs.js?v=167"></script>
-<script src="character-style.js?v=167"></script>
-<script src="campaign-opponents.js?v=167"></script>
-<script src="campaign-dialogue.js?v=167"></script>
-<link rel="stylesheet" href="character-style.css?v=167">
+<script src="gameplay-polish.js?v=168"></script>
+<script src="piece-designs.js?v=168"></script>
+<script src="character-style.js?v=168"></script>
+<script src="campaign-opponents.js?v=168"></script>
+<script src="campaign-dialogue.js?v=168"></script>
+<link rel="stylesheet" href="character-style.css?v=168">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2403,9 +2403,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=167">
-<link rel="stylesheet" href="ruler-style.css?v=167">
-<link rel="stylesheet" href="gameplay-polish.css?v=167">
+<link rel="stylesheet" href="city-board.css?v=168">
+<link rel="stylesheet" href="ruler-style.css?v=168">
+<link rel="stylesheet" href="gameplay-polish.css?v=168">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3217,7 +3217,21 @@ const rulerRoad = () => !!(RUN && RUN.circuit === 'ruler');
 function roadStart(){ if(rulerRoad() && !B && (RUN.ante < nStages() || RUN.blind < 2)){ RUN.ante = nStages(); RUN.blind = 2; } }
 const stageName = a => { const st = LV().stages; if(RUN && RUN.circuit !== 'ruler') return st[CIRCUIT_STAGE_IDX[(a - 1) % CIRCUIT_STAGES]]; return st[(a - 1) % STAGES]; };
 const champName = () => LV().champ;
-function enterLand(){ if(!RUN) return; if(RUN.match){ RUN.land = 'arena'; arenaOn(); return; } if(!RUN.land) RUN.land = PACK; if(RUN.bosses){ const n = nStages(); if(RUN.bosses.length > n) RUN.bosses = RUN.bosses.slice(0, n); while(RUN.bosses.length < n) RUN.bosses.push(pick(BOSSES).id); RUN.bosses[n-1] = RUN.circuit === 'ruler' ? 'ruler' : 'mini'; gmPlace(); if(!RUN.won && RUN.ante > n){ RUN.ante = n; RUN.blind = 2; } } if(PACK !== RUN.land){ setPack(RUN.land); musicRestart(); } }
+// v168: keep the opponent identity ID; suppress only an unstarted Intro's extra rule.
+function migrateIntroRule(r, battle){
+  if(!r || r.gauntlet || r.match || r.circuit === 'ruler' || r.ante !== 1 || battle || r.introStarted || r.introRuleFree) return;
+  // Older retries have no battle object. Compare lives with the Circuit entry,
+  // including purchased lives, so a carried army with fewer than 3 lives is not a retry.
+  const cp = cpGet().cur, entry = cp && cp.land === r.land && cp.circuit === r.circuit ? cp.carry : null;
+  const entryLives = entry && entry.lives != null ? entry.lives : 3;
+  const bought = (r.livesBought || 0) - (entry?.livesBought || 0);
+  if(r.lives != null && r.lives < entryLives + bought) return;
+  r.introRuleFree = true;
+  const key = [r.land, r.circuit, 1, r.blind].join('|');
+  if(r.fightTarget?.key === key) delete r.fightTarget;
+}
+function introRuleFree(id){return !!(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1 && RUN.introRuleFree && id === bossAt(1));}
+function enterLand(){ if(!RUN) return; if(RUN.match){ RUN.land = 'arena'; arenaOn(); return; } if(!RUN.land) RUN.land = PACK; if(RUN.bosses){ const n = nStages(); if(RUN.bosses.length > n) RUN.bosses = RUN.bosses.slice(0, n); while(RUN.bosses.length < n) RUN.bosses.push(pick(BOSSES).id); RUN.bosses[n-1] = RUN.circuit === 'ruler' ? 'ruler' : 'mini'; gmPlace(); if(!RUN.won && RUN.ante > n){ RUN.ante = n; RUN.blind = 2; } } migrateIntroRule(RUN, B); if(PACK !== RUN.land){ setPack(RUN.land); musicRestart(); } }
 function setPack(id){ PACK = id; document.body.dataset.pack = gArenaOn() ? 'gauntlet' : id; if(gArenaOn()) document.body.dataset.gtier = gTier(gWave()).id; applyLandTheme(); applyNames(id); try{ localStorage.setItem('crownfall-pack', id); }catch(e){} }
 function landsScreen(after){
   const musicBefore = MM.want; setMusicContext('menu');
@@ -3410,6 +3424,7 @@ function newRun(circuit){
   if(RUN.land === 'throne' && RUN.circuit === 'midnight') RUN.bosses[2] = 'crown';   // Stage 3: always the Fallen Grandmaster
   cpBossBias();   // v134: each Circuit favours its own existing boss rules
   gmPlace();      // beta 2: no Fallen Grandmaster anywhere but Tribute Hall Stage 3
+  if(RUN.circuit !== 'ruler') RUN.introRuleFree = true;
   { const cp = cpGet(), entry = clone(getCarry());          // the Circuit checkpoint: the army exactly as it enters (before anything is earned)
     RUN.att = Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);   // beta 2: this Circuit attempt
     if(RUN.circuit !== 'ruler'){ cp.cur = {land:RUN.land, circuit:RUN.circuit, carry:entry, at:Date.now()}; cp.mid = null; setCheckpoint(cp); }
@@ -3437,7 +3452,7 @@ const CLOUD = {doc:null, state:'off', last:0, timer:null, busy:false, again:fals
 function stamp(){ savedAt = Date.now(); try{ localStorage.setItem('gambit-savedAt', String(savedAt)); }catch(e){} cloudSoon(); }
 function save(){ if(B && B.cr && !enSnap) crSync(); if(MATCH) return matchWrite(); laEnsure();   // v127: a Crown Match never touches the Campaign save
   try{ localStorage.setItem('gambit-run', enSnap && B && !B.done ? enSnap : JSON.stringify({RUN, B})); }catch(e){} stamp(); }   // a move in flight saves its clean boundary (v118)
-function loadRun(){ try{ const x = JSON.parse(localStorage.getItem('gambit-run')); if(x && x.RUN){ RUN = migRun(normLv(x.RUN)); B = x.B; return true; } }catch(e){} return false; }
+function loadRun(){ try{ const x = JSON.parse(localStorage.getItem('gambit-run')); if(x && x.RUN){ RUN = migRun(normLv(x.RUN)); B = x.B; migrateIntroRule(RUN, B); return true; } }catch(e){} return false; }
 function clearRun(){ try{ localStorage.removeItem('gambit-run'); }catch(e){} RUN = null; B = null; stamp(); }
 let BEST = {ante:0, hand:0}; try{ BEST = Object.assign(BEST, JSON.parse(localStorage.getItem('gambit-best')||'{}')); }catch(e){}
 const saveBest = () => { try{ localStorage.setItem('gambit-best', JSON.stringify(BEST)); }catch(e){} stamp(); };
@@ -3480,6 +3495,7 @@ async function cloudInit(){
       if((d.savedAt || 0) > savedAt && typeof d.json === 'string'){
         const x = xc;
         const cR = migRun(normLv(x.RUN || null)), cB = x.B || null; if(!MATCH){ RUN = cR; B = cB; } if('REBUILD' in x) setRebuild(x.REBUILD || null); if('CP' in x){ try{ x.CP ? localStorage.setItem(CP_KEY, JSON.stringify(x.CP)) : localStorage.removeItem(CP_KEY); }catch(e){} } if('CARRY' in x){ try{ x.CARRY ? localStorage.setItem('crownfall-carry', JSON.stringify(x.CARRY)) : localStorage.removeItem('crownfall-carry'); }catch(e){} } if(x.BEST) BEST = Object.assign({ante:0, hand:0}, x.BEST); if(x.ACH){ ACH = mergeAch(ACH, x.ACH); migrateProgress(true); try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){} }
+        if(!MATCH) migrateIntroRule(RUN, B);
         savedAt = d.savedAt;
         try{ if(cR) localStorage.setItem('gambit-run', JSON.stringify({RUN:cR, B:cB})); else localStorage.removeItem('gambit-run'); localStorage.setItem('gambit-best', JSON.stringify(BEST)); localStorage.setItem('gambit-savedAt', String(savedAt)); }catch(e){}
         CLOUD.state = 'on'; CLOUD.last = d.savedAt;
@@ -3496,14 +3512,14 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 167;
+const GAME_VERSION = 168;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
 const bossId = () => RUN.blind === 2 ? bossAt(RUN.ante) : null;
 const miniName = () => ((MINIS[land()] || MINIS.street)[RUN.circuit]) || 'The Circuit Boss';
 // Ignore the retired rule in old Campaign and Gauntlet saves too.
-const ruleOf = id => (id === 'ruler' ? RULER().rules : id === 'mini' ? [MINI_RULE[RUN.circuit], ...(RUN.gauntlet && RUN.gExtra ? [RUN.gExtra] : [])] : id ? [id] : []).filter(r => r && r !== 'thief');   // (v152: a late Gauntlet boss wave may add a second rule)
+const ruleOf = id => (introRuleFree(id) ? [] : id === 'ruler' ? RULER().rules : id === 'mini' ? [MINI_RULE[RUN.circuit], ...(RUN.gauntlet && RUN.gExtra ? [RUN.gExtra] : [])] : id ? [id] : []).filter(r => r && r !== 'thief');   // (v152: a late Gauntlet boss wave may add a second rule)
 const RULE = x => ruleOf(bossId()).includes(x);
 // Legacy Double Mover bosses ('march'): no longer two moves every turn. Each keeps its identity as a
 // one-use double turn per battle, run by the same rules as Morwen's Shadow Step (1 charge, not before turn 3,
@@ -3514,7 +3530,7 @@ const marchDbl = () => (RUN && RUN.gauntlet ? ['Double Move', 'the enemy'] : MOD
 const dblRule = () => RULE('shadow') || RULE('march');                 // bosses with a one-use double turn
 const dblLabel = () => RULE('march') && !RULE('shadow') ? marchDbl()[0] : 'Shadow Step';
 const dblWho = () => RULE('march') && !RULE('shadow') ? marchDbl()[1].replace(/^the /, 'The ') : 'Morwen';
-function bossObj(id){ if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit]; return {id, name:miniName(), desc:MINI_DESC[rule] || 'Standard chess rules.', mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), name:bossName(id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } const boss=BOSSES.find(b => b.id === id); return boss?{...boss,name:bossName(id)}:boss; }
+function bossObj(id){ if(introRuleFree(id)) return {...BOSSES.find(b => b.id === id), id, name:bossName(id), desc:'Standard chess rules.'}; if(id === 'ruler'){ const r = RULER(); return {id, name:r.name, desc:r.desc, ruler:true}; } if(id === 'mini'){ const rule = MINI_RULE[RUN.circuit]; return {id, name:miniName(), desc:MINI_DESC[rule] || 'Standard chess rules.', mini:true}; } if(id === 'march'){ const [lab, who] = marchDbl(); return {...BOSSES.find(b => b.id === id), name:bossName(id), desc:`${lab}: once per battle, ${who} may make two moves before you can respond.`}; } const boss=BOSSES.find(b => b.id === id); return boss?{...boss,name:bossName(id)}:boss; }
 /* ---------- score targets ----------
    A new army grows fast, so it plays the original curve (this is all of Crown City Easy on a fresh save).
    Once an army has been through a few circuits its Training is capped and its pieces are customised, so its
@@ -3573,8 +3589,8 @@ function targetParts(i){
   let t = Math.min(prog, cap); if(fresh != null) t = Math.min(t, fresh); if(blitz != null) t = Math.min(t, blitz);
   t *= lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF();   // beta: army-size factor (beta 2: Blitz after Crown City uses ratio^1.5, was ratio^2.5)
   if(!lim && land() === 'street') t *= CC_TARGET[RUN.circuit] || 1;   // beta 2: Crown City share calibration
-  if(i === 2 && RUN.land === 'street') t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
-  if(i === 2 && RUN.land === 'street' && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
+  if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante))) t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
+  if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
   return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), ppm:capacityPPM(), power:+armyPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
@@ -5563,7 +5579,7 @@ function bossChips(id){
 function bossDetails(boss){
   if(RUN && RUN.gauntlet && !MATCH) return gFoeDetails(boss);   // v152
   const pp = personaOf(boss.id), a = SIG_BOSS[bossRuleName(boss.id)], A = a && ARCHE[sigBase(a)], lim = moveLimitFor(parFor(), boss.id);
-  const m = modal(`<p class="tr-kicker" style="margin:0">${boss.ruler ? 'Ruler' : boss.mini ? 'Rival · Circuit boss' : 'Boss'}</p><h2 style="margin:0">${bossName(boss.id)}</h2>${encounterHTML(true)}
+  const m = modal(`<p class="tr-kicker" style="margin:0">${opponentRole(boss)}</p><h2 style="margin:0">${bossName(boss.id)}</h2>${encounterHTML(true)}
     <div class="cash" style="gap:8px;display:flex;flex-direction:column">
       <div><b style="font-family:var(--display);font-weight:400;color:#ffb3bd">Rules</b><br><span style="font-size:14px">${boss.desc}</span></div>
       ${lim ? `<div><b style="font-family:var(--display);font-weight:400;color:#ff3d9a">Blitz</b><br><span style="font-size:14px">Reach the target within ${lim} moves.</span></div>` : ''}
@@ -5573,14 +5589,14 @@ function bossDetails(boss){
     </div><button class="btn" id="bdok">Close</button>`, '#bdok');
 }
 // v153: where this Stage sits in its Circuit (one Stage = one fight: Introduction, Rival, Elite Challenge, Circuit Boss)
-const STAGE_ROLE = ['Introduction', 'Rival', 'Elite Challenge', 'Circuit Boss'];
+const STAGE_ROLE = ['Intro', 'Rival', 'Elite', 'Circuit Boss'];
 function stageProgress(){
   if(!RUN || RUN.gauntlet) return '';
   if(rulerRoad()) return `<div class="stprog ruler" role="group" aria-label="The Ruler’s Road, the final battle of this Land"><p><b>The Ruler’s Road · Final battle</b><span>Win to claim ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</span></p></div>`;
   const a = Math.min(RUN.ante, CIRCUIT_STAGES), role = STAGE_ROLE[a - 1] || '';
   const next = a < CIRCUIT_STAGES ? `Win to advance to Stage ${a + 1}` : `Win to clear ${CIR().name}`;
   return `<div class="stprog" role="group" aria-label="Stage ${a} of ${CIRCUIT_STAGES}, ${role}. Current opponent: ${bossName(bossAt(a),a)}. ${next}.">
-    <ol class="stpips" aria-hidden="true">${STAGE_ROLE.map((r, i) => `<li class="${i + 1 < a ? 'done' : i + 1 === a ? 'cur' : ''}"><i>${i + 1 < a ? '✓' : i + 1}</i><small>${r === 'Elite Challenge' ? 'Elite' : r === 'Circuit Boss' ? 'Boss' : r === 'Introduction' ? 'Intro' : r}</small></li>`).join('')}</ol>
+    <ol class="stpips" aria-hidden="true">${STAGE_ROLE.map((r, i) => `<li class="${i + 1 < a ? 'done' : i + 1 === a ? 'cur' : ''}"><i>${i + 1 < a ? '✓' : i + 1}</i><small>${r}</small></li>`).join('')}</ol>
     <p><b>Stage ${a} · ${role}</b><span>${next}</span></p></div>`;
 }
 // v154: why a recruit can or can't join right now (Land limits and per-type caps are unchanged)
@@ -5652,7 +5668,7 @@ function blindSelect(){
     ${relicRow()}
     ${stageProgress()}
     <div class="blinds solo">${BLINDS.map((bl, i) => i < 2 ? '' : `<div class="bcard k${i} ${i===RUN.blind?'cur':i<RUN.blind?'done':''}${i===2 ? (boss.ruler ? ' ruler' : boss.mini ? ' rival' : ' boss') : ''}">
-      <div class="chip" style="background:${bl.col}">${i === 2 && boss.ruler ? 'RULER' : i === 2 && boss.mini ? 'BOSS' : i === 2 ? (['INTRO', 'RIVAL', 'ELITE'][RUN.ante - 1] || LV().chips[i]) : LV().chips[i]}</div>
+      <div class="chip" style="background:${bl.col}">${i === 2 && boss.ruler ? 'RULER' : i === 2 && boss.mini ? 'CIRCUIT BOSS' : i === 2 ? (['INTRO', 'RIVAL', 'ELITE'][RUN.ante - 1] || LV().chips[i]) : LV().chips[i]}</div>
       <span style="font-family:var(--display)">${i===2 ? bossName(boss.id) : roundName(i)}</span>
       <small>Score at least</small><b>${t(i).toLocaleString()}</b>
       <small>Reward $${bl.reward}</small>
@@ -5718,6 +5734,7 @@ const OPP_TREAT_SIG = {knightRush:'speed', nightRaid:'speed', knightPack:'speed'
   twinQueens:'power', promotionHorde:'power', pawnWave:'power', bishopCourt:'court', bishopGuard:'court', classic:'court', mirror:'court'};
 const OPP_TREAT_RULE = {clock:'speed', wall:'fortress', shadow:'shadow', march:'shadow', crown:'power', tax:'court', thief:'court'};
 const OPP_TREAT_NAME = {'Heracles':'power'};
+function opponentRole(boss, stage=RUN?.ante){return boss?.ruler ? 'Ruler' : boss?.mini ? 'Circuit Boss' : ['Intro','Rival','Elite'][stage-1] || 'Boss';}
 function oppTier(boss){ if(MATCH || !RUN) return ''; if(!boss) return 'normal'; if(boss.ruler) return land() === 'throne' ? 'crownless' : 'ruler'; return boss.mini ? 'rival' : 'boss'; }
 function oppTreat(boss){
   if(!boss || MATCH) return '';
@@ -5736,12 +5753,14 @@ function oppEntrance(boss, tier){
   const el = document.createElement('div'); el.className = `oppin ${tier}`; el.setAttribute('aria-hidden', 'true');
   const pp = curPersona(), line = pp ? ((Array.isArray(pp.intro) ? pick(pp.intro) : pp.intro) || repLine(pp)) : '';   // v154: the opening line lives on the card
   if(line) B.introSaid = 1;
-  el.innerHTML = `<small class="oland">${PACKS.find(x => x.id === land()).name} · ${CIR().name}</small><b>${bossName(boss.id)}</b><span class="otags"><i class="otag">${tier === 'rival' ? 'Rival' : 'Boss'}</i>${sigChip()}${mech ? `<small class="mchip">${mech}</small>` : ''}</span>${line ? `<q class="oline">${line}</q>` : ''}${encounterHTML()}${hazardHTML(true)}<small class="otap">Tap to continue</small>`;
+  el.innerHTML = `<small class="oland">${PACKS.find(x => x.id === land()).name} · ${CIR().name}</small><b>${bossName(boss.id)}</b><span class="otags"><i class="otag">${opponentRole(boss)}</i>${sigChip()}${mech ? `<small class="mchip">${mech}</small>` : ''}</span>${line ? `<q class="oline">${line}</q>` : ''}${encounterHTML()}${hazardHTML(true)}<small class="otap">Tap to continue</small>`;
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
 }
 function startBlind(){ try{ laClear(); }catch(e){}
+  migrateIntroRule(RUN, B);
+  if(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1) RUN.introStarted = true;
   midCheckpoint();   // beta 2
   enSnap = null; enCommitted = false;   // a new fight never inherits an in-flight enemy move (v118)
   RUN.roster = RUN.roster.filter(Boolean); RUN.cards = RUN.cards || [];
@@ -8944,7 +8963,7 @@ function winBlind(){
   const bp = bossWin && !RUN.gauntlet ? personaOf(bossId()) : null;
   // presentation facts, captured before the commit below moves the run on
   const vLand = land(), vRuler = bossWin && bossId() === 'ruler', vName = roundName(RUN.blind), vScore = B.score, vLog = B.log;
-  const vOpp = bossWin && !vRuler ? {tier: bossObj(bossId()).mini ? 'rival' : 'boss', name: bossName(bossId())} : null;   // v132
+  const vOpp = bossWin && !vRuler ? {tier: bossObj(bossId()).mini ? 'rival' : 'boss', name: bossName(bossId()), tag:RUN.gauntlet ? undefined : opponentRole(bossObj(bossId()))} : null;   // v132
   const html = (`${bp ? `<div class="quote">${portrait(bp)}<span>“${bp.lose}”<small>${bp.name}</small></span></div>` : ''}<p class="muted">${bossWin ? bossName(bossId()) : roundName(RUN.blind)} beaten</p><h2 style="color:var(--brass)">${B.mate ? (B.kingFell ? 'The King falls!' : 'Checkmate!') : RUN.circuit === 'ruler' ? 'Ruler defeated!' : `Stage ${RUN.ante} cleared!`}</h2>
     <div class="kv"><span>Score</span><b>${B.score.toLocaleString()} / ${B.target.toLocaleString()}</b></div>
     ${B.mateBonus ? `<div class="kv"><span>Checkmate score bonus</span><b style="color:var(--brass)">+${B.mateBonus.toLocaleString()}</b></div>` : ''}
@@ -9542,6 +9561,7 @@ const lives = () => (RUN && RUN.lives !== undefined) ? RUN.lives : 3;
 const lifeCost = () => price(tierPrice(STORE_PRICES.life, (RUN && RUN.livesBought) || 0));
 const hearts = (n, big) => `<span class="hearts${big ? ' big' : ''}" aria-label="${n} lives">${'<i class="h on">♥</i>'.repeat(Math.max(0, n))}</span>`;
 function loseLife(why){
+  if(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1) RUN.introStarted = true;
   sfx.lose();
   const evNote = evLoseLife();   // v139
   RUN.lives = lives() - 1;
