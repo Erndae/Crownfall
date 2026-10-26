@@ -5172,7 +5172,7 @@ const CSCENE = {
 const CS_CIRC = ['downtown', 'rooftop', 'harbor', 'midnight'];
 function csDef(l, c){ const L = CSCENE[l]; if(!L) return null; return L[c] || (c === 'ruler' ? L.midnight : null); }
 // k tiles side by side (odd tiles mirrored) so wide, short bands show whole silhouettes instead of cropping their tops
-function csSVG(l, c, part, k = 3){ const d = csDef(l, c); if(!d || !d[part]) return ''; const r = csR(7 + CS_CIRC.indexOf(c) * 131 + Object.keys(CSCENE).indexOf(l) * 977); const body = d[part](r); if(!body) return '';
+function csSVG(l, c, part, k = 3){ const d = csDef(l, c); if(!d || !d[part]) return ''; const r = csR(7 + CS_CIRC.indexOf(c === 'ruler' ? 'midnight' : c) * 131 + Object.keys(CSCENE).indexOf(l) * 977); const body = d[part](r); if(!body) return '';
   const H = part === 'top' ? 40 : 100; let g = '';
   for(let i = 0; i < k; i++) g += `<g transform="${i % 2 ? `translate(${200 * (i + 1)} 0) scale(-1 1)` : `translate(${200 * i} 0)`}">${body}</g>`;
   return `<svg viewBox="0 0 ${200 * k} ${H}" preserveAspectRatio="${part === 'top' ? 'xMidYMin' : 'xMidYMax'} slice" aria-hidden="true"><g class="ink">${g}</g></svg>`; }
