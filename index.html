@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=169"></script>
-<script src="piece-designs.js?v=169"></script>
-<script src="character-style.js?v=169"></script>
-<script src="campaign-opponents.js?v=169"></script>
-<script src="campaign-dialogue.js?v=169"></script>
-<link rel="stylesheet" href="character-style.css?v=169">
+<script src="gameplay-polish.js?v=170"></script>
+<script src="piece-designs.js?v=170"></script>
+<script src="character-style.js?v=170"></script>
+<script src="campaign-opponents.js?v=170"></script>
+<script src="campaign-dialogue.js?v=170"></script>
+<link rel="stylesheet" href="character-style.css?v=170">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2398,9 +2398,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=169">
-<link rel="stylesheet" href="ruler-style.css?v=169">
-<link rel="stylesheet" href="gameplay-polish.css?v=169">
+<link rel="stylesheet" href="city-board.css?v=170">
+<link rel="stylesheet" href="ruler-style.css?v=170">
+<link rel="stylesheet" href="gameplay-polish.css?v=170">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3507,7 +3507,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 169;
+const GAME_VERSION = 170;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5091,7 +5091,7 @@ function matchMenu(){
   bindConfirmMoves(m);
   m.querySelector('#snd2').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
   m.querySelector('#expl').onclick = () => { m.remove(); explainScore(); };
-  m.querySelector('#ttl').onclick = () => { m.remove(); save(); title(); };
+  m.querySelector('#ttl').onclick = e => saveAndTitle(e.currentTarget);
   const cq = m.querySelector('#concede'); if(cq) cq.onclick = () => { m.remove();
     const c = modal(`<h2 style="color:var(--mult)">Concede match?</h2><p>This match ends as a defeat. Your Campaign is not affected.</p><button class="btn" id="cno">Cancel</button><button class="btn red" id="cyes" disabled>Concede</button>`, '#cno');
     const yes = c.querySelector('#cyes'); setTimeout(() => { if(yes.isConnected) yes.disabled = false; }, 700);
@@ -5214,7 +5214,8 @@ function circuitArrival(){
   if(!RUN || MATCH || RUN.circuit === 'ruler' || RUN.ante !== 1 || RUN.csArrived === RUN.circuit) return;
   RUN.csArrived = RUN.circuit; save();
   const l = land(), d = csDef(l, RUN.circuit); if(!d) return; const myst = csMyst(l, RUN.circuit);
-  const go = () => { if(document.querySelector('.landintro, .lachap')) return setTimeout(go, 250);
+  const arrivalView = battleView, arrivalRun = RUN;
+  const go = () => { if(arrivalView !== battleView || RUN !== arrivalRun || onTitle) return; if(document.querySelector('.landintro, .lachap')) return setTimeout(go, 250);
     const el = document.createElement('div'); el.className = 'carrive'; el.style.setProperty('--c2', d.c2); el.style.setProperty('--cs-ink', CS_INK[l]);
     el.innerHTML = `<div class="ca-art">${csSVG(l, RUN.circuit, 'bot')}</div><div class="ca-txt"><small>${PACKS.find(x => x.id === l).name}</small><b><i>${d.ic}&#xFE0E;</i>${CIR().name}</b><span>Circuit ${CS_CIRC.indexOf(RUN.circuit) + 1} of 4</span>${cpDef(l, RUN.circuit) ? `<em class="catr"><b>${cpDef(l, RUN.circuit).tr}</b>${cpDef(l, RUN.circuit).line}</em>` : ''}${myst ? `<em class="camyst">${myst}</em>` : ''}</div>`;
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
@@ -5225,6 +5226,7 @@ function circuitArrival(){
 function title(){
   if(endingResume()) return;
   if(MATCH) matchLeave();                                                   // v127: the title screen is always the Campaign's
+  leaveBoard(true);
   arenaOff();
   matchBootTry = false;   // v151: Crown Match is no longer a mode
   sceneMusic('menu');
@@ -5289,7 +5291,22 @@ document.addEventListener('pointerdown', e => {
   e.preventDefault(); e.stopImmediatePropagation(); sp.remove(); swallowClick = Date.now();
 }, true);
 document.addEventListener('click', e => { if(swallowClick && Date.now() - swallowClick < 700){ swallowClick = 0; e.preventDefault(); e.stopImmediatePropagation(); } }, true);
-function leaveBoard(){ app.classList.remove('play'); document.body.dataset.mood = 'calm'; document.body.classList.remove('peeking'); document.querySelectorAll('.peekbar,#speech').forEach(x => x.remove()); window.scrollTo(0, 0); }
+// A battle's delayed presentation belongs to that board, never to the next menu/board.
+let battleView = 0;
+function leaveBoard(dialogs = false){
+  battleView++;
+  app.classList.remove('play'); document.body.dataset.mood = 'calm'; document.body.classList.remove('peeking');
+  document.querySelectorAll('.peekbar').forEach(x => { if(x._stop) x._stop(); x.remove(); });
+  document.querySelectorAll('#speech,.lachat,.laring,.oppin,.carrive,.reinf,.vict,.coach,.initbar').forEach(x => x.remove());
+  if(dialogs){ document.querySelectorAll('.modal,.recintro').forEach(x => x.remove()); choiceOpen = false; }
+  clearTimeout(say.t); clearTimeout(tacSpotT); hideTip();
+  if(csHz.ro) csHz.ro.disconnect();
+  document.querySelectorAll('.coach-hl').forEach(x => x.classList.remove('coach-hl')); coachOn = false;
+  swallowClick = 0; msgSwallow = 0;
+  // Never alter the saved board or an enemy reply still in progress.
+  if(!B || B.done || dialogs) busy = false;
+  window.scrollTo(0, 0);
+}
 function circuitSelect(startLand, startCircuit){
   setTimeout(() => crownChoiceFlow(), 450);                                 // any World Crown still waiting for its power choice
   sceneMusic('menu');
@@ -5644,6 +5661,7 @@ document.addEventListener('click', e => { if(performance.now() < msgSwallow){ ms
 const MSG_MS = 5000, MSG_INTRO_MS = 6000;
 const msgT = ms => Math.round(ms * (window.__msgScale || 1));   // (tests may scale reading times; the game always uses 1)
 function blindSelect(){
+  if(app.classList.contains('play')) leaveBoard();
   setTimeout(() => crownChoiceFlow(), 450);                                 // any World Crown still waiting for its power choice
   sceneMusic('land');
   setLandBg(RUN && land());
@@ -5792,6 +5810,8 @@ function startBlind(){ try{ laClear(); }catch(e){}
 let movePreview = null, lastTraining = null;
 let sel = null, swapMode = false, swapA = null, busy = false, pending = null, trapMode = false, tacSwap = false, gambitMode = false;
 function playBlind(resumed){
+  const view = ++battleView, fight = B;
+  const later = (fn, ms) => setTimeout(() => { if(view === battleView && B === fight && app.classList.contains('play')) fn(); }, ms);
   movePreview = null;
   defeatLock = false; if(B) delete B.defeatPending;
   setLandBg(null);
@@ -5828,20 +5848,20 @@ function playBlind(resumed){
   const isRuler = !!(boss && boss.ruler && land() !== 'throne');       // the Crownless King keeps his own story timing
   const introKey = isRuler ? [land(), TIER(), RUN.ante, (RUN.stats && RUN.stats.wins) || 0].join('|') : '';   // a retry after losing a life is the same encounter
   if(isRuler && !resumed && !rulerIntroSeen.has(introKey)){ rulerIntroSeen.add(introKey); rulerIntro(land()); }
-  if(resumed && B.enchPick) setTimeout(() => { if(B && B.enchPick) openEnchPick(); }, 600);   // v137: an enhancement choice was open
-  if(!coachSeen().score) setTimeout(() => { if(B && app.classList.contains('play')) coach('score'); }, 1100);
+  if(resumed && B.enchPick) later(() => { if(B && B.enchPick) openEnchPick(); }, 600);   // v137: an enhancement choice was open
+  if(!coachSeen().score) later(() => { if(B && app.classList.contains('play')) coach('score'); }, 1100);
   else {
-    if(!resumed && curPersona()) setTimeout(() => { if(!(B && B.introSaid)) say('intro', true); }, boss && !boss.ruler ? 1750 : 1300);   // v132: after the name card (v154: the card already carries the line)
-    if(resumed && B.promoPending) setTimeout(() => { if(B && B.promoPending && !busy) resumePromo(); }, 500);   // a promotion choice was open
-    if(!resumed && !MATCH && !coachSeen().command && baseCrowns() > 0 && !crownChoicesDue().length) setTimeout(() => { if(B && !B.done && !busy && !document.querySelector('.modal') && !coachSeen().command){ coachMark('command'); cmdRules(); } }, 2600);   // first time Command is introduced (after the first win)
-    if(!resumed && !(boss && !boss.ruler && !MATCH)) setTimeout(() => brilliant(MATCH ? 'Crown Match' : rulerRoad() ? 'The Ruler’s Road' : stageName(RUN.ante)), 250);   // (Rivals/Bosses get their name card instead)
-    if(resumed) setTimeout(() => { if(B && B.pendingWin && !B.done && !busy && !document.querySelector('.modal')){ busy = true; return enemyPhase(-1); } if(B && !B.done && !busy && !document.querySelector('.modal') && loneKing()) return loneKingDefeat(); if(B && !B.done && !busy && !document.querySelector('.modal') && !canPlay()) gameOver(inCheck(B.board, 'me') ? 'Checkmate. Your King is trapped.' : 'Stalemate. You have no legal moves left.'); }, 700);   // a saved dead position
+    if(!resumed && curPersona()) later(() => { if(!(B && B.introSaid)) say('intro', true); }, boss && !boss.ruler ? 1750 : 1300);   // v132: after the name card (v154: the card already carries the line)
+    if(resumed && B.promoPending) later(() => { if(B && B.promoPending && !busy) resumePromo(); }, 500);   // a promotion choice was open
+    if(!resumed && !MATCH && !coachSeen().command && baseCrowns() > 0 && !crownChoicesDue().length) later(() => { if(B && !B.done && !busy && !document.querySelector('.modal') && !coachSeen().command){ coachMark('command'); cmdRules(); } }, 2600);   // first time Command is introduced (after the first win)
+    if(!resumed && !(boss && !boss.ruler && !MATCH)) later(() => brilliant(MATCH ? 'Crown Match' : rulerRoad() ? 'The Ruler’s Road' : stageName(RUN.ante)), 250);   // (Rivals/Bosses get their name card instead)
+    if(resumed) later(() => { if(B && B.pendingWin && !B.done && !busy && !document.querySelector('.modal')){ busy = true; return enemyPhase(-1); } if(B && !B.done && !busy && !document.querySelector('.modal') && loneKing()) return loneKingDefeat(); if(B && !B.done && !busy && !document.querySelector('.modal') && !canPlay()) gameOver(inCheck(B.board, 'me') ? 'Checkmate. Your King is trapped.' : 'Stalemate. You have no legal moves left.'); }, 700);   // a saved dead position
   }
   $('#swapBtn').onclick = toggleSwap;
   $('#tacBtn').onclick = () => { clearTimeout(tacSpotT); $('#tacBtn').classList.remove('tachl'); tacMenu(); };
-  if(resumed && B.enemyOwes && !B.initOffer && !B.pendingWin && !B.promoPending && !B.done) setTimeout(() => { if(B && B.enemyOwes && !B.done && !busy && !document.querySelector('.modal') && !enemyMated()){ busy = true; enemyPhase(-1); } }, 700);   // refreshed before the enemy replied: the reply still comes
-  if(resumed && enemyMated()) setTimeout(() => { if(B && !B.done) mateNow(); }, 300);   // v156: refreshed during a mate
-  if(B.initOffer && !B.done) setTimeout(() => { if(B && B.initOffer && !busy && !enemyMated()){ busy = true; const to = B.initOffer.to; delete B.initOffer; endTurn(to); } }, 400);   // a refresh during the Momentum offer asks again
+  if(resumed && B.enemyOwes && !B.initOffer && !B.pendingWin && !B.promoPending && !B.done) later(() => { if(B && B.enemyOwes && !B.done && !busy && !document.querySelector('.modal') && !enemyMated()){ busy = true; enemyPhase(-1); } }, 700);   // refreshed before the enemy replied: the reply still comes
+  if(resumed && enemyMated()) later(() => { if(B && !B.done) mateNow(); }, 300);   // v156: refreshed during a mate
+  if(B.initOffer && !B.done) later(() => { if(B && B.initOffer && !busy && !enemyMated()){ busy = true; const to = B.initOffer.to; delete B.initOffer; endTurn(to); } }, 400);   // a refresh during the Momentum offer asks again
   const tbtn = $('#trapBtn'); if(tbtn) tbtn.onclick = toggleTrap;
   $('#quit').onclick = gameMenu;
   renderCards(); pieceInfo(null);
@@ -5849,10 +5869,10 @@ function playBlind(resumed){
   if(RUN.gauntlet && !MATCH) gArenaSync(true);   // v152
   applyLandTheme(); drawLandDecor();
   csBoard();   // v133
-  if(!resumed && B.cpChal && chalOn()){ const cid = B.cpChal; const t = () => { if(!B || B.done || !chalOn()) return; if(busy || (B.roll && B.roll.state === 'pending') || document.querySelector('.modal,.oppin,.vict,#speech')) return setTimeout(t, 400); chalToast(`${B.cpSrc === 'event' ? 'Event bonus' : B.cpSrc ? B.cpSrc : 'Circuit bonus'} · ${C(cid).name}`, CHALLENGES[cid].goal + ' · ' + CHALLENGES[cid].reward, 'go'); }; setTimeout(t, 900); }   // v134
+  if(!resumed && B.cpChal && chalOn()){ const cid = B.cpChal; const t = () => { if(!B || B.done || !chalOn()) return; if(busy || (B.roll && B.roll.state === 'pending') || document.querySelector('.modal,.oppin,.vict,#speech')) return later(t, 400); chalToast(`${B.cpSrc === 'event' ? 'Event bonus' : B.cpSrc ? B.cpSrc : 'Circuit bonus'} · ${C(cid).name}`, CHALLENGES[cid].goal + ' · ' + CHALLENGES[cid].reward, 'go'); }; later(t, 900); }   // v134
   { const tier = oppTier(boss); document.body.dataset.opp = RUN.gauntlet ? 'gauntlet' : tier; document.body.dataset.otreat = oppTreat(boss);   // v132 atmosphere + opponent identity
     const pb = app.querySelector('.pblind'); if(pb && boss && !MATCH){ pb.classList.add('tappable'); pb.onclick = () => { if(!busy && !cmdMode && !document.querySelector('.modal')) bossDetails(boss); }; }
-    if(!resumed && (tier === 'rival' || tier === 'boss')) setTimeout(() => oppEntrance(boss, tier), 200); }
+    if(!resumed && (tier === 'rival' || tier === 'boss')) later(() => oppEntrance(boss, tier), 200); }
   if(boss && boss.ruler && land() !== 'throne') document.body.dataset.ruler = '1'; else delete document.body.dataset.ruler;
   drawBoard();
   if(B.roll && B.roll.state === 'pending'){ busy = true; rollWait(); }   // nothing moves until the Initiative Roll
@@ -5877,8 +5897,8 @@ function rpsOpp(me){
 }
 function rollWait(){
   // after the intro: wait until speech, the Ruler intro, coach cards and other popups are gone
-  const t0 = Date.now();
-  const tick = () => { if(!B || !B.roll || B.roll.state !== 'pending' || !app.classList.contains('play')) return;
+  const t0 = Date.now(), view = battleView, fight = B;
+  const tick = () => { if(view !== battleView || B !== fight || !B || !B.roll || B.roll.state !== 'pending' || !app.classList.contains('play')) return;
     if(document.getElementById('speech') || document.querySelector('.modal, .coach, .landintro, .vict, .oppin') || (curPersona() && Date.now() - t0 < 1600)) return setTimeout(tick, 200);
     rollPanel(); };
   setTimeout(tick, 500);
@@ -6339,7 +6359,9 @@ function gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mate){
       <div class="kv" style="border-top:1px solid var(--line);padding-top:6px"><span>Arena Tokens</span><b class="money" style="font-size:20px">+$${total}</b></div></div>
     ${laWinHtml(laRes)}<p class="gnext">${armory ? `The Armory is open · then Wave ${nx}` : `Next · Wave ${nx}${gBossWave(nx) ? ' · Boss wave' : ''}${gTier(nx).id !== T.id ? ` · ${gTier(nx).name}` : ''}`}</p>
     <button class="btn" id="cash">${armory ? 'To the Armory' : `Wave ${nx}`}</button><button class="btn ghost" id="peek">View the board</button>`;
+  const rewardView = battleView;
   stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared}`, name:tag, kick:'Wave cleared'}).then(() => {
+    if(rewardView !== battleView) return;
     const m = modal(`<p class="gwave">Wave ${cleared} cleared</p>` + html, null); m.classList.add('vicm', 'gvic'); addPeek(m, vLog);
     let go = false; m.querySelector('#cash').onclick = () => { if(go) return; go = true; m.remove(); sfx.coin(); armory ? shop() : gNextWave(); };
   });
@@ -8337,6 +8359,19 @@ function concedeAsk(){
     conceding = false;
   };
 }
+// Finish an active move before switching screens; title() reloads the saved board.
+// Interruption/Momentum panels are waiting for input, so their saved state can leave immediately.
+async function saveAndTitle(button){
+  if(button.disabled) return;
+  button.disabled = true;
+  const waiting = () => B?.roll?.state === 'pending' || !!document.querySelector('#enHalt,#initBar');
+  if(busy && B && !B.done && !waiting()){
+    button.textContent = 'Finishing turn…';
+    while(busy && B && !B.done && button.isConnected && app.classList.contains('play') && !waiting()) await sleep(60);
+  }
+  if(!button.isConnected) return;
+  save(); title();
+}
 function gameMenu(){
   if(MATCH) return matchMenu();
   const m = modal(`<h2>Menu</h2>
@@ -8361,7 +8396,7 @@ function gameMenu(){
   { const sj = m.querySelector('#sty2'); if(sj) sj.onclick = () => { m.remove(); landsScreen(); }; }
   m.querySelector('#expl').onclick = () => { m.remove(); explainScore(); };
   m.querySelector('#snd2').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
-  m.querySelector('#ttl').onclick = () => { m.remove(); save(); title(); };
+  m.querySelector('#ttl').onclick = e => saveAndTitle(e.currentTarget);
   m.querySelector('#savenow').onclick = async e => { save(); const b = e.target; b.disabled = true; b.textContent = 'Saving…';
     const ok = CLOUD.doc ? await cloudPush() : true;
     b.textContent = ok ? (CLOUD.doc ? 'Saved to your account ✓' : 'Saved on this device ✓') : 'Saved on this device ✓'; sfx.coin();
@@ -8615,7 +8650,7 @@ const laJoinLine = ch => { const L = LA_JOIN[ch.p] || LA_JOIN.V; let h = 0; for(
 // a new recruit, introduced once (after the purchase, off the board); a refresh still shows anyone not introduced yet
 function laIntroShow(){
   try{
-    if(!RUN || MATCH || !Array.isArray(RUN.laNewPend) || !RUN.laNewPend.length) return;
+    if(onTitle || !RUN || MATCH || !Array.isArray(RUN.laNewPend) || !RUN.laNewPend.length) return;
     if(app.classList.contains('play') || document.querySelector('.modal, .recintro, .lachap, .landintro, .vict, .coach, #tip')) return setTimeout(laIntroShow, 600);
     const id = RUN.laNewPend.shift(), ri = RUN.roster.findIndex(s => s && laParse(s) && laParse(s).id === id); save();
     if(ri < 0) return laIntroShow();
@@ -8857,6 +8892,7 @@ function vOverlay(cls, l){
 function musicDip(f){ if(!MM.master || !AC) return; const t = AC.currentTime; MM.master.gain.cancelScheduledValues(t); MM.master.gain.setTargetAtTime(musicLevel() * f, t, 0.25); }
 // 1) ordinary stage win: freeze → compact banner → rewards (~1.8s, no skip needed)
 async function stageWinIntro(l, score, name, opp){
+  const view = battleView;
   busy = true;
   const ov = vOverlay('stage', l); const T = vTimeline(ov, 250);   // v154: a tap skips
   if(opp) ov.classList.add('opp-' + opp.tier);
@@ -8866,10 +8902,11 @@ async function stageWinIntro(l, score, name, opp){
   const bd = $('#bw'); if(bd && !calm) bd.animate([{transform:'scale(1)'},{transform:'scale(1.012)'},{transform:'scale(1)'}], {duration:260});
   requestAnimationFrame(() => ov.classList.add('in'));
   await T.wait(msgT(4500));   // v154: readable
-  ov.classList.add('out'); await T.wait(220); ov.remove(); busy = false;
+  ov.classList.add('out'); await T.wait(220); ov.remove(); if(view === battleView) busy = false;
 }
 // 2) ruler defeated: board stays, darkens, music dips (no restart), name reveal (~3s, tap after 1s)
 async function rulerDefeatIntro(l, rulerName){
+  const view = battleView;
   busy = true; musicDip(0.45);
   const ov = vOverlay('ruler', l); const T = vTimeline(ov, 1000);
   requestAnimationFrame(() => ov.classList.add('dim'));
@@ -8879,7 +8916,7 @@ async function rulerDefeatIntro(l, rulerName){
   requestAnimationFrame(() => ov.classList.add('in'));
   await T.wait(600); ov.classList.add('name');
   await T.wait(1800);
-  ov.classList.add('out'); await new Promise(r => setTimeout(r, 260)); ov.remove(); busy = false; musicDip(1);
+  ov.classList.add('out'); await new Promise(r => setTimeout(r, 260)); ov.remove(); if(view === battleView){ busy = false; musicDip(1); }
 }
 const rulerShort = l => RULERS[l].short || RULERS[l].name.split(/,| the /)[0];
 // 3) land conquered: a chapter ending (World Crown → name → LAND CONQUERED → X / 4)
@@ -9002,9 +9039,11 @@ function winBlind(){
     setTimeout(fin, 1000); return;
   }
   // presentation → the existing rewards window
+  const rewardView = battleView;
   const intro = vRuler && vLand === 'throne' ? Promise.resolve()                       // the Crownless King keeps his own story flow
     : vRuler ? rulerDefeatIntro(vLand, rulerShort(vLand)) : stageWinIntro(vLand, vScore, vName, vOpp);
   intro.then(() => {
+  if(rewardView !== battleView) return;
   const m = modal(html, null); m.classList.add('vicm'); addPeek(m, vLog);
   let paid = false;
   m.querySelector('#cash').onclick = () => {
@@ -9526,8 +9565,9 @@ function addPeek(m, log){
     bar.innerHTML = L ? `<div class="rnote" id="rnote"></div><div class="rctl"><button class="btn ghost" id="rfirst" aria-label="First move">«</button><button class="btn ghost" id="rprev" aria-label="Previous move">‹</button><span class="rcount" id="rcount"></span><button class="btn ghost" id="rnext" aria-label="Next move">›</button><button class="btn ghost" id="rplay">Play</button><button class="btn" id="unpeek">Done</button></div>`
       : '<span>Final position</span><button class="btn" id="unpeek">Back to results</button>';
     document.body.appendChild(bar);
-    const show = () => { drawSnap(L[k]); $('#rnote').textContent = L[k].n; $('#rcount').textContent = `${k} / ${L.length-1}`; if(k) sfx.move(); };
-    const stop = () => { clearInterval(timer); timer = null; const p = $('#rplay'); if(p) p.textContent = 'Play'; };
+    const show = () => { if(!bar.isConnected || !m.isConnected || !app.classList.contains('play')){ stop(); return; } drawSnap(L[k]); $('#rnote').textContent = L[k].n; $('#rcount').textContent = `${k} / ${L.length-1}`; if(k) sfx.move(); };
+    const stop = () => { clearInterval(timer); timer = null; const p = bar.querySelector('#rplay'); if(p) p.textContent = 'Play'; };
+    bar._stop = stop;
     if(L){
       drawSnap(L[k]); $('#rnote').textContent = L[k].n; $('#rcount').textContent = `${k} / ${L.length-1}`;
       $('#rfirst').onclick = () => { stop(); k = 0; show(); };
@@ -9927,6 +9967,7 @@ function renderShop(html){
   after.forEach((section,i)=>{if(section.outerHTML!==before[i].outerHTML)before[i].replaceWith(section);});
 }
 function shop(){
+  if(app.classList.contains('play')) leaveBoard();
   const shopPosition = shopScrollPosition();
   if(RUN && RUN.land && PACK !== RUN.land) setPack(RUN.land);   // tile names always follow the Land you are in
   sceneMusic('land');

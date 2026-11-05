@@ -59,3 +59,10 @@ Iron Kingdom battles now stand against the torchlit fortress, Olympian Court aga
 ## v167 — optional move confirmation in the pause menu
 
 Confirm Move is now an accessible On/Off switch in the Campaign, Gauntlet and Crown Match pause menus. It defaults to Off unless the player has explicitly enabled it, and remembers their choice on this device. Turning it off cancels any tentative move without spending a turn. The objective panel focuses on battle rules.
+
+
+## v170 — reliable return from fights
+
+Returning to title clears old fight dialogs, replay controls/timers, input-swallow state, and battle presentation. Delayed board messages and reward panels are scoped to their originating battle view so they cannot cover a later menu or fight. Save-and-title waits for an active move to finish, while allowing paused initiative and interrupted replies to remain saved for Continue. The shop also clears board replay state. Saved board, rewards and campaign progression retain the same schema.
+
+Validation: `node validate-menu-transitions.mjs` (requires happy-dom, or set `CROWNFALL_DOM_MODULE`). Covers blocked title from nested enemy-recovery/pause dialogs, active-move exit, pending initiative exit, leftover overlays, delayed speech, replay cleanup, repeated defeat exits, Campaign rewards/shop and stale Gauntlet rewards. Existing polish integration, design, character, gameplay and splash checks pass. Browser check covers Campaign setup, defeat, return to title and opening Records afterward. Exact mobile viewport testing was unavailable in this environment.
