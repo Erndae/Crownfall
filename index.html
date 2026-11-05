@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=170"></script>
-<script src="piece-designs.js?v=170"></script>
-<script src="character-style.js?v=170"></script>
-<script src="campaign-opponents.js?v=170"></script>
-<script src="campaign-dialogue.js?v=170"></script>
-<link rel="stylesheet" href="character-style.css?v=170">
+<script src="gameplay-polish.js?v=171"></script>
+<script src="piece-designs.js?v=171"></script>
+<script src="character-style.js?v=171"></script>
+<script src="campaign-opponents.js?v=171"></script>
+<script src="campaign-dialogue.js?v=171"></script>
+<link rel="stylesheet" href="character-style.css?v=171">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2395,12 +2395,12 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 <style id="crown-dice">
 /* Crown marks retain the standard one-to-six face positions. */
 .die .f u{width:13px;height:13px;border-radius:0;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 3 5 6 8 1 11 6 15 3 13 11H3ZM3 12H13V14H3Z'/%3E%3C/svg%3E") center/contain no-repeat}
+  .city-objective-marker{position:absolute;top:2px;right:3px;z-index:4;color:#6fffe4;font-size:12px;line-height:1;text-shadow:0 1px 3px #000,0 0 4px #000;pointer-events:none}
+  .city-objective-label{position:absolute;left:5px;top:50%;transform:translateY(-50%);z-index:2;background:#182d30;color:#a9fff1;border-radius:3px;padding:2px 4px;font-size:9px;line-height:1;pointer-events:none}
 </style>
-
-
-<link rel="stylesheet" href="city-board.css?v=170">
-<link rel="stylesheet" href="ruler-style.css?v=170">
-<link rel="stylesheet" href="gameplay-polish.css?v=170">
+<link rel="stylesheet" href="city-board.css?v=171">
+<link rel="stylesheet" href="ruler-style.css?v=171">
+<link rel="stylesheet" href="gameplay-polish.css?v=171">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3507,7 +3507,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 170;
+const GAME_VERSION = 171;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5771,6 +5771,64 @@ function oppEntrance(boss, tier){
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
 }
+const CITY_ENCOUNTERS = {
+  2: {name:'Escort', hint:'Promote your marked pawn and win to earn $3.'},
+  3: {name:'Ambush', hint:'An enemy has advanced. Check the marked piece before you commit.'},
+  4: {name:'Holdout', hint:'Occupy d4 and e4 after three consecutive replies and win to earn $3.'},
+};
+function cityEncounterPlan(){
+  if(!RUN || MATCH || RUN.match || RUN.gauntlet || land() !== 'street' || RUN.circuit !== 'downtown' || RUN.blind !== 2) return null;
+  return CITY_ENCOUNTERS[RUN.ante] || null;
+}
+function startCityEncounter(){
+  const plan = cityEncounterPlan();
+  if(!plan) return;
+  const board = B.board;
+  if(plan.name === 'Escort'){
+    const pawn = board.find(p => p?.side === 'me' && p.t === 'P');
+    B.cityEncounter = {name:plan.name, pieceId:pawn?.id ?? null, done:false};
+  } else if(plan.name === 'Holdout'){
+    B.cityEncounter = {name:plan.name, streak:0, checkedMove:0, done:false};
+  } else {
+    let best = null;
+    for(let from = 0; from < 64; from++){
+      const piece = board[from];
+      if(piece?.side !== 'en' || piece.t === 'K') continue;
+      for(const to of legalFor(board, from)){
+        if(board[to] || to < 18 || to >= 40 || (to >> 3) <= (from >> 3)) continue;
+        const next = board.slice();
+        next[to] = piece;
+        next[from] = null;
+        if(inCheck(next, 'me') || inCheck(next, 'en') || !anyLegal(next, 'me') || !anyLegal(next, 'en')) continue;
+        const pressure = attackSquares(next, to).filter(i => next[i]?.side === 'me').length;
+        const score = pressure * 10 + (to >> 3);
+        if(!best || score > best.score) best = {next, pieceId:piece.id, score};
+      }
+    }
+    if(best) B.board = best.next;
+    B.cityEncounter = {name:plan.name, pieceId:best?.pieceId ?? null};
+  }
+}
+function cityEncounterBrief(planned){
+  const plan = cityEncounterPlan();
+  const active = !planned && B?.cityEncounter;
+  if(!plan || (!planned && !active)) return '';
+  let hint = plan.hint;
+  if(active?.done) hint = 'Objective complete. Win to claim $3.';
+  else if(active?.name === 'Escort'){
+    if(active.pieceId === null) hint = 'Your army has no pawn to escort. Win normally.';
+    else if(!B.board.some(p => p?.side === 'me' && p.id === active.pieceId)) hint = 'The escort pawn was lost. Win normally.';
+  } else if(active?.name === 'Ambush' && active.pieceId === null) hint = 'The enemy held its formation. Win normally.';
+  else if(active?.name === 'Holdout') hint += ` Progress: ${active.streak}/3.`;
+  return `<p class="encounter-brief"><b>${plan.name}</b> · ${hint}</p>`;
+}
+function trackCityHoldout(){
+  const event = B.cityEncounter;
+  if(event?.name !== 'Holdout' || event.done || B.moveCount <= event.checkedMove) return;
+  event.checkedMove = B.moveCount;
+  event.streak = [35, 36].every(i => B.board[i]?.side === 'me') ? event.streak + 1 : 0;
+  event.done = event.streak >= 3;
+}
 function startBlind(){ try{ laClear(); }catch(e){}
   migrateIntroRule(RUN, B);
   if(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1) RUN.introStarted = true;
@@ -5788,6 +5846,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
     B.cp = (P && P.cp) || null;   // v134
     if(P && P.sig && ARCHE[sigBase(P.sig)].tag && !coachSeen().sig){ coachMark('sig'); setTimeout(() => showTip(`<b>${ARCHE[sigBase(P.sig)].tag}</b><br>Some bosses break the usual rules of army composition.`), 1600); }
     B.aiRef = CFAI.material(B.board); if(!RUN.gauntlet || MATCH || gOpeningOK()) break; (window.__gOpen = window.__gOpen || []).push(RUN.gWave); }
+  startCityEncounter();
   B.startVal = enemyValue(B.board);
   B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; B.cmd = null; cmdState(); crInit();   // castling rights for this fight's own King/Rook pairs
   cpChallenge();   // v134: some Circuits open with a free existing Challenge
@@ -5832,7 +5891,7 @@ function playBlind(resumed){
       <div class="sc"><small>Score</small><b id="score">${B.score.toLocaleString()}</b></div>
       <button class="cbox chips" id="expC"><small>Material</small><span id="cc">0</span></button><span class="x">×</span><button class="cbox mult" id="expM"><small>Brilliance</small><span id="cm">×0</span><em class="combo" id="combo"></em></button>
     </div>
-    <button type="button" class="pbar goal-button" id="goalInfo" aria-label="Win conditions and move preview settings"><i id="pbar" style="width:${Math.min(100,B.score/B.target*100)}%"></i><span class="ptgt" id="goalLabel">${goalText()}</span></button>
+    <button type="button" class="pbar goal-button" id="goalInfo" aria-label="Win conditions and move preview settings"><i id="pbar" style="width:${Math.min(100,B.score/B.target*100)}%"></i><span class="ptgt" id="goalLabel">${goalText()}</span>${B.cityEncounter ? '<span class="city-objective-label" id="cityObjective"></span>' : ''}</button>
     <div class="handrow"><span class="hand" id="hand">Tap a piece, then a target</span><span class="mood" id="mood"><i></i><span id="moodTxt">Enemy waiting</span></span></div>
     ${MATCH ? '' : relicRow()}
     <div class="boardArea"><div class="boardWrap" id="bw"><div class="bdecor" id="bdecor"></div><div class="board" id="board"></div><div class="fxl" id="fxl"></div></div></div>
@@ -6749,7 +6808,7 @@ function goalText(){return CrownfallPolish.objective({score:B?.score,target:B?.t
 function encounterHTML(planned=false){
   const plan=planned&&RUN&&!RUN.gauntlet?campaignBossPlan(RUN):null;
   const f=CrownfallPolish.formation(plan?.signature||B?.ai?.sig,plan?.style||B?.ai?.style);
-  return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
+  return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>${cityEncounterBrief(planned)}`;
 }
 function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
 function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
@@ -6777,6 +6836,12 @@ function drawBoard(){
   if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)){movePreview=null;pieceInfo(null);}
   const el = $('#board'); if(!el) return;
   boardSides(el);
+  const event = B.cityEncounter;
+  const badge = $('#cityObjective');
+  if(badge){
+    badge.textContent = event?.name === 'Holdout' ? `Holdout ${event.streak}/3`
+      : event?.name === 'Escort' && event.done ? 'Escort complete' : event?.name || '';
+  }
   const displayBoard=movePreview?.position||B.board;
   const threats = new Set(attacksOn(displayBoard, 'en'));
   const legal = !movePreview&&sel !== null ? legalMoves(sel) : [];
@@ -6786,6 +6851,10 @@ function drawBoard(){
     const [r,c] = rc(i), p = displayBoard[i];
     const cls = ['sq', (r+c)%2 ? 'd' : 'l'];
     if(i === sel) cls.push('sel');
+    const objective = event && !event.done && (
+      (event.name === 'Holdout' && (i === 35 || i === 36)) ||
+      (p && p.id === event.pieceId && (event.name !== 'Ambush' || B.moveCount === 0))
+    );
     if(movePreview && (i===movePreview.from||i===movePreview.to))cls.push('preview-target');
     if(i === swapA) cls.push('swapA');
     if(B.scout && i === B.scout.from) cls.push('scoutF'); if(B.scout && i === B.scout.to) cls.push('scoutT');
@@ -6797,6 +6866,7 @@ function drawBoard(){
     if(p && p.side === 'me' && threats.has(i)) cls.push('threat');
     if(p && p.t === 'K' && inCheck(displayBoard, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
+    if(objective) inner += `<span class="city-objective-marker" role="img" aria-label="${event.name} marker on ${sqName(i)}">◆</span>`;
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: you lose up to $2; enemy entry gives you $2" title="Crate trap · you −$2 / enemy +$2 to you"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
     if(B.trapSq && B.trapSq.includes(i)) inner += '<span class="trapmk"></span>';
@@ -7734,6 +7804,7 @@ async function enemyPhaseRun(to){
   }
   B.enPhase = null;
   B.enemyOwes = false;                                                      // the reply is complete
+  trackCityHoldout();
   cmdState().lock = false; B.board.forEach(q => { if(q && q.mark) delete q.mark; });
   B.ep = (B.ep || []).filter(e => e.by !== 'me');                          // the enemy's en passant chances end with its response   // the whole reply is over: a new turn for Crown abilities; Focus Fire marks expire
   tacResolve();
@@ -8013,6 +8084,7 @@ async function enemyTurn(sub){ return enemyMove(sub || 0, false); }
 function qlog(src){ (window.__qlog = window.__qlog || []).push({src, land:land(), circuit:RUN && RUN.circuit}); }   // test log of Queen sources
 function keepPromotion(q, at, src){
   qlog(src || 'promotion');
+  if(at < 8 && B?.cityEncounter?.name === 'Escort' && B.cityEncounter.pieceId === q.id) B.cityEncounter.done = true;
   if(q.ri !== undefined && RUN.roster[q.ri]){ const e = parseR(RUN.roster[q.ri]).e; RUN.roster[q.ri] = laStr(q.t, e, laSeg(RUN.roster[q.ri])); q.rt = q.t; laPromote(q); if(RUN && RUN.gauntlet && !MATCH) gSealPromo(q, at); }
   if(hasE(q, 'rise') && B && !MATCH){ q.sh = Math.max(q.sh || 0, 1); setTimeout(() => pop(at, `${ENCH.rise.name}: Armored!`, 'fxg'), 450); }   // v137 Ascendant (it keeps its +40 Material afterwards)
   pop(at, `${TYPE[q.t].name} joins your army!`, 'fxx');
@@ -8990,7 +9062,8 @@ function winBlind(){
   const laRes = (() => { try{ return laWin(RUN.blind === 2, RUN.blind === 2 && bossId() === 'ruler'); }catch(e){ return null; } })();   // v147: before the rewards window
   const chal = chalWinReward();
   evWin();   // v139/v140: a wager bound to this fight settles (first try + its Challenge)
-  const total = reward + movesBonus + interest + piggy + mateBonus + chal.cash;
+  const objectiveBonus = B.cityEncounter?.done ? 3 : 0;
+  const total = reward + movesBonus + interest + piggy + mateBonus + chal.cash + objectiveBonus;
   const bossWin = RUN.blind === 2, finalWin = bossWin && RUN.ante === nStages() && !RUN.won;
   const bp = bossWin && !RUN.gauntlet ? personaOf(bossId()) : null;
   // presentation facts, captured before the commit below moves the run on
@@ -9005,6 +9078,7 @@ function winBlind(){
       <div class="kv"><span>Savings bonus ($1 per $5 saved, max $${isC('midnight') ? 6 : 5})</span><b class="money">$${interest}</b></div>
       ${piggy ? `<div class="kv"><span>Piggy Bank</span><b class="money">$${piggy}</b></div>` : ''}
       ${mateBonus ? `<div class="kv"><span>Checkmate bonus</span><b class="money">$${mateBonus}</b></div>` : ''}
+      ${objectiveBonus ? `<div class="kv"><span>${B.cityEncounter.name} bonus</span><b class="money">+$${objectiveBonus}</b></div>` : ''}
       ${chal.cash ? `<div class="kv"><span>Challenge · ${chal.name}${chal.swap ? ' · +1 Swap next round' : ''}</span><b class="money">$${chal.cash}</b></div>` : ''}
       <div class="kv" style="border-top:1px solid var(--line);padding-top:6px"><span>Total</span><b class="money" style="font-size:20px">$${total}</b></div>
     </div>${bossWin && (RUN.cards || []).length >= 2 ? '<p class="handfull">Hand full · no card reward this time</p>' : ''}
