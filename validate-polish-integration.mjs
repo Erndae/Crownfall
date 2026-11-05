@@ -11,13 +11,28 @@ const bridge=`
 const realPlayScore = playScore;
 window.__polishTest={
  setup(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
- scoringSequence(){
+ bonusFixture(){
+    RUN.relics=['cavalry'];
+    playBlind(true);
+  },
+  record(points){return recordRunCapture(points);},
+  carriedRecord(){storeCarry();newRun('downtown');return RUN.bestCapture;},
+  async resolveFinish(recapture){
+    B.score=1200;B.target=1000;B.pendingWin={gain:400,id:B.board[42].id,sq:42};
+    const originalEnemy=enemyMove, originalWin=winBlind;
+    let won=false;
+    enemyMove=async()=>{if(recapture)B.board[42]=null;return true;};
+    winBlind=()=>{won=true;};
+    try {await enemyPhaseRun(42);return {won,finish:B.captureFinish,score:B.score};}
+    finally {enemyMove=originalEnemy;winBlind=originalWin;}
+  },
+  scoringSequence(){
     RUN.relics=['cavalry'];
     B.streak=1;
     B.board[42].e='iron';
     B.nextX=3;
     playBlind(true);
-    return realPlayScore(scoreCapture(42,25),25);
+    return realPlayScore(scoreCapture(42,25),25,true);
   },
   pause:(match=false)=>{document.querySelectorAll('.modal').forEach(x=>x.remove());if(match)matchMenu();else gameMenu();}, tap:i=>tapSquare(i),info:()=>battleInfo(),
  state:()=>({money:RUN.money,score:B?.score,selected:sel,preview:!!movePreview,squares:B?.board.map(x=>x?.t||'.').join(''),level:RUN.lv.P,confirm:confirmMoves()}),
@@ -46,10 +61,35 @@ console.log('PASS: all 80 campaign circuit profiles match their tactical plans.'
 for(const land of ['street','medieval','greek','fantasy','throne'])for(const circuit of ['rooftop','harbor']){const e=api.actual(circuit,2,land);assert.equal(e.enemyKings,1);assert.equal(e.playerKings,1);assert(e.brief.includes(window.CrownfallPolish.formation(e.sig).title));}
 console.log('PASS: 10 actual cross-land battle openings keep both Kings and brief the accepted formation.');
 api.setup();
+assert.equal(api.record(200),false,'First capture establishes a benchmark');
+assert.equal(api.record(200),false,'A tie does not break the record');
+assert.equal(api.record(100),false);
+assert.equal(api.record(250),true);
+assert.equal(api.carriedRecord(),250);
+api.setup();
+api.bonusFixture();
+await api.tap(42);
+const capture = $('#board [data-i="25"]');
+assert(capture.querySelector('.capture-bonus-mark'));
+assert.match(capture.dataset.captureBonus,/Horsepower \+4 Brilliance/);
+assert.equal(documentCount('#board .capture-bonus-mark'),1);
+function documentCount(selector){return window.document.querySelectorAll(selector).length;}
+window.setTimeout=(fn,ms)=>ms===420?globalThis.setTimeout(fn,0):0;
+capture.onpointerdown({isPrimary:true,button:0,clientX:0,clientY:0});
+await new Promise(r=>globalThis.setTimeout(r,10));
+assert.match($('#tip').textContent,/Horsepower/);
+capture.onpointerup();
+capture.onclick({detail:1});
+assert.equal(api.state().score,0,'Holding a target does not play the move');
+$('#tip').remove();
+api.setup();
+api.record(250);
 const beats=[];
+let recordStamp=false;
 window.setTimeout=(fn,ms)=>{
   const step=$('.scoring-sequence');
-  if(step&&ms<=330){
+  if(step&&ms<=480){
+    recordStamp ||= !!step.querySelector('.scoring-record-label');
     const label=step.querySelector('small').textContent;
     if(beats.at(-1)!==label)beats.push(label);
     return globalThis.setTimeout(fn,0);
@@ -61,9 +101,21 @@ assert.deepEqual(beats.slice(0,-1).map(label=>label.split(' · ')[1]),[
  'Knight base','Rook captured','Chrome','Horsepower','The Heavy Hitter','Capture streak',
 ]);
 assert.equal(api.state().score,3000);
+assert(recordStamp,'A higher capture gets the run-record stamp');
 assert.match(beats.at(-1),/80 Material × 37.5 Brilliance/);
 assert.equal($('.scoring-sequence'),null);
 assert.equal($('#cc').textContent,'0');
 assert.equal($('#cm').textContent,'×0');
 console.log('PASS: scoring sequence names each effect in order, shows final totals, awards points once, and clears the overlay.');
+api.setup();
+window.setTimeout=(fn,ms)=>ms<=330?globalThis.setTimeout(fn,0):0;
+const secured=await api.resolveFinish(false);
+assert.equal(secured.won,true);
+assert.equal(secured.finish,400);
+api.setup();
+const recaptured=await api.resolveFinish(true);
+assert.equal(recaptured.won,false);
+assert.equal(recaptured.finish,undefined);
+assert.equal(recaptured.score,800);
+console.log('PASS: capture inspection cannot play the move, records carry forward, and only secured winning captures get the payoff.');
 await window.happyDOM.abort();window.close();

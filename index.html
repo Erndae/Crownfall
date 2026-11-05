@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=172"></script>
-<script src="piece-designs.js?v=172"></script>
-<script src="character-style.js?v=172"></script>
-<script src="campaign-opponents.js?v=172"></script>
-<script src="campaign-dialogue.js?v=172"></script>
-<link rel="stylesheet" href="character-style.css?v=172">
+<script src="gameplay-polish.js?v=173"></script>
+<script src="piece-designs.js?v=173"></script>
+<script src="character-style.js?v=173"></script>
+<script src="campaign-opponents.js?v=173"></script>
+<script src="campaign-dialogue.js?v=173"></script>
+<link rel="stylesheet" href="character-style.css?v=173">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2403,12 +2403,15 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-sequence small{color:#e8d5ff;font-family:var(--body);font-size:11px;line-height:1.2}
 .scoring-sequence b{font-size:clamp(13px,3.6vw,19px);line-height:1.15}
 .scoring-sequence.scoring-total{border-color:var(--brass)}
+.capture-bonus-mark{position:absolute;inset:3px;border:2px dashed #6ff3ff;border-radius:5px;box-shadow:inset 0 0 8px #6ff3ff99;z-index:3;pointer-events:none}
+.scoring-sequence.scoring-record{border-color:#ffe14d;box-shadow:0 0 14px #ffe14d66}
+.scoring-record-label{color:#ffe14d;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=172">
-<link rel="stylesheet" href="ruler-style.css?v=172">
-<link rel="stylesheet" href="gameplay-polish.css?v=172">
+<link rel="stylesheet" href="city-board.css?v=173">
+<link rel="stylesheet" href="ruler-style.css?v=173">
+<link rel="stylesheet" href="gameplay-polish.css?v=173">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2786,6 +2789,11 @@ const sfx = {
   mult: i => { kit.clap(0, 0.28); tone({f:300 + i*40, f2:340 + i*40, type:'triangle', dur:0.08, vol:0.08}); },
   xm:   i => { kit.scratch(); kit.kick(0.02, 0.4); },
   total:() => { kit.horn(); kit.kick(0, 0.6); },
+  record:() => {
+    tone({f:523.25,type:'triangle',dur:.24,vol:.09});
+    tone({f:659.25,type:'triangle',dur:.24,vol:.09,at:.09});
+    tone({f:1046.5,type:'triangle',dur:.35,vol:.1,at:.18});
+  },
   lose: () => { kit.scratch(); setTimeout(kit.vinyl, 180); },
   win:  () => { kit.kick(0); kit.hat(0.12); kit.snare(0.24); kit.hat(0.36); kit.kick(0.48); kit.kick(0.6); kit.snare(0.72); kit.horn(0.72, 0.5); },
   coin: () => kit.cowbell(),
@@ -3418,7 +3426,7 @@ function normLv(r){ if(r && r.lv) for(const k in r.lv) r.lv[k] = Math.max(1, Mat
 const KING_SCORE_LV = 3;   // v142: King XP / King Level retired. The King's captures score at a fixed level (the campaign average of the old Lv.1-4 curve was ~2.7)
 const scoreLv = t => t === 'K' ? (MATCH ? 1 : KING_SCORE_LV) : effLv(t);
 const lvLabel = t => `Lv.${effLv(t)}${effLv(t) >= LV_MAX ? ' · MAX' : ''}`;
-function storeCarry(){ if(!RUN) return; setCarry({roster:RUN.roster.filter(Boolean), lv:RUN.lv, relics:RUN.relics, cards:RUN.cards || [], money:RUN.money, lives:lives(), livesBought:RUN.livesBought || 0, bonusSwaps:RUN.bonusSwaps || 0, lifeLand:RUN.lifeLand || null, qBought:RUN.qBought || 0, journeys:(RUN.journeys || 1) + 1, armyStages:RUN.armyStages || 0, evHist:RUN.evHist || [], fallen:RUN.fallen || [], laLast:RUN.laLast || {}}); }
+function storeCarry(){ if(!RUN) return; setCarry({roster:RUN.roster.filter(Boolean), lv:RUN.lv, relics:RUN.relics, cards:RUN.cards || [], money:RUN.money, lives:lives(), livesBought:RUN.livesBought || 0, bonusSwaps:RUN.bonusSwaps || 0, lifeLand:RUN.lifeLand || null, qBought:RUN.qBought || 0, journeys:(RUN.journeys || 1) + 1, armyStages:RUN.armyStages || 0, evHist:RUN.evHist || [], fallen:RUN.fallen || [], laLast:RUN.laLast || {}, bestCapture:RUN.bestCapture || 0}); }
 function newRun(circuit){
   const bosses = []; for(let a=1;a<=nStages(circuit || 'downtown');a++) bosses.push(pick(BOSSES).id);
   RUN = {ante:1, blind:(circuit || 'downtown') === 'ruler' ? 0 : 2, money:4, relics:[], roster:draftRoster() || ['K','R','B','N','P','P','P','P'], lv:{P:1,N:1,B:1,R:1,Q:1,K:1}, bosses, restocks:0, best:0, won:false,
@@ -3439,7 +3447,7 @@ function newRun(circuit){
   if(carry){
     if(carry.lv && (carry.lv.K | 0) > 1) kingTrainRefunded += dropKingTraining(carry);   // a carried army that missed the v105 migration
     RUN.roster = carry.roster.slice(); RUN.lv = Object.assign({P:1,N:1,B:1,R:1,Q:1,K:1}, carry.lv); normLv(RUN); RUN.relics = carry.relics.slice(0, 5); RUN.cards = (carry.cards || []).slice(0, 2);
-    RUN.money = carry.money + (isC('midnight') ? 4 : 0); RUN.lives = carry.lives || 3; RUN.livesBought = carry.livesBought || 0; RUN.lifeLand = carry.lifeLand || null; RUN.bonusSwaps = carry.bonusSwaps || 0; RUN.qBought = carry.qBought || 0; RUN.journeys = carry.journeys || 1; RUN.evHist = (carry.evHist || []).slice(-6); RUN.fallen = (carry.fallen || []).slice(-40); RUN.laLast = carry.laLast || {}; RUN.armyStages = carry.armyStages != null ? carry.armyStages : Math.max(0, (RUN.journeys - 1) * 4); RUN.carried = true;
+    RUN.money = carry.money + (isC('midnight') ? 4 : 0); RUN.lives = carry.lives || 3; RUN.livesBought = carry.livesBought || 0; RUN.lifeLand = carry.lifeLand || null; RUN.bonusSwaps = carry.bonusSwaps || 0; RUN.qBought = carry.qBought || 0; RUN.journeys = carry.journeys || 1; RUN.evHist = (carry.evHist || []).slice(-6); RUN.fallen = (carry.fallen || []).slice(-40); RUN.laLast = carry.laLast || {}; RUN.armyStages = carry.armyStages != null ? carry.armyStages : Math.max(0, (RUN.journeys - 1) * 4); RUN.bestCapture = carry.bestCapture || 0; RUN.carried = true;
     setCarry(null); // it now lives inside this game
   }
   if(isC('harbor')){ if(betaCan('N')) recruitAdd('N'); RUN.lv.N = Math.max(RUN.lv.N, 2); }   // v156: in Crown City this is the Circuit's recruit
@@ -3515,7 +3523,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 172;
+const GAME_VERSION = 173;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6346,7 +6354,7 @@ function gRetryWave(){
   setPack(RUN.land); playBlind(false);
 }
 /* ---------- victory: Arena Tokens, then the next wave (or the Armory after every fifth) ---------- */
-function gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mate){
+function gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mate, captureFinish){
   gFight(true);
   const cleared = RUN.gWave, boss = gBossWave(cleared), T = gTier(cleared), armory = cleared % 5 === 0, tag = gFoeTag();
   const parts = [[`Wave reward · ${T.name}`, T.tok]];
@@ -6362,13 +6370,13 @@ function gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mate){
   B = null; save();                                                     // committed before anything is shown
   const nx = RUN.gWave;
   const html = `<p class="muted">${boss ? 'Boss wave · ' : ''}${tag} beaten</p><h2 style="color:var(--brass)">${mate ? 'Checkmate!' : 'Wave won!'}</h2>
-    <div class="kv"><span>Score</span><b>${vScore.toLocaleString()}</b></div>
+    ${captureFinishHTML(captureFinish)}<div class="kv"><span>Score</span><b>${vScore.toLocaleString()}</b></div>
     <div class="cash">${parts.map(([k, v]) => `<div class="kv"><span>${k}</span><b class="money">$${v}</b></div>`).join('')}
       <div class="kv" style="border-top:1px solid var(--line);padding-top:6px"><span>Arena Tokens</span><b class="money" style="font-size:20px">+$${total}</b></div></div>
     ${laWinHtml(laRes)}<p class="gnext">${armory ? `The Armory is open · then Wave ${nx}` : `Next · Wave ${nx}${gBossWave(nx) ? ' · Boss wave' : ''}${gTier(nx).id !== T.id ? ` · ${gTier(nx).name}` : ''}`}</p>
     <button class="btn" id="cash">${armory ? 'To the Armory' : `Wave ${nx}`}</button><button class="btn ghost" id="peek">View the board</button>`;
   const rewardView = battleView;
-  stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared}`, name:tag, kick:'Wave cleared'}).then(() => {
+  stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared}`, name:tag, kick:'Wave cleared'}, captureFinish).then(() => {
     if(rewardView !== battleView) return;
     const m = modal(`<p class="gwave">Wave ${cleared} cleared</p>` + html, null); m.classList.add('vicm', 'gvic'); addPeek(m, vLog);
     let go = false; m.querySelector('#cash').onclick = () => { if(go) return; go = true; m.remove(); sfx.coin(); armory ? shop() : gNextWave(); };
@@ -6760,7 +6768,7 @@ function encounterHTML(planned=false){
   return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
 }
 function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
-function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
+function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a cyan outlined capture square to see which scoring bonuses it triggers.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
   const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to);
@@ -6781,6 +6789,43 @@ async function commitMovePreview(){
 }
 function lossHTML(review){const esc=CrownfallPolish.escape;return `<div class="loss-review"><b>${esc(review.title)}</b><p>${esc(review.tip)}</p>${review.note?`<p class="last-turn">Last exchange: ${esc(review.note)}</p>`:''}</div>`;}
 function lossBoardHTML(log){const sn=log?.at(-1);if(!sn?.s)return '';let html='';for(let i=0;i<64;i++){const ch=sn.s[i],me=ch&&ch===ch.toUpperCase();html+=`<div class="sq ${(Math.floor(i/8)+i%8)%2?'d':'l'}${i===sn.t?' lastte':''}">${ch&&ch!=='.'?pieceSVG(ch.toUpperCase(),me?'me':'en'):''}</div>`;}return `<details><summary>Review final position</summary><div class="board loss-final">${html}</div></details>`;}
+function captureBonusText(score, charged){
+  const sources = new Set(['ench','gear','circuit','card','relic','combo','charge']);
+  const names = {circuit:'Rooftop bonus', combo:'Capture streak', charge:'Charge'};
+  const steps = (score?.steps || []).filter(step => sources.has(step.src));
+  if(charged) steps.push({src:'charge',x:1.5});
+  return steps.map(step => {
+    const parts = [];
+    if(step.c) parts.push(`+${step.c} Material`);
+    if(step.m) parts.push(`+${step.m} Brilliance`);
+    if(step.x) parts.push(`×${step.x} Brilliance`);
+    return `${step.name || names[step.src]} ${parts.join(' / ')}`;
+  }).join(' · ');
+}
+function bindCaptureHold(square, bonus, move){
+  let hold, x, y, inspected = false;
+  const cancel = () => clearTimeout(hold);
+  square.onpointerdown = e => {
+    inspected = false;
+    cancel();
+    if(!e.isPrimary || e.button !== 0 || busy) return;
+    x = e.clientX;
+    y = e.clientY;
+    hold = setTimeout(() => {
+      if(busy || !square.isConnected) return;
+      inspected = true;
+      showTip(`<b>Capture bonuses</b><br>${CrownfallPolish.escape(bonus)}`);
+    }, 420);
+  };
+  square.onpointermove = e => { if(Math.hypot(e.clientX-x,e.clientY-y)>10) cancel(); };
+  square.onpointerup = square.onpointerleave = square.onpointercancel = cancel;
+  square.oncontextmenu = e => e.preventDefault();
+  square.onclick = e => {
+    cancel();
+    if(inspected && e.detail !== 0){ inspected = false; return; }
+    move();
+  };
+}
 function drawBoard(){
   if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)){movePreview=null;pieceInfo(null);}
   const el = $('#board'); if(!el) return;
@@ -6812,19 +6857,28 @@ function drawBoard(){
     if(p && (eList(p.e).length > 1 || eList(p.e).some(x => !MAT[x]))) inner += `<span class="edots">${eList(p.e).map(x => `<i style="background:${ENCH[x].col}"></i>`).join('')}</span>`;
     if(swapMode && swapA !== null && p && p.side === 'me' && i !== swapA){ const [r1,c1] = rc(swapA); if(Math.max(Math.abs(r1-r),Math.abs(c1-c)) === 1) inner += '<span class="ring"></span>'; }
     if(pending !== null && p){ const c = C(RUN.cards[pending]); const ok = (c.target === 'enemy' && p.side === 'en' && p.t !== 'K') || (c.target === 'defect' && p.side === 'en' && (p.t === 'P' || p.t === 'N')) || (c.target === 'pawn' && p.side === 'me' && p.t === 'P') || (c.target === 'mine' && p.side === 'me' && !((c.id === 'alchemist' || c.id === 'mentor') && p.t === 'K')); if(ok) inner += '<span class="ring"></span>'; }
+    let captureBonus = '';
     if(legal.includes(i)){
       const nb = applyMove(B.board, sel, i); const risk = attacksOn(nb, 'en').includes(i);
       const sc = scoreCapture(sel, i);
       inner += p || epVictim(B.board, sel, i) ? `<span class="ring ${risk?'risk':''}"></span>${p ? '' : '<span class="eptag">En passant</span>'}` : `<span class="dot ${risk?'risk':''}"></span>`;
+      if(!busy && !swapMode && !trapMode && !cmdMode && !gambitMode && pending === null && (p?.side === 'en' || epVictim(B.board, sel, i))){
+        captureBonus = captureBonusText(sc, B.board[sel]?.charge);
+        if(captureBonus) inner += '<span class="capture-bonus-mark" aria-hidden="true"></span>';
+      }
       if(sc) inner += `<span class="pv">+${sc.total.toLocaleString()}</span>`;
       if(risk)inner += '<span class="preview-warning" aria-label="Attacked destination">!</span>';
     }
     if(advT.includes(i)) inner += p ? '<span class="ring"></span>' : '<span class="dot"></span>';
     if(c === 0) inner += `<span class="coord">${8-r}</span>`;
-    h += `<div class="${cls.join(' ')}" data-i="${i}"${(B.crates || []).includes(i) ? ' aria-label="Crate trap on '+sqName(i)+': you lose up to $2; enemy entry gives you $2"' : ''}>${inner}</div>`;
+    h += `<div class="${cls.join(' ')}" data-i="${i}"${captureBonus ? ` data-capture-bonus="${CrownfallPolish.escape(captureBonus)}" title="${CrownfallPolish.escape(captureBonus)}"` : ''}${(B.crates || []).includes(i) ? ' aria-label="Crate trap on '+sqName(i)+': you lose up to $2; enemy entry gives you $2"' : ''}>${inner}</div>`;
   }
   el.innerHTML = h;
-  el.querySelectorAll('.sq').forEach(s => s.onclick = () => tapSquare(+s.dataset.i));
+  el.querySelectorAll('.sq').forEach(square => {
+    const move = () => tapSquare(+square.dataset.i);
+    if(square.dataset.captureBonus) bindCaptureHold(square, square.dataset.captureBonus, move);
+    else square.onclick = move;
+  });
   applyMood();
   coachBoard();
   const tb = $('#tipbar');
@@ -7225,7 +7279,7 @@ async function doMove(from, to, pt){
   if(res && res.check){ pop(kingIdx(B.board,'en'), 'Check!', 'fxx'); sfx.check(); }
   if(res){
     if(victim){ sfx.cap(); B.caps++; }
-    await playScore(res, to);
+    await playScore(res, to, !!victim);
     if(victim && victim.t !== 'K' && Math.random() < 0.45) setTimeout(() => say('hurt'), 250);
     if(victim) coach('brilliance');
     if(victim){ B.streak++; if(B.streak >= 5) packAch('combo'); B.vic = B.vic || []; B.vic.push(victim.t); if(B.vic.includes('R') && B.vic.includes('Q')) packAch('siege'); }
@@ -7264,7 +7318,7 @@ async function doMove(from, to, pt){
     // Winning capture: a capture that first reaches the target only counts if that piece survives the enemy's reply
     const sp = victim && score0 < B.target && B.board[to] && B.board[to].side === 'me' ? B.board[to] : null;
     if(sp && sp.id != null){ B.pendingWin = {gain:B.score - score0, id:sp.id, sq:to}; (window.__cc = window.__cc || []).push('pending'); $('#hand').innerHTML = '<span class="money">Target reached</span> The enemy responds…'; save(); }
-    else { busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
+    else { if(victim && score0 < B.target && B.score > score0) B.captureFinish = B.score - score0; busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
   }
   if(loneKing()){ busy = false; return loneKingDefeat(); }
   if(strike && !B.pendingWin){ busy = false; save(); drawBoard(); $('#hand').innerHTML = '<span class="money">Strike</span> Still your move'; return; }   // (a winning capture still waits for the enemy's reply)
@@ -7747,11 +7801,13 @@ async function enemyPhaseRun(to){
   tacResolve();
   // Winning capture resolved: the scoring piece survived the whole reply (both moves for Morwen), or it was taken back
   if(B.pendingWin){ const pw = B.pendingWin; B.pendingWin = null;
-    (window.__cc = window.__cc || []).push(B.board.some(q => q && q.side === 'me' && q.id === pw.id) ? 'secured' : 'taken back');
-    if(!B.board.some(q => q && q.side === 'me' && q.id === pw.id)){
+    const secured = B.board.some(q => q && q.side === 'me' && q.id === pw.id);
+    (window.__cc = window.__cc || []).push(secured ? 'secured' : 'taken back');
+    if(!secured){
       B.score = Math.max(0, B.score - pw.gain); $('#score').textContent = B.score.toLocaleString(); updateHud();
       pop(pw.sq, `Recaptured: −${pw.gain.toLocaleString()}`, 'fxm'); $('#hand').innerHTML = '<span class="money">Recaptured</span> That capture no longer counts';
       logPos(`Your winning capture was taken back (−${pw.gain.toLocaleString()})`, -1, -1, 'fx'); }
+    if(secured && B.score >= B.target) B.captureFinish = pw.gain;
     save();
     if(B.score >= B.target){ busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
   }
@@ -8051,7 +8107,13 @@ function trapEnded(){
   if(inCheck(B.board, 'en') && !anyLegal(B.board, 'en')){ busy = false; checkmateWin(); return true; }
   return false;
 }
-async function playScore(res, at){
+function recordRunCapture(points){
+  const previous = RUN.bestCapture || 0;
+  if(points <= previous) return false;
+  RUN.bestCapture = points;
+  return previous > 0;
+}
+async function playScore(res, at, capture = false){
   const hand = $('#hand'), cc = $('#cc'), cm = $('#cm');
   let chips = 0, mult = 0, i = 0;
   hand.textContent = res.label;
@@ -8082,6 +8144,7 @@ async function playScore(res, at){
       i++; await beat(stepMs);
     }
     const total = res.total;
+    const record = capture && !MATCH && recordRunCapture(total);
     hand.innerHTML = `${res.label} = <span class="money">${total.toLocaleString()}</span>`;
     if(sequence.isConnected){
       cc.textContent = number(res.chips);
@@ -8089,18 +8152,25 @@ async function playScore(res, at){
       sequence.classList.add('scoring-total');
       source.textContent = `${number(res.chips)} Material × ${number(res.mult)} Brilliance`;
       amount.textContent = `+${number(total)} points`;
+      if(record){
+        sequence.classList.add('scoring-record');
+        const stamp = document.createElement('strong');
+        stamp.className = 'scoring-record-label';
+        stamp.textContent = 'Best Capture This Run';
+        sequence.prepend(stamp);
+      }
       bump(sequence);
     }
     scoreFly(at, total, 'gain');
     if(total >= Math.max(400, B.target*0.45)) brilliant(total >= B.target ? 'Brilliant!!' : 'Great move!');
-    sfx.total();
+    if(record) sfx.record(); else sfx.total();
     if(!MATCH && total > BEST.hand){ BEST.hand = total; saveBest(); }
     if(total >= 2000) packAch('dragon');
     const start = B.score, end = B.score + total, sc = $('#score'), t0 = performance.now(), dur = T(500);
     B.score = end;
     await new Promise(res2 => { (function f(){ const k = Math.min(1, (performance.now()-t0)/dur); sc.textContent = Math.round(start + (end-start)*k).toLocaleString(); if(k < 1) requestAnimationFrame(f); else res2(); })(); });
     bump(sc); updateHud();
-    await beat(260);
+    await beat(record ? 480 : 260);
     cc.textContent = '0'; cm.textContent = '×0';
   } finally { sequence.remove(); }
 }
@@ -8925,13 +8995,13 @@ function vOverlay(cls, l){
 }
 function musicDip(f){ if(!MM.master || !AC) return; const t = AC.currentTime; MM.master.gain.cancelScheduledValues(t); MM.master.gain.setTargetAtTime(musicLevel() * f, t, 0.25); }
 // 1) ordinary stage win: freeze → compact banner → rewards (~1.8s, no skip needed)
-async function stageWinIntro(l, score, name, opp){
+async function stageWinIntro(l, score, name, opp, captureFinish){
   const view = battleView;
   busy = true;
   const ov = vOverlay('stage', l); const T = vTimeline(ov, 250);   // v154: a tap skips
   if(opp) ov.classList.add('opp-' + opp.tier);
   await T.wait(500);
-  ov.innerHTML = `<div class="vcard"><span class="vhit"></span><b class="vk">${opp && opp.kick ? opp.kick : 'Stage cleared'}</b><span class="vs">Final Score: <em>${score.toLocaleString()}</em></span>${opp ? `<span class="vdef"><i>${opp.tag || (opp.tier === 'rival' ? 'Rival' : 'Boss')}</i>${opp.name}<em>Defeated</em></span>` : `<span class="vn">${name}</span>`}</div>`;
+  ov.innerHTML = `<div class="vcard"><span class="vhit"></span><b class="vk">${captureFinish ? 'Winning capture' : opp && opp.kick ? opp.kick : 'Stage cleared'}</b>${captureFinish ? `<span class="money">+${captureFinish.toLocaleString()} points</span>` : ''}<span class="vs">Final Score: <em>${score.toLocaleString()}</em></span>${opp ? `<span class="vdef"><i>${opp.tag || (opp.tier === 'rival' ? 'Rival' : 'Boss')}</i>${opp.name}<em>Defeated</em></span>` : `<span class="vn">${name}</span>`}</div>`;
   victorySound(l, false);
   const bd = $('#bw'); if(bd && !calm) bd.animate([{transform:'scale(1)'},{transform:'scale(1.012)'},{transform:'scale(1)'}], {duration:260});
   requestAnimationFrame(() => ov.classList.add('in'));
@@ -9000,6 +9070,9 @@ async function landConquered(l){
   btns.querySelector('#vgo').onclick = () => { if(used) return; used = true; ov.remove(); circuitSelect(next || l); };
   btns.querySelector('#vvault').onclick = () => { if(used) return; used = true; ov.remove(); landsScreen(() => circuitSelect(next || l)); };
 }
+function captureFinishHTML(points){
+  return points > 0 ? `<p class="money">Winning capture · +${points.toLocaleString()} points</p>` : '';
+}
 function winBlind(){
   if(MATCH) return matchEnd(true, B.mate ? 'CHECKMATE' : 'SCORE');
   laClear();
@@ -9028,10 +9101,11 @@ function winBlind(){
   const bossWin = RUN.blind === 2, finalWin = bossWin && RUN.ante === nStages() && !RUN.won;
   const bp = bossWin && !RUN.gauntlet ? personaOf(bossId()) : null;
   // presentation facts, captured before the commit below moves the run on
+  const captureFinish = B.captureFinish;
   const vLand = land(), vRuler = bossWin && bossId() === 'ruler', vName = roundName(RUN.blind), vScore = B.score, vLog = B.log;
   const vOpp = bossWin && !vRuler ? {tier: bossObj(bossId()).mini ? 'rival' : 'boss', name: bossName(bossId()), tag:RUN.gauntlet ? undefined : opponentRole(bossObj(bossId()))} : null;   // v132
   const html = (`${bp ? `<div class="quote">${portrait(bp)}<span>“${bp.lose}”<small>${bp.name}</small></span></div>` : ''}<p class="muted">${bossWin ? bossName(bossId()) : roundName(RUN.blind)} beaten</p><h2 style="color:var(--brass)">${B.mate ? (B.kingFell ? 'The King falls!' : 'Checkmate!') : RUN.circuit === 'ruler' ? 'Ruler defeated!' : `Stage ${RUN.ante} cleared!`}</h2>
-    <div class="kv"><span>Score</span><b>${B.score.toLocaleString()} / ${B.target.toLocaleString()}</b></div>
+    ${captureFinishHTML(captureFinish)}<div class="kv"><span>Score</span><b>${B.score.toLocaleString()} / ${B.target.toLocaleString()}</b></div>
     ${B.mateBonus ? `<div class="kv"><span>Checkmate score bonus</span><b style="color:var(--brass)">+${B.mateBonus.toLocaleString()}</b></div>` : ''}
     <div class="cash">
       <div class="kv"><span>${RUN.circuit === 'ruler' ? 'Ruler reward' : 'Stage reward'}${debtNote ? ` (${C('loanshark').name} took it)` : ''}</span><b class="money">$${reward}</b></div>
@@ -9045,7 +9119,7 @@ function winBlind(){
     
     ${RUN.circuit !== 'ruler' && bossWin ? `<p class="stnext">Stage ${RUN.ante} · ${STAGE_ROLE[RUN.ante - 1] || ''} · ${RUN.ante < CIRCUIT_STAGES ? `next: Stage ${RUN.ante + 1} · ${STAGE_ROLE[RUN.ante]}` : `${CIR().name} conquered`}</p>` : ''}${laWinHtml(laRes)}<button class="btn" id="cash">Collect winnings</button><button class="btn ghost" id="peek">View the board</button>`);
   B.done = true;
-  if(RUN.gauntlet) return gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mateBonus);   // v152: Arena Tokens (committed in gWin)
+  if(RUN.gauntlet) return gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mateBonus, captureFinish);   // v152: Arena Tokens (committed in gWin)
   // commit the win right away, so closing the app or going back never loses it
   RUN.money += total;
   let giftCard = null, fin = null;
@@ -9075,7 +9149,7 @@ function winBlind(){
   // presentation → the existing rewards window
   const rewardView = battleView;
   const intro = vRuler && vLand === 'throne' ? Promise.resolve()                       // the Crownless King keeps his own story flow
-    : vRuler ? rulerDefeatIntro(vLand, rulerShort(vLand)) : stageWinIntro(vLand, vScore, vName, vOpp);
+    : vRuler ? rulerDefeatIntro(vLand, rulerShort(vLand)) : stageWinIntro(vLand, vScore, vName, vOpp, captureFinish);
   intro.then(() => {
   if(rewardView !== battleView) return;
   const m = modal(html, null); m.classList.add('vicm'); addPeek(m, vLog);
