@@ -8,9 +8,18 @@ window.HTMLElement.prototype.animate=()=>({finished:Promise.resolve(),cancel(){}
 const html=fs.readFileSync('index.html','utf8');window.document.write(html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,''));
 for(const file of ['gameplay-polish.js','piece-designs.js','character-style.js','campaign-opponents.js','campaign-dialogue.js'])window.eval(fs.readFileSync(file,'utf8')+(file==='campaign-opponents.js'?';window.campaignOpponentName=campaignOpponentName;':''));
 const bridge=`
+const realPlayScore = playScore;
 window.__polishTest={
  setup(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
- pause:(match=false)=>{document.querySelectorAll('.modal').forEach(x=>x.remove());if(match)matchMenu();else gameMenu();}, tap:i=>tapSquare(i),info:()=>battleInfo(),
+ scoringSequence(){
+    RUN.relics=['cavalry'];
+    B.streak=1;
+    B.board[42].e='iron';
+    B.nextX=3;
+    playBlind(true);
+    return realPlayScore(scoreCapture(42,25),25);
+  },
+  pause:(match=false)=>{document.querySelectorAll('.modal').forEach(x=>x.remove());if(match)matchMenu();else gameMenu();}, tap:i=>tapSquare(i),info:()=>battleInfo(),
  state:()=>({money:RUN.money,score:B?.score,selected:sel,preview:!!movePreview,squares:B?.board.map(x=>x?.t||'.').join(''),level:RUN.lv.P,confirm:confirmMoves()}),
  stale(){B.board=B.board.slice();drawBoard();},
  loss(){B.log.push({s:posKey(B.board),k:'me',f:42,t:25,n:'Knight takes Rook on b5'});B.log.push({s:posKey(B.board),k:'en',f:4,t:12,n:'Enemy King to e7, check'});B.log.push({s:posKey(B.board),k:'fx',f:12,t:12,n:'Armor breaks'});gameOver('Checkmate. Your King is trapped.');},
@@ -36,4 +45,25 @@ for(const land of ['street','medieval','greek','fantasy','throne'])for(const cir
 console.log('PASS: all 80 campaign circuit profiles match their tactical plans.');
 for(const land of ['street','medieval','greek','fantasy','throne'])for(const circuit of ['rooftop','harbor']){const e=api.actual(circuit,2,land);assert.equal(e.enemyKings,1);assert.equal(e.playerKings,1);assert(e.brief.includes(window.CrownfallPolish.formation(e.sig).title));}
 console.log('PASS: 10 actual cross-land battle openings keep both Kings and brief the accepted formation.');
+api.setup();
+const beats=[];
+window.setTimeout=(fn,ms)=>{
+  const step=$('.scoring-sequence');
+  if(step&&ms<=330){
+    const label=step.querySelector('small').textContent;
+    if(beats.at(-1)!==label)beats.push(label);
+    return globalThis.setTimeout(fn,0);
+  }
+  return 0;
+};
+await api.scoringSequence();
+assert.deepEqual(beats.slice(0,-1).map(label=>label.split(' · ')[1]),[
+ 'Knight base','Rook captured','Chrome','Horsepower','The Heavy Hitter','Capture streak',
+]);
+assert.equal(api.state().score,3000);
+assert.match(beats.at(-1),/80 Material × 37.5 Brilliance/);
+assert.equal($('.scoring-sequence'),null);
+assert.equal($('#cc').textContent,'0');
+assert.equal($('#cm').textContent,'×0');
+console.log('PASS: scoring sequence names each effect in order, shows final totals, awards points once, and clears the overlay.');
 await window.happyDOM.abort();window.close();

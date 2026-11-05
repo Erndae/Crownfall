@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=170"></script>
-<script src="piece-designs.js?v=170"></script>
-<script src="character-style.js?v=170"></script>
-<script src="campaign-opponents.js?v=170"></script>
-<script src="campaign-dialogue.js?v=170"></script>
-<link rel="stylesheet" href="character-style.css?v=170">
+<script src="gameplay-polish.js?v=172"></script>
+<script src="piece-designs.js?v=172"></script>
+<script src="character-style.js?v=172"></script>
+<script src="campaign-opponents.js?v=172"></script>
+<script src="campaign-dialogue.js?v=172"></script>
+<link rel="stylesheet" href="character-style.css?v=172">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2398,9 +2398,17 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 </style>
 
 
-<link rel="stylesheet" href="city-board.css?v=170">
-<link rel="stylesheet" href="ruler-style.css?v=170">
-<link rel="stylesheet" href="gameplay-polish.css?v=170">
+<style>
+.scoring-sequence{position:absolute;z-index:13;inset:10% 7% auto;pointer-events:none;display:grid;gap:4px;padding:8px;text-align:center;background:#14101c;color:#fff;border:2px solid #8f68be;border-radius:9px;box-shadow:0 3px 12px #0009;font-family:var(--display)}
+.scoring-sequence small{color:#e8d5ff;font-family:var(--body);font-size:11px;line-height:1.2}
+.scoring-sequence b{font-size:clamp(13px,3.6vw,19px);line-height:1.15}
+.scoring-sequence.scoring-total{border-color:var(--brass)}
+.scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
+@media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
+</style>
+<link rel="stylesheet" href="city-board.css?v=172">
+<link rel="stylesheet" href="ruler-style.css?v=172">
+<link rel="stylesheet" href="gameplay-polish.css?v=172">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3507,7 +3515,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 170;
+const GAME_VERSION = 172;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4917,11 +4925,11 @@ function scoreCapture(from, to, pt){
   let chips, mult, vv = 0;
   if(victim){
     chips = T0.chips + T0.lc*(lv-1); mult = T0.mult + T0.lm*(lv-1);
-    steps.push({src:'base', c:chips, m:mult});
+    steps.push({src:'base', name:T0.name + ' base', c:chips, m:mult});
     vv = TYPE[v].val; if(v === 'P' && RULE('wall')) vv = 0;
-    if(vv){ steps.push({src:'victim', c:vv}); chips += vv; }
+    if(vv){ steps.push({src:'victim', name:TYPE[v].name + ' captured', c:vv}); chips += vv; }
     if(check){ steps.push({src:'check', c:25, m:2}); chips += 25; mult += 2; }
-  } else { chips = 25; mult = 2; steps.push({src:'base', c:25, m:2}); }
+  } else { chips = 25; mult = 2; steps.push({src:'base', name:'Check', c:25, m:2}); }
   const promo = a === 'P' && nb[to].t !== 'P';
   if(promo && victim){ steps.push({src:'promo', m:2}); mult += 2; }
   const fork = attackSquares(nb, to).filter(x => nb[x] && nb[x].side === 'en').length;
@@ -4929,25 +4937,25 @@ function scoreCapture(from, to, pt){
   const ctx = {capture:!!victim, check, a, v, vv, dist: Math.max(Math.abs(fr-trr), Math.abs(fc-tcc)), fork, before:B.caps, money:RUN.money, left:B.moves-1, promo, lost:B.lost, mine:nb.filter(p => p && p.side === 'me' && p.t !== 'K').length,
     risky: attacksOn(nb, 'en').includes(to), lastOne: !!victim && nb.filter(p => p && p.side === 'en' && p.t !== 'K').length === 0, streak: B.streak > 0};
   const me = b[from];
-  if(victim && hasE(me,'iron')){ mult += 4; steps.push({src:'ench', m:4}); }
-  if(victim && hasE(me,'fire')){ chips += 50; steps.push({src:'ench', c:50}); }
-  if(victim && hasE(me,'royal')){ chips += 25; mult += 2; steps.push({src:'ench', c:25, m:2}); }
-  if(victim && hasE(me,'rise')){ chips += 40; steps.push({src:'ench', c:40}); }
-  if(victim && hasE(me,'edge') && TYPE[v].val >= T0.val){ mult += 3; steps.push({src:'ench', m:3}); }
-  if(victim && hasE(me,'crystal')){ mult *= 2; steps.push({src:'ench', x:2}); }
+  if(victim && hasE(me,'iron')){ mult += 4; steps.push({src:'ench', name:ENCH.iron.name, m:4}); }
+  if(victim && hasE(me,'fire')){ chips += 50; steps.push({src:'ench', name:ENCH.fire.name, c:50}); }
+  if(victim && hasE(me,'royal')){ chips += 25; mult += 2; steps.push({src:'ench', name:ENCH.royal.name, c:25, m:2}); }
+  if(victim && hasE(me,'rise')){ chips += 40; steps.push({src:'ench', name:ENCH.rise.name, c:40}); }
+  if(victim && hasE(me,'edge') && TYPE[v].val >= T0.val){ mult += 3; steps.push({src:'ench', name:ENCH.edge.name, m:3}); }
+  if(victim && hasE(me,'crystal')){ mult *= 2; steps.push({src:'ench', name:ENCH.crystal.name, x:2}); }
   if(victim && RUN && RUN.gauntlet && !MATCH){ const gq = gEqOf(me);   // v152 Gauntlet equipment
-    if(gq === 'emblem'){ const add = Math.round(chips * 0.25); chips += add; steps.push({src:'gear', c:add}); }
-    else if(gq === 'crest'){ const k = gCrestBonus(me); if(k){ mult += k; steps.push({src:'gear', m:k}); } } }
+    if(gq === 'emblem'){ const add = Math.round(chips * 0.25); chips += add; steps.push({src:'gear', name:G_EQUIP.emblem.name, c:add}); }
+    else if(gq === 'crest'){ const k = gCrestBonus(me); if(k){ mult += k; steps.push({src:'gear', name:G_EQUIP.crest.name, m:k}); } } }
   if(victim && a === 'K' && isC('rooftop')){ mult *= 2; steps.push({src:'circuit', x:2}); }
-  if(victim && chalBonusNow()){ chips += CHALLENGES.blitzer.material; steps.push({src:'card', c:CHALLENGES.blitzer.material}); }   // the capture that completes the challenge
-  if(victim && a === 'N' && B.knightBuff){ mult += B.knightBuff; steps.push({src:'card', m:B.knightBuff}); }
-  if(victim && a === 'K' && B.kingX){ mult *= B.kingX; steps.push({src:'card', x:B.kingX}); }
-  if(victim && B.forkX && fork){ mult += B.forkX*fork; steps.push({src:'card', m:B.forkX*fork}); }
+  if(victim && chalBonusNow()){ chips += CHALLENGES.blitzer.material; steps.push({src:'card', name:CHALLENGES.blitzer.name || 'Blitzer', c:CHALLENGES.blitzer.material}); }   // the capture that completes the challenge
+  if(victim && a === 'N' && B.knightBuff){ mult += B.knightBuff; steps.push({src:'card', name:C('stampede').name, m:B.knightBuff}); }
+  if(victim && a === 'K' && B.kingX){ mult *= B.kingX; steps.push({src:'card', name:C('decree').name, x:B.kingX}); }
+  if(victim && B.forkX && fork){ mult += B.forkX*fork; steps.push({src:'card', name:C('forkcard').name, m:B.forkX*fork}); }
   RUN.relics.forEach((id, k) => { const rel = R(id); if(!rel.on) return; if(!ctx.capture && !rel.check) return; const e = rel.on(ctx); if(!e) return;
-    if(e.c){ chips += e.c; steps.push({src:'relic', k, c:e.c}); }
-    if(e.m){ mult += e.m; steps.push({src:'relic', k, m:e.m}); }
-    if(e.x){ mult *= e.x; steps.push({src:'relic', k, x:e.x}); } });
-  if(victim && B.nextX){ mult *= B.nextX; steps.push({src:'card', x:B.nextX}); }
+    if(e.c){ chips += e.c; steps.push({src:'relic', name:rel.name, k, c:e.c}); }
+    if(e.m){ mult += e.m; steps.push({src:'relic', name:rel.name, k, m:e.m}); }
+    if(e.x){ mult *= e.x; steps.push({src:'relic', name:rel.name, k, x:e.x}); } });
+  if(victim && B.nextX){ mult *= B.nextX; steps.push({src:'card', name:C('attacker').name, x:B.nextX}); }
   if(victim && B.streak > 0){ const cx = comboX(B.streak); mult *= cx; steps.push({src:'combo', x:cx}); }
   if(!victim && B.checks > 0){ const f = Math.pow(0.5, Math.min(B.checks, 4)); mult *= f; steps.push({src:'fatigue', x:f}); }
   mult = Math.round(mult*10)/10;
@@ -8047,28 +8055,54 @@ async function playScore(res, at){
   const hand = $('#hand'), cc = $('#cc'), cm = $('#cm');
   let chips = 0, mult = 0, i = 0;
   hand.textContent = res.label;
-  const bump = el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
-  for(const s of res.steps){
-    if(s.src === 'relic'){ const r = document.querySelector(`[data-rk="${s.k}"]`); if(r){ r.classList.remove('fire'); void r.offsetWidth; r.classList.add('fire'); } }
-    if(s.c){ chips += s.c; cc.textContent = chips.toLocaleString(); bump(cc); sfx.chip(i); pop(at, `+${s.c}`, 'fxc'); }
-    if(s.m){ mult += s.m; cm.textContent = '×' + +mult.toFixed(1); bump(cm); sfx.mult(i); if(s.src !== 'base') pop(at, `+${s.m} Brilliance`, 'fxm'); }
-    if(s.x){ mult *= s.x; cm.textContent = '×' + +mult.toFixed(1); bump(cm); sfx.xm(i); pop(at, s.src === 'combo' ? `Combo ×${s.x}` : s.src === 'fatigue' ? `Repeat check ×${s.x}` : `×${s.x} Brilliance`, s.src === 'fatigue' ? 'fxm' : 'fxx'); }
-    if(s.src === 'base'){ cm.textContent = '×' + +mult.toFixed(1); }
-    i++; await sleep(T(s.src === 'base' ? 260 : 330));
-  }
-  const total = res.total;
-  hand.innerHTML = `${res.label} = <span class="money">${total.toLocaleString()}</span>`;
-  scoreFly(at, total, 'gain');
-  if(total >= Math.max(400, B.target*0.45)) brilliant(total >= B.target ? 'Brilliant!!' : 'Great move!');
-  sfx.total();
-  if(!MATCH && total > BEST.hand){ BEST.hand = total; saveBest(); }
-  if(total >= 2000) packAch('dragon');
-  const start = B.score, end = B.score + total, sc = $('#score'), t0 = performance.now(), dur = T(500);
-  B.score = end;
-  await new Promise(res2 => { (function f(){ const k = Math.min(1, (performance.now()-t0)/dur); sc.textContent = Math.round(start + (end-start)*k).toLocaleString(); if(k < 1) requestAnimationFrame(f); else res2(); })(); });
-  bump(sc); updateHud();
-  await sleep(T(200));
-  cc.textContent = '0'; cm.textContent = '×0';
+  const sequence = document.createElement('div');
+  sequence.className = 'scoring-sequence';
+  sequence.setAttribute('aria-hidden', 'true');
+  sequence.innerHTML = '<small></small><b></b>';
+  const source = sequence.querySelector('small'), amount = sequence.querySelector('b');
+  const number = n => n.toLocaleString(undefined, {maximumFractionDigits:3});
+  const names = {check:'Check', promo:'Promotion', circuit:'Rooftop bonus', combo:'Capture streak', fatigue:'Repeat check', charge:'Charge'};
+  const stepMs = Math.min(330, Math.max(125, 2200 / Math.max(1, res.steps.length)));
+  const beat = ms => sleep(fast ? ms * .45 : ms);
+  if(res.steps.length) $('#bw')?.appendChild(sequence);
+  try {
+    const bump = el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
+    for(const s of res.steps){
+      if(s.src === 'relic'){ const r = document.querySelector(`[data-rk="${s.k}"]`); if(r){ r.classList.remove('fire'); void r.offsetWidth; r.classList.add('fire'); } }
+      if(s.c){ chips += s.c; cc.textContent = number(chips); bump(cc); sfx.chip(i); }
+      if(s.m){ mult += s.m; cm.textContent = '×' + number(mult); bump(cm); sfx.mult(i); }
+      if(s.x){ mult *= s.x; cm.textContent = '×' + number(mult); bump(cm); sfx.xm(i); }
+      source.textContent = `${i + 1}/${res.steps.length} · ${s.name || names[s.src] || 'Scoring bonus'}`;
+      const changes = [];
+      if(s.c) changes.push(`<span class="fxc">+${number(s.c)} Material</span>`);
+      if(s.m) changes.push(`<span class="fxm">+${number(s.m)} Brilliance</span>`);
+      if(s.x) changes.push(`<span class="fxx">×${number(s.x)} Brilliance</span>`);
+      amount.innerHTML = changes.join(' · ');
+      bump(sequence);
+      i++; await beat(stepMs);
+    }
+    const total = res.total;
+    hand.innerHTML = `${res.label} = <span class="money">${total.toLocaleString()}</span>`;
+    if(sequence.isConnected){
+      cc.textContent = number(res.chips);
+      cm.textContent = '×' + number(res.mult);
+      sequence.classList.add('scoring-total');
+      source.textContent = `${number(res.chips)} Material × ${number(res.mult)} Brilliance`;
+      amount.textContent = `+${number(total)} points`;
+      bump(sequence);
+    }
+    scoreFly(at, total, 'gain');
+    if(total >= Math.max(400, B.target*0.45)) brilliant(total >= B.target ? 'Brilliant!!' : 'Great move!');
+    sfx.total();
+    if(!MATCH && total > BEST.hand){ BEST.hand = total; saveBest(); }
+    if(total >= 2000) packAch('dragon');
+    const start = B.score, end = B.score + total, sc = $('#score'), t0 = performance.now(), dur = T(500);
+    B.score = end;
+    await new Promise(res2 => { (function f(){ const k = Math.min(1, (performance.now()-t0)/dur); sc.textContent = Math.round(start + (end-start)*k).toLocaleString(); if(k < 1) requestAnimationFrame(f); else res2(); })(); });
+    bump(sc); updateHud();
+    await beat(260);
+    cc.textContent = '0'; cm.textContent = '×0';
+  } finally { sequence.remove(); }
 }
 const MOVES_TXT = {P:'Moves forward, captures diagonally', N:'Jumps in an L shape', B:'Slides diagonally', R:'Slides straight', Q:'Slides any direction', K:'One square any direction'};
 function pieceInfo(p){
