@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=173"></script>
-<script src="piece-designs.js?v=173"></script>
-<script src="character-style.js?v=173"></script>
-<script src="campaign-opponents.js?v=173"></script>
-<script src="campaign-dialogue.js?v=173"></script>
-<link rel="stylesheet" href="character-style.css?v=173">
+<script src="gameplay-polish.js?v=174"></script>
+<script src="piece-designs.js?v=174"></script>
+<script src="character-style.js?v=174"></script>
+<script src="campaign-opponents.js?v=174"></script>
+<script src="campaign-dialogue.js?v=174"></script>
+<link rel="stylesheet" href="character-style.css?v=174">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2409,9 +2409,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=173">
-<link rel="stylesheet" href="ruler-style.css?v=173">
-<link rel="stylesheet" href="gameplay-polish.css?v=173">
+<link rel="stylesheet" href="city-board.css?v=174">
+<link rel="stylesheet" href="ruler-style.css?v=174">
+<link rel="stylesheet" href="gameplay-polish.css?v=174">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3523,7 +3523,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 173;
+const GAME_VERSION = 174;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5281,7 +5281,7 @@ function title(){
     <a class="legacylink" id="legacy" href="legacy.html">Legacy Campaign · the original 245-battle game (v150)</a>
     <div class="gver" id="gver">Crownfall ${VERSION_LABEL()}</div>
   </section>`;
-  { const c = $('#cont'); if(c) c.onclick = () => inC ? (!RUN ? draftResume() : B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect())) : goMode('campaign', 'cont'); }
+  { const c = $('#cont'); if(c) c.onclick = () => inC ? continueCampaign() : goMode('campaign', 'cont'); }
   if(inC && !RUN && !getCarry() && draftGet() && !draftGet().seen && !window.__draftResumed){ window.__draftResumed = true; return teamIntro(); }   // v155: a refresh during "Meet your army" comes back to it
   $('#customCharacter').onclick=()=>CrownfallCharacter.open();
   $('#new').onclick = () => inC ? (hasCampaign() ? newGameAsk() : startNewGame()) : goMode('campaign', 'new');   // NEW CAMPAIGN always replaces the whole campaign
@@ -6210,17 +6210,27 @@ function gSummary(){
 function campSummary(saved){
   const nameOf = l => (PACKS.find(x => x.id === l) || PACKS[0]).name;
   if(MODE === 'campaign'){ const c = getCarry();
-    return {cont:saved && RUN ? `${nameOf(land())} · ${rulerRoad() ? 'The Ruler’s Road' : `Stage ${RUN.ante}: ${stageName(RUN.ante)}`}` : !c && draftGet() ? `Crown City · your army is assembled (${draftGet().r.length} pieces)` : null,
+    return {cont:saved && RUN ? `${nameOf(land())} · ${rulerRoad() ? 'The Ruler’s Road' : `Stage ${RUN.ante}: ${stageName(RUN.ante)}`}` : !c && draftGet() ? `Crown City · your army is assembled (${draftGet().r.length} pieces)` : hasCampaign() ? 'Continue your journey' : null,
       ready:!(saved && RUN) && c ? `Your army is ready: ${c.roster.length} pieces · $${c.money}` : null}; }
   let R0 = null, c = null; try{ const x = JSON.parse(rawGet(NS_C + 'gambit-run') || 'null'); R0 = x && x.RUN; c = JSON.parse(rawGet(NS_C + 'crownfall-carry') || 'null'); }catch(e){}
-  return {cont:R0 ? `${nameOf(R0.land)} · ${R0.circuit === 'ruler' ? 'The Ruler’s Road' : `Stage ${R0.ante}`}` : null, ready:!R0 && c ? `Your army is ready: ${c.roster.length} pieces · $${c.money}` : null};
+  return {cont:R0 ? `${nameOf(R0.land)} · ${R0.circuit === 'ruler' ? 'The Ruler’s Road' : `Stage ${R0.ante}`}` : storedCampaignExists() ? 'Continue your journey' : null, ready:!R0 && c ? `Your army is ready: ${c.roster.length} pieces · $${c.money}` : null};
+}
+// A completed circuit clears the battle save, not the campaign.
+function storedCampaignExists(){
+  const read = k => { try{ return JSON.parse(rawGet(NS_C + k) || 'null'); }catch(e){ return null; } };
+  return !!(read('gambit-run')?.RUN || read('crownfall-carry') || read(REBUILD_KEY) || read(CP_KEY) || read('gambit-ach')?.cdraft || Object.keys(read('gambit-ach') || {}).some(k => /^(crown_|conq_|clr_|kxp_)/.test(k)));
+}
+function continueCampaign(){
+  if(RUN) return B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect());
+  if(!getCarry() && draftGet()) return draftResume();
+  if(hasCampaign()) return circuitSelect(frontierLand());
+  return title();
 }
 function goMode(m, intent){ rawSet('crownfall-mode', m); rawSet('crownfall-intent', intent || ''); try{ location.reload(); }catch(e){} }
 function modeIntent(){
   const it = rawGet('crownfall-intent'); rawDel('crownfall-intent'); if(!it) return;
   if(MODE === 'gauntlet'){ if(it === 'new') return gNewRun(); if(it === 'cont') return gContinue(); return; }
-  if(it === 'cont' && RUN) return B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect());
-  if(it === 'cont' && draftGet()) return draftResume();
+  if(it === 'cont') return continueCampaign();
   if(it === 'new') return hasCampaign() ? newGameAsk() : startNewGame();
   if(it === 'ach') return achScreen();
   if(it === 'journey') return landsScreen(title);
