@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=175"></script>
-<script src="piece-designs.js?v=175"></script>
-<script src="character-style.js?v=175"></script>
-<script src="campaign-opponents.js?v=175"></script>
-<script src="campaign-dialogue.js?v=175"></script>
-<link rel="stylesheet" href="character-style.css?v=175">
+<script src="gameplay-polish.js?v=176"></script>
+<script src="piece-designs.js?v=176"></script>
+<script src="character-style.js?v=176"></script>
+<script src="campaign-opponents.js?v=176"></script>
+<script src="campaign-dialogue.js?v=176"></script>
+<link rel="stylesheet" href="character-style.css?v=176">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -20,7 +20,11 @@
 <link rel="apple-touch-icon" href="cf-touch-180.png">
 <link rel="icon" type="image/png" sizes="32x32" href="cf-favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="cf-icon-192.png">
-<style>html,body{margin:0;background:#1c1c1e}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>html,body{margin:0;background:#1c1c1e}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}img{max-width:100%}[hidden]{display:none!important}/* Guard markers stay inside the square; the board never changes size. */
+.guard-mark{position:absolute;left:3%;top:2%;z-index:5;color:#fff4bd;background:#34270c;border:1px solid #f5cf66;border-radius:4px;font:bold clamp(12px,3vw,19px)/1.1 system-ui;padding:0 2px;pointer-events:none;text-shadow:0 1px #000}
+.guard-brief{padding:8px 10px;border-left:3px solid #f5cf66;background:rgba(56,43,16,.9);color:#fff1ca;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.oppin:has(.guard-brief){max-height:90%;overflow-y:auto;box-sizing:border-box}
+</style>
 <title>Crownfall</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2409,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=175">
-<link rel="stylesheet" href="ruler-style.css?v=175">
-<link rel="stylesheet" href="gameplay-polish.css?v=175">
+<link rel="stylesheet" href="city-board.css?v=176">
+<link rel="stylesheet" href="ruler-style.css?v=176">
+<link rel="stylesheet" href="gameplay-polish.css?v=176">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3523,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 175;
+const GAME_VERSION = 176;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3700,7 +3704,7 @@ function showScoreDamage(dmg, from, to){
    Alpha-beta search with quiescence, iterative deepening, check extension, killer/history move ordering and a
    rating-scaled evaluation (material, piece squares, king safety, passed pawns, mobility, simplify-when-ahead).
    An internal strength rating (600–1700, AI_MAX) sets depth, node/time budget, evaluation quality and how far
-   from the best move it may stray. It plays by the board only: no hidden information (traps, cards, score). */
+   from the best move it may stray. Its chess search uses the board; a bounded root guard also reads public scoring threats. No hidden traps or cards. */
 const AI_MAX = 1700;
 const CFAI = (() => {
   // square codes: 0 empty; type in bits 0-2 (1 P, 2 N, 3 B, 4 R, 5 Q, 6 K); 8 = the player's ('me') side;
@@ -4055,7 +4059,7 @@ const CFAI = (() => {
     const E0 = profile(opts.rating), rng = opts.rng || Math.random;
     const s = fromGame(board), me = opts.side === 'me';
     const ctx = {march: !!opts.march, promoRow: opts.promoRow || 0, dm: !!opts.dm, spec:{}};
-    const E = {...E0, promoRow: ctx.promoRow, ref: Math.max(2000, opts.ref || 8000), passEn: 1, passMe: 1, ksEn: 1, ksMe: 1, ahead: 1, behindPress: 1, staleDraw: !me && gStaleDraw()};
+    const E = {...E0, ms:Math.min(E0.ms, opts.budgetMs ?? E0.ms), promoRow: ctx.promoRow, ref: Math.max(2000, opts.ref || 8000), passEn: 1, passMe: 1, ksEn: 1, ksMe: 1, ahead: 1, behindPress: 1, staleDraw: !me && gStaleDraw()};
     // advantage assessment from the chooser's side: real material on the board
     const mat = side => { let v = 0; for(let i = 0; i < 64; i++){ const x = s[i]; if(x && ((x & ME) !== 0) === side && (x & 7) !== K) v += VAL[x & 7]; } return v; };
     const adv = me ? mat(true) - mat(false) : mat(false) - mat(true);
@@ -5821,6 +5825,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   if(!MATCH && RUN.evFx && RUN.evFx.armor){ const ei = evArmorIdx(B.board, RUN.evFx.armor); if(ei >= 0) B.board[ei].sh = Math.max(B.board[ei].sh || 0, 1); delete RUN.evFx.armor; }   // v139 event Armor: next fight only, no stacking
   if(RUN.gauntlet && !MATCH) gFightStart();   // v152: Gauntlet equipment + Armory preparations
   if(land() === 'throne') B.openCheck = {rejects:openGate.rejects, fallback:openGate.fallback, failed:openGate.failed};   // saved with the accepted board (v119)
+  initGuards();
   B.openDone = true;
   logPos('Start of the round', -1, -1, 'fx');
   if(RUN.gauntlet && !MATCH) gEntrySnap();   // v152: a stalemate replays exactly this start
@@ -6776,11 +6781,30 @@ function boardSides(el){ const ls = lightSide(); for(const x of [el, document.ge
 function confirmMoves(){try{return localStorage.getItem('crownfall-move-confirm')==='on';}catch{return false;}}
 function confirmMoveControl(){return `<button class="btn ghost" id="confirmMoves" role="switch" aria-checked="${confirmMoves()}">Confirm Move: ${confirmMoves()?'On':'Off'}</button><p class="muted" style="font-size:12px">When on, tap ✓ to confirm your move or ✕ to cancel.</p>`;}
 function bindConfirmMoves(m){m.querySelector('#confirmMoves').onclick=e=>{const on=!confirmMoves();try{localStorage.setItem('crownfall-move-confirm',on?'on':'off');}catch{}cancelMovePreview();e.currentTarget.textContent='Confirm Move: '+(on?'On':'Off');e.currentTarget.setAttribute('aria-checked',String(confirmMoves()));};}
-function goalText(){return CrownfallPolish.objective({score:B?.score,target:B?.target,pending:B?.pendingWin,mateOnly:finalPhase()&&!B?.ckFinal,hold:B?.ckFinal&&B.score>=B.target&&B.moveCount<=Math.max(B.ckFinalAt,B.ckHoldAt??-1),moves:B?.moveLimit?B.moves:null});}
+/* v176: one announced Guard encounter per later Land. Existing fight saves keep their original rules. */
+function guardEncounterPlanned(){ return !!(RUN && MODE === 'campaign' && !RUN.gauntlet && !MATCH && ['greek','fantasy','throne'].includes(land()) && RUN.circuit === 'harbor' && RUN.ante === 3); }
+function guardsLeft(board = B?.board){ return !B?.guardIds ? 0 : (board || []).filter(p => p && p.side === 'en' && B.guardIds.includes(p.id)).length; }
+function scoreGoalReady(){ return !!(B && B.score >= B.target && guardsLeft() === 0); }
+function initGuards(){
+  if(!guardEncounterPlanned() || B.guardIds) return;
+  // Prefer defended officers. Mark existing pieces, never add pieces, armor, or score requirements.
+  const defenders = B.board.map((p,i) => ({p,i})).filter(x => x.p?.side === 'en' && x.p.t !== 'K');
+  const rank = ({p,i}) => (B.board.some((q,j) => q?.side === 'en' && j !== i && attackSquares(B.board,j).includes(i)) ? 1000 : 0) + TYPE[p.t].val;
+  defenders.sort((a,b) => rank(b)-rank(a) || a.i-b.i);
+  if(defenders.length >= 2) B.guardIds = defenders.slice(0,2).map(x => x.p.id);
+}
+function guardBrief(planned=false){
+  const active = planned ? guardEncounterPlanned() : !!B?.guardIds;
+  if(!active) return '';
+  const n = planned ? 2 : guardsLeft();
+  return `<p class="guard-brief"><b>Guard encounter · ${n} defender${n === 1 ? '' : 's'} left</b><br>Remove both shield-marked defenders and reach the score target, or checkmate to win immediately. All combo points still count.</p>`;
+}
+
+function goalText(){if(B?.guardIds && guardsLeft())return `CHECKMATE OR ${B.target.toLocaleString()} POINTS + ${guardsLeft()} DEFENDERS`;return CrownfallPolish.objective({score:B?.score,target:B?.target,pending:B?.pendingWin,mateOnly:finalPhase()&&!B?.ckFinal,hold:B?.ckFinal&&B.score>=B.target&&B.moveCount<=Math.max(B.ckFinalAt,B.ckHoldAt??-1),moves:B?.moveLimit?B.moves:null});}
 function encounterHTML(planned=false){
   const plan=planned&&RUN&&!RUN.gauntlet?campaignBossPlan(RUN):null;
   const f=CrownfallPolish.formation(plan?.signature||B?.ai?.sig,plan?.style||B?.ai?.style);
-  return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>`;
+  return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>${guardBrief(planned)}`;
 }
 function hazardHTML(short=false){if(!B?.crates?.length)return '';return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
 function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a cyan outlined capture square to see which scoring bonuses it triggers.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
@@ -6865,6 +6889,7 @@ function drawBoard(){
     if(p && p.side === 'me' && threats.has(i)) cls.push('threat');
     if(p && p.t === 'K' && inCheck(displayBoard, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
+    if(p?.side === 'en' && B.guardIds?.includes(p.id)) inner += '<span class="guard-mark" role="img" aria-label="Marked defender: remove to unlock score victory" title="Marked defender">⛨</span>';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: you lose up to $2; enemy entry gives you $2" title="Crate trap · you −$2 / enemy +$2 to you"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
     if(B.trapSq && B.trapSq.includes(i)) inner += '<span class="trapmk"></span>';
@@ -7264,6 +7289,7 @@ function springDockCrate(at){
 async function doMove(from, to, pt){
   if(!pt && isPromo(B.board, from, to)){ busy = true; pt = await askPromo(from, to, B.cmdMove === 'strike' ? 'strike' : 'move'); }
   busy = true; sel = null;
+  const guardBefore = guardsLeft();
   const mover = B.board[from], victim = B.board[to] || epVictim(B.board, from, to), score0 = B.score, castle = isCastle(B.board, from, to);
   const laCk = !MATCH && inCheck(B.board, 'me'), laThr = MATCH ? null : new Set(attacksOn(B.board, 'en'));   // v147 (chatter only)
   const strike = B.cmdMove === 'strike'; B.cmdMove = null; delete B.decreeNow;   // Strike: an extra capture that doesn't use your move (or Momentum's)
@@ -7329,10 +7355,10 @@ async function doMove(from, to, pt){
   chalAfterMove(mover, victim);
   updateHud();
   if(enemyMated()){ save(); busy = false; return checkmateWin(); }      // v156: saved first, so a refresh comes back to the mate
-  if(B.score >= B.target && !(B.ckFinal && B.moveCount <= Math.max(B.ckFinalAt, B.ckHoldAt == null ? -1 : B.ckHoldAt))){
+  if(scoreGoalReady() && !(B.ckFinal && B.moveCount <= Math.max(B.ckFinalAt, B.ckHoldAt == null ? -1 : B.ckHoldAt))){
     // Winning capture: a capture that first reaches the target only counts if that piece survives the enemy's reply
-    const sp = victim && score0 < B.target && B.board[to] && B.board[to].side === 'me' ? B.board[to] : null;
-    if(sp && sp.id != null){ B.pendingWin = {gain:B.score - score0, id:sp.id, sq:to}; (window.__cc = window.__cc || []).push('pending'); $('#hand').innerHTML = '<span class="money">Target reached</span> The enemy responds…'; save(); }
+    const sp = victim && (score0 < B.target || guardBefore > 0) && B.board[to] && B.board[to].side === 'me' ? B.board[to] : null;
+    if(sp && sp.id != null){ B.pendingWin = {gain:B.score - score0, id:sp.id, sq:to, guard:guardBefore > 0}; (window.__cc = window.__cc || []).push('pending'); $('#hand').innerHTML = '<span class="money">Target reached</span> The enemy responds…'; save(); }
     else { if(victim && score0 < B.target && B.score > score0) B.captureFinish = B.score - score0; busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
   }
   if(loneKing()){ busy = false; return loneKingDefeat(); }
@@ -7815,17 +7841,20 @@ async function enemyPhaseRun(to){
   B.ep = (B.ep || []).filter(e => e.by !== 'me');                          // the enemy's en passant chances end with its response   // the whole reply is over: a new turn for Crown abilities; Focus Fire marks expire
   tacResolve();
   // Winning capture resolved: the scoring piece survived the whole reply (both moves for Morwen), or it was taken back
+  let guardCaptureFailed = false;
   if(B.pendingWin){ const pw = B.pendingWin; B.pendingWin = null;
     const secured = B.board.some(q => q && q.side === 'me' && q.id === pw.id);
     (window.__cc = window.__cc || []).push(secured ? 'secured' : 'taken back');
     if(!secured){
+      guardCaptureFailed = !!pw.guard;
       B.score = Math.max(0, B.score - pw.gain); $('#score').textContent = B.score.toLocaleString(); updateHud();
       pop(pw.sq, `Recaptured: −${pw.gain.toLocaleString()}`, 'fxm'); $('#hand').innerHTML = '<span class="money">Recaptured</span> That capture no longer counts';
       logPos(`Your winning capture was taken back (−${pw.gain.toLocaleString()})`, -1, -1, 'fx'); }
-    if(secured && B.score >= B.target) B.captureFinish = pw.gain;
+    if(secured && scoreGoalReady()) B.captureFinish = pw.gain;
     save();
-    if(B.score >= B.target){ busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
+    if(scoreGoalReady() && (secured || !pw.guard)){ busy = false; if(isCrownless()) (window.__ck = window.__ck || {}).final = {type:'score', move:B.moveCount, score:B.score}; return winBlind(); }
   }
+  if(B.guardIds && !guardCaptureFailed && scoreGoalReady()){ busy = false; return winBlind(); }
   // reinforcements
   if(!B.board.some(p => p && p.side === 'en' && p.t !== 'K')) await reinforce();   // (at most REINF_MAX waves; then the King must be checkmated)
   save();
@@ -7951,7 +7980,100 @@ function enSettle(plan){
     if(q && q.side === 'en' && q.t === 'P' && (plan.to >> 3) === 7){ let pt = 'Q'; try{ if(enPre) pt = enemyPromoPick(plan.from, plan.to, enPre); }catch(_){} B.board[plan.to] = {...q, t:pt}; } }catch(e){ enLog('settle', e); }
 }
 // choose the enemy's move (rating, style, signature army, double movers...). Nothing on the board changes here.
+/* v176: public-score defense, bounded to the existing enemy thinking budget.
+   Read-only speculative positions: no saved state, RNG, hidden traps, cards or UI effects are touched.
+   A deadline returns unknown, never an assertion that an unfinished search found a safe defense. */
+function scoringDefenseOn(){ return !!(RUN && B && MODE === 'campaign' && !RUN.gauntlet && !MATCH && land() !== 'street' && !(land() === 'throne' && RUN.circuit === 'ruler')); }
+function defenseIn(state, fn){ const live = B; try{ B = state; return fn(); } finally{ B = live; } }
+function defensePosition(state, from, to, side, pt){
+  const next = {...state, board:state.board.map(p => p ? {...p} : null), cr:state.cr ? {me:{...state.cr.me},en:{...state.cr.en}} : null, ep:(state.ep || []).map(e => ({...e}))};
+  return defenseIn(next, () => {
+    const p = B.board[from], lost = B.board[to] || epVictim(B.board,from,to);
+    if(!p) return null;
+    if(side === 'en' && lost && armorHolds(B.board,to)){
+      if(p.t === 'K'){ const kb = kbPick(from,to); if(kb == null) return null; B.board[from] = null; B.board[kb] = p; }
+      lost.sh--;
+    } else {
+      B.board = applyMove(B.board,from,to,pt);
+      if(side === 'en' && lost){
+        B.score = Math.max(0,B.score-scoreDamageFor(lost)); B.lost++; B.streak = 0;
+        if(hasE(lost,'thorn')) B.board[to] = null;
+      }
+      epAfter(side,from,to,p.t === 'P');
+    }
+    // Armor is public and breaks when its wearer gives check, just as in committed moves.
+    B.board.forEach((q,i) => { if(q?.sh > 0 && q.side === side && checksKing(B.board,i)) q.sh = 0; });
+    B.ep = (B.ep || []).filter(e => e.by === side);
+    if(side === 'en') B.noCap = Math.max(0,(B.noCap || 0)-1);
+    return next;
+  });
+}
+function scoringThreat(state, deadline){
+  return defenseIn(state, () => {
+    if(performance.now() >= deadline) return null;
+    // The enemy can also defend by checkmating the player.
+    if(inCheck(B.board,'me') && !anyLegal(B.board,'me')) return false;
+    for(let f=0;f<64;f++){
+      if(B.board[f]?.side !== 'me') continue;
+      for(const t of legalFor(B.board,f)) for(const pt of isPromo(B.board,f,t) ? PROMO_TYPES : [undefined]){
+        if(performance.now() >= deadline) return null;
+        const victim = B.board[t] || epVictim(B.board,f,t), points = scoreCapture(f,t,pt);
+        if(!points) continue;
+        const gain = points.total * (victim && B.board[f].charge ? 1.5 : 1);
+        if(B.score + Math.round(gain) < B.target) continue;
+        const after = defensePosition(state,f,t,'me',pt); if(!after) continue;
+        if(defenseIn(after,()=>guardsLeft()) > 0) continue;
+        if(!victim) return true; // scoring checks win immediately; no capture to secure
+        after.score += Math.round(gain); after.caps++; after.streak++;
+        const id = after.board[t]?.id;
+        // A legal reply must either remove the scorer, lower the score below target, or mate.
+        let counter = false;
+        const reply = defenseIn(after, () => {
+          for(let ef=0;ef<64;ef++){
+            if(B.board[ef]?.side !== 'en') continue;
+            for(const et of legalFor(B.board,ef)){
+              if(performance.now() >= deadline) return null;
+              if(B.noCap > 0 && (B.board[et] || epVictim(B.board,ef,et))) continue;
+              const result = defensePosition(after,ef,et,'en'); if(!result) continue;
+              const alive = result.board.some(q=>q?.side === 'me' && q.id === id);
+              if(kingIdx(result.board,'en') >= 0 && (!alive || result.score < result.target || defenseIn(result,()=>inCheck(B.board,'me') && !anyLegal(B.board,'me')))){ counter = true; return false; }
+            }
+          }
+          return true;
+        });
+        if(reply === null) return null;
+        if(!counter) return true;
+      }
+    }
+    return false;
+  });
+}
+function defendScore(best, cands, deadline){
+  if(!best || performance.now() >= deadline) return best;
+  const live = B;
+  const classify = move => {
+    const after = defensePosition(live,move.from,move.to,'en'); if(!after) return null;
+    if(live.pendingWin){
+      const alive = after.board.some(q=>q?.side === 'me' && q.id === live.pendingWin.id);
+      return alive && after.score >= after.target && defenseIn(after,()=>guardsLeft() === 0 && !(inCheck(B.board,'me') && !anyLegal(B.board,'me')));
+    }
+    return scoringThreat(after,deadline);
+  };
+  if(classify(best) !== true) return best;
+  // Only override a proven scoring loss, trying promising chess defenses first.
+  const ordered = cands.filter(([f,t]) => f !== best.from || t !== best.to).map(([from,to])=>({from,to,v:enemyMoveValue(from,to)})).sort((a,b)=>b.v-a.v);
+  for(const move of ordered){
+    if(performance.now() >= deadline) break;
+    if(classify(move) === false){
+      const after = defensePosition(live,move.from,move.to,'en');
+      if(performance.now() < deadline && !CFAI.mateInOne(after.board,'me',{promoRow:has('promo') ? 2 : 0})) return {...move,scoreDefense:true};
+    }
+  }
+  return best;
+}
+
 function enemyPlan(sub){
+  const defenseStart = performance.now(), defenseActive = scoringDefenseOn() && !(B.blunder > 0);
   let best = null, think = 0;
   const cands = [];
   B.board.forEach((p,i) => { if(!p || p.side !== 'en') return;
@@ -7962,7 +8084,7 @@ function enemyPlan(sub){
     best = worst; setTimeout(() => { const at = best.to; pop(at, 'Blunder!', 'fxx'); }, 50);
   } else if(cands.length){
     const rating = (B.ai && B.ai.rating) || aiRating();
-    const o = {side:'en', rating, march:false, sub, promoRow:has('promo') ? 2 : 0, extra:specialMoves('en'),
+    const o = {side:'en', rating, budgetMs:defenseActive ? Math.max(20, CFAI.profile(rating).ms * 0.60) : undefined, march:false, sub, promoRow:has('promo') ? 2 : 0, extra:specialMoves('en'),
       noCap:B.noCap > 0, ref:B.aiRef || CFAI.material(B.board), seen:k => !!(B.seenEn && B.seenEn[k]), style:aiStyle(), sig:B.ai && B.ai.sig, dm:doubleMarch()};
     let r;
     if(dblRule() && sub === 1) r = CFAI.choose(B.board, {...o, exclude:B.shadowFirst});        // Shadow Step: a different piece
@@ -7973,6 +8095,10 @@ function enemyPlan(sub){
     if(r){ best = {from:r.from, to:r.to, v:r.score}; think = r.ms;
       B.aiT = B.aiT || []; if(B.aiT.length < 400) B.aiT.push(Math.round(r.ms));
       (window.__ai = window.__ai || []).push({ms:Math.round(r.ms), depth:r.depth, nodes:r.nodes, rating, band:r.band}); if(window.__ai.length > 2000) window.__ai.shift(); }
+  }
+  if(defenseActive && best && (!B.shadowNow || sub === 1)){
+    const allowed = cands.filter(([f]) => !(sub === 1 && dblRule() && f === B.shadowFirst));
+    best = defendScore(best, allowed, defenseStart + CFAI.profile((B.ai && B.ai.rating) || aiRating()).ms);
   }
   if(B.noCap > 0) B.noCap--;
   if(!best && cands.length && !(sub === 1 && dblRule())){ let bv = null; for(const [i, t] of cands){ const v = enemyMoveValue(i, t); if(!bv || v > bv.v) bv = {from:i, to:t, v}; } best = bv; (window.__fallback = window.__fallback || []).push(1); }   // the reply is owed: never pass while a legal move exists
@@ -8118,7 +8244,7 @@ async function springTrap(at, roll){
 function trapEnded(){
   if(!B.trapHit) return false; B.trapHit = false;
   if(!B.board.some(p => p && p.side === 'en' && p.t === 'K')){ busy = false; checkmateWin(); return true; }
-  if(B.score >= B.target && !B.pendingWin){ busy = false; winBlind(); return true; }
+  if(scoreGoalReady() && !B.pendingWin){ busy = false; winBlind(); return true; }
   if(inCheck(B.board, 'en') && !anyLegal(B.board, 'en')){ busy = false; checkmateWin(); return true; }
   return false;
 }
@@ -8289,7 +8415,7 @@ async function targetCard(i){
     B.score += pts; $('#score').textContent = B.score.toLocaleString(); updateHud(); save();
     await sleep(T(500)); busy = false;
     if(mateNow()) return;                                                   // v156
-    if(B.score >= B.target) return winBlind();
+    if(scoreGoalReady()) return winBlind();
     if(!B.board.some(q => q && q.side === 'en' && q.t !== 'K')){ busy = true; await reinforce(); busy = false; }
     return;
   }
@@ -8299,6 +8425,7 @@ async function targetCard(i){
     if(inCheck(nb, 'en') && !anyLegal(nb, 'en')){ /* allowed: can deliver mate */ }
     B.board = nb; pop(i, 'Defected!', 'fxx'); logPos(`Card: ${c.name} turns a ${TYPE[p.t].name}`, i, i, 'fx'); consumeCard(k); cardFlash(c); drawBoard(); updateHud();
     if(inCheck(B.board, 'en') && !anyLegal(B.board, 'en')) return checkmateWin();
+    save(); if(scoreGoalReady()) return winBlind();
     return;
   }
   if(p.side !== 'me' || (c.target === 'pawn' && p.t !== 'P') || (c.id === 'alchemist' && p.t === 'K')){ sfx.bad(); return; }
@@ -9089,6 +9216,7 @@ function captureFinishHTML(points){
   return points > 0 ? `<p class="money">Winning capture · +${points.toLocaleString()} points</p>` : '';
 }
 function winBlind(){
+  if(!B || (!B.mate && guardsLeft() > 0)) return;
   if(MATCH) return matchEnd(true, B.mate ? 'CHECKMATE' : 'SCORE');
   laClear();
   ptelFlush('win');

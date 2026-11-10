@@ -1,0 +1,9 @@
+const fs=require('fs'),vm=require('vm');const noop=()=>{};
+const node=new Proxy({style:{setProperty:noop,removeProperty:noop},dataset:{},classList:{add:noop,remove:noop,toggle:noop,contains:()=>false},querySelectorAll:()=>[],getBoundingClientRect:()=>({top:0,left:0,width:400,height:400}),querySelector:()=>node,cloneNode:()=>node},{get:(o,k)=>k in o?o[k]:noop});
+node.createElement=()=>node;node.createElementNS=()=>node;node.getElementById=()=>node;node.body=node;node.documentElement=node;
+class Storage{constructor(){this.m=new Map()}getItem(k){return this.m.get(k)||null}setItem(k,v){this.m.set(k,''+v)}removeItem(k){this.m.delete(k)}}
+const c={console,performance,Storage,localStorage:new Storage(),sessionStorage:new Storage(),document:node,location:{protocol:'file:',search:'',hash:''},navigator:{},setTimeout:()=>0,clearTimeout:noop,setInterval:()=>0,clearInterval:noop,requestAnimationFrame:()=>0,matchMedia:()=>({matches:true,addEventListener:noop}),Audio:class{addEventListener(){}pause(){}},Image:class{},URLSearchParams,TextEncoder,crypto:require('crypto').webcrypto};c.window=c;c.addEventListener=noop;c.scrollTo=noop;c.innerWidth=390;c.innerHeight=844;
+let seed=+(process.env.QA_SEED||20261110);c.Math=Object.create(Math);c.Math.random=()=>{seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296};
+vm.createContext(c);const dir=require('path').resolve(__dirname,'..')+'/';
+for(const f of ['gameplay-polish.js','campaign-opponents.js','campaign-dialogue.js'])vm.runInContext(fs.readFileSync(dir+f,'utf8'),c);
+let s=fs.readFileSync(dir+'index.html','utf8').split('<script>')[1].split('</script>')[0];s=s.slice(0,s.indexOf('(function splash(){'))+'globalThis.testEval = s => eval(s);})();';s=s.replace('const sleep = ms => new Promise(r => setTimeout(r, ms));','const sleep = ms => Promise.resolve();');vm.runInContext(s,c,{timeout:20000});module.exports=c;
