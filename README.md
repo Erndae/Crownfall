@@ -190,3 +190,7 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 
 - The "Up next" ticket on the stage screen now shows the opponent's face beside their name, with the gold ring for Circuit Bosses. Rulers are unchanged.
 - The ticket is the same height in most cases and up to 34px taller where a long name now wraps beside the face. The face is smaller on 320px-wide phones.
+
+## v194 — the Land's picture is visible again
+
+- Behind the stage and store screens, each Land's picture was drawn at 13% under a heavy shade and read as nearly black. It now shows clearly at the top of the screen and fades into the dark behind the cards, in the Iron Kingdom, the Olympian Court, the Shattered Realm and the Fallen Throne, on every stage. Crown City has its own backdrop and is unchanged.

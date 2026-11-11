@@ -195,3 +195,7 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
 .blinds.solo .bcard > .bface{grid-area:face;align-self:center;display:grid;font-style:normal}
 .blinds.solo .bcard > .bface .spk-face{width:46px;height:46px}
 @media (max-width:340px){ .blinds.solo .bcard > .bface .spk-face{width:36px;height:36px} .blinds.solo .bcard.wface{column-gap:8px} }
+/* v194: the Land's picture behind the stage screen was at 13% under a heavy shade and read as black. It now shows
+   clearly at the top and fades down into the dark behind the cards. (Crown City has its own backdrop and is unchanged.) */
+body[data-art="1"]:not([data-pack="street"])::before{opacity:.62}
+body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(180deg,rgba(10,9,12,.5),rgba(10,9,12,.34) 22%,rgba(10,9,12,.72) 52%,rgba(10,9,12,.93) 78%)}
