@@ -108,3 +108,8 @@ When the Crown of Crowns is claimed, the winning King's name and soldiers' names
 Presentation only: his army, rules, AI, targets and the save format are unchanged. Nothing appears until an ending has been earned on the device, and never in the campaign that earned it, so the twist cannot be revealed early. Names are reduced to letters, digits, spaces and simple punctuation. The record is local and is not part of cloud saves.
 
 Validation: `node validate-v181.cjs`.
+
+
+## v182 — poster title screen
+
+The title screen opens on the painted city with a larger logo and the game's motto, "Everybody wants a crown." The panel is clear behind them and fades in below. Campaign is one large crimson button (Continue Campaign when a save exists, with New Campaign beneath it); the Campaign heading remains for screen readers. Journey, Achievements, How to play and Customize share a 2 × 2 grid, and the Gauntlet card is more compact. Title screen only: no rule, save or other screen changes. Checked at 320, 390 × 664 and 390 × 844 with no horizontal overflow.

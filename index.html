@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=181"></script>
-<script src="piece-designs.js?v=181"></script>
-<script src="character-style.js?v=181"></script>
-<script src="campaign-opponents.js?v=181"></script>
-<script src="campaign-dialogue.js?v=181"></script>
-<link rel="stylesheet" href="character-style.css?v=181">
+<script src="gameplay-polish.js?v=182"></script>
+<script src="piece-designs.js?v=182"></script>
+<script src="character-style.js?v=182"></script>
+<script src="campaign-opponents.js?v=182"></script>
+<script src="campaign-dialogue.js?v=182"></script>
+<link rel="stylesheet" href="character-style.css?v=182">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=181">
-<link rel="stylesheet" href="ruler-style.css?v=181">
-<link rel="stylesheet" href="gameplay-polish.css?v=181">
+<link rel="stylesheet" href="city-board.css?v=182">
+<link rel="stylesheet" href="ruler-style.css?v=182">
+<link rel="stylesheet" href="gameplay-polish.css?v=182">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3527,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 181;
+const GAME_VERSION = 182;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5292,7 +5292,7 @@ function title(){
   const inC = MODE === 'campaign';
   app.innerHTML = `<section class="screen" style="padding-block:18px">
     <h1 class="logoimg"><span class="lg-halo" style="-webkit-mask-image:url(${LOGO_HALO});mask-image:url(${LOGO_HALO})"></span><img class="brandimg" src="${LOGO}" alt="Crownfall" width="869" height="423"></h1>
-    <p class="muted" style="text-align:center;margin-top:-4px">A chess roguelike. Build an army, capture pieces and score <b class="fxc">Material</b> × <b class="fxm">Brilliance</b>.</p>
+    <p class="titlemotto">Everybody wants a crown.</p>
     <div class="modecard mc-camp keepcash">
       <div class="mchead"><b>Campaign</b><small>85 battles · five Lands · claim the Crowns</small></div>
       ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${camp.cont}</small></button>` : ''}
@@ -5306,9 +5306,9 @@ function title(){
       <div class="gbtns"><button class="btn ${gs ? 'ghost' : 'gbtn'}" id="gnew">${gs ? 'New run' : 'Enter the Gauntlet'}</button><button class="btn ghost" id="grec">Records</button></div>
     </div>
     ${inC && worldCrowns() ? `<p class="savebadge runnertag" style="color:#ffd23d;font-family:var(--tag);font-size:15px">${runnerTitle()}</p>` : ''}
-    <button class="btn ghost landsbtn" id="lands">${inC ? `${crownRow(PACK)} Journey · ${worldCrowns()}/${WORLD_TOTAL}` : 'Campaign Journey'}</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" id="achb">${inC ? `Achievements ${Object.keys(ACH).filter(k => ACHS.some(a => a.id === k)).length}/${ACHS.length}` : 'Achievements'}</button><button class="btn ghost" id="how">How to play</button></div>
-    <button class="btn ghost character-menu" id="customCharacter"><span data-character-token="badge">${CrownfallCharacter.svg()}</span> Customize character</button>
+    <div class="titlenav"><button class="btn ghost landsbtn" id="lands">${inC ? `${crownRow(PACK)} Journey · ${worldCrowns()}/${WORLD_TOTAL}` : 'Campaign Journey'}</button>
+    <button class="btn ghost" id="achb">${inC ? `Achievements ${Object.keys(ACH).filter(k => ACHS.some(a => a.id === k)).length}/${ACHS.length}` : 'Achievements'}</button><button class="btn ghost" id="how">How to play</button>
+    <button class="btn ghost character-menu" id="customCharacter"><span data-character-token="badge">${CrownfallCharacter.svg()}</span> Customize</button></div>
     <p class="savebadge">${saveBadgeText()}</p>
     ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span></div>` : ''}
     <div class="setg three"><button class="btn ghost" id="mus">Music: ${musicOn?'On':'Off'}</button><button class="btn ghost" id="snd">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="spd">Speed: ${fast?'Fast':'Normal'}</button></div>

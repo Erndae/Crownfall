@@ -34,3 +34,22 @@
 @media(max-width:360px){.pbar.goal-button .ptgt{font-size:10px}}
 
 .training-help{border:0;background:none;text-decoration:underline;color:var(--text);font:12px var(--body);min-height:40px;padding:5px 8px}.loss-final{width:100%;margin-top:10px}
+
+/* v182 title: poster layout. The painted city and a larger logo carry the top of the menu; the panel is clear behind
+   them and fades in below the motto. Campaign is one large crimson action (the red of the logo); the four secondary
+   destinations share a 2 x 2 grid. Title screen only. */
+body:has(section.screen > h1.logoimg)::before{background:linear-gradient(180deg,#0b111810,#0c111533 30%,#0b1015b0 52%,#0b1015ea)!important}
+body section.screen:has(> h1.logoimg){position:relative;background:linear-gradient(180deg,#17202400 0,#17202400 250px,#172024c0 330px,#172024ee 400px)!important;border-color:transparent!important;box-shadow:none!important;padding-top:34px!important}
+body section.screen:has(> h1.logoimg) > h1.logoimg{width:min(92vw,470px);margin-inline:-14px;align-self:center;filter:drop-shadow(0 6px 14px #000b)}
+body section.screen:has(> h1.logoimg) > p.titlemotto{margin:6px 0 14px;text-align:center;font-family:var(--display);font-weight:600;font-size:clamp(17px,5.6vw,22px);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:#f6eedf;text-shadow:0 1px 8px #000}
+body .screen .mc-camp{background:none!important;border-color:transparent!important;box-shadow:none!important;padding:0!important}
+body .screen .mc-camp .mchead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+body .screen .mc-camp > #new:not(.ghost),body .screen .mc-camp > #cont{background:#c4203a!important;color:#f6eedf!important;border-color:#ee5a70!important;box-shadow:0 3px 14px #7d0f2080!important;padding-block:19px!important;font-size:23px!important}
+body .screen .mc-camp > #cont{padding-block:13px 12px!important}
+body .screen .mc-gaunt{padding:8px 10px!important}
+body .screen .mc-gaunt .mchead small{display:none}
+body .screen .mc-gaunt .gstats span{padding:4px}
+body .screen .mc-gaunt .gstats small{font-size:10px}
+.titlenav{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.titlenav > .btn{display:flex!important;align-items:center;justify-content:center;gap:8px;min-height:54px;margin:0;padding-inline:8px;line-height:1.1}
+.titlenav .crowns{display:inline-flex}
