@@ -173,3 +173,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Soldiers notice.** After each World Crown, the longest-serving named soldier says one line about what feels wrong, in a bold, wary or warm voice that follows their personality. Twelve lines, hints only.
 - **Fix: the remembered army (v181) never recorded in real play.** It was saved after the run had already been cleared, so the final fight in a later campaign never named anyone. It is now saved at the moment of victory. Campaigns finished before this update were not recorded.
 - Short phones: the crown art steps back when the Crowns and the soldier speak, so the words fit.
+
+## v191 — a face for every opponent
+
+- **60 faces.** Each named Campaign opponent now has their own face in the battle speech bubble, the win and loss quotes, and the intro card before the fight. They are animal people like the Rulers: Crown City wears caps, beanies and hoods; the Iron Kingdom helms and coifs; Olympus laurels and crests; the Shattered Realm witch hats and circlets. Everyone in the Fallen Throne is ashen with hollow red eyes.
+- No land uses its own Ruler's species, and no two opponents share a face.
+- The faces are drawn in code from a small kit of parts inside `campaign-opponents.js`, so there are no new image downloads. Rulers keep their painted portraits; Circuit Bosses and Crown Match opponents keep the chess-piece badge for now.

@@ -184,3 +184,7 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
   .vict.land.bm .vsig{width:min(104px,30vw)}
   .vict.land[data-land="street"].bm .vsig{width:min(150px,44vw)}
 }
+/* v191: opponent faces */
+.spk-face.oface{background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--fa) 36%,var(--fb)),var(--fb) 76%)}
+.spk-face.oface svg{width:92%;height:92%;margin-top:4%}
+.oppin .spk-face.oface.big{width:68px;height:68px;margin:2px 0 3px}
