@@ -185,3 +185,8 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Circuit Bosses.** All 20 (Rush Hour Rex, Heracles, Goblin King Grubnik, The Hollow Crown and the rest) have their own face, with a gold ring so a boss reads as a boss.
 - **The Ruler's Road and Crown Match.** The 27 remaining rule-named opponents (Big Boss Mack, The High King, Kronos, The Dragon Hoarder, The Fallen Grandmaster and the rest) have faces too. Every named opponent in the game is now drawn; only the five Rulers keep their painted portraits. 107 faces, no two alike.
 - New parts for them: a lion and its mane, and a whole gold crown for the kings.
+
+## v193 — the opponent's face on the stage ticket
+
+- The "Up next" ticket on the stage screen now shows the opponent's face beside their name, with the gold ring for Circuit Bosses. Rulers are unchanged.
+- The ticket is the same height in most cases and up to 34px taller where a long name now wraps beside the face. The face is smaller on 320px-wide phones.

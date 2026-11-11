@@ -190,3 +190,8 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
 .oppin .spk-face.oface.big{width:68px;height:68px;margin:2px 0 3px}
 /* v192: Circuit Bosses wear a gold ring */
 .spk-face.oface.boss{border-color:#ffd23d;box-shadow:0 0 0 1px #0d0d0d,0 0 10px rgba(255,210,61,.35)}
+/* v193: the opponent's face on the stage ticket */
+.blinds.solo .bcard.wface{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"chip chip lab" "face name num" "face style rew" "chips chips more" "prize prize prize"}
+.blinds.solo .bcard > .bface{grid-area:face;align-self:center;display:grid;font-style:normal}
+.blinds.solo .bcard > .bface .spk-face{width:46px;height:46px}
+@media (max-width:340px){ .blinds.solo .bcard > .bface .spk-face{width:36px;height:36px} .blinds.solo .bcard.wface{column-gap:8px} }
