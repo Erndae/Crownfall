@@ -165,6 +165,8 @@ const MARK={
 const WEAR={
  cap:c=>`<path d="M13 27Q14 10 32 10Q50 10 51 27Q32 21 13 27Z" fill="${c.a}"/><path d="M12 27Q32 20 52 27Q58 28 61 32Q46 27 12 31Z" fill="${c.b}"/>`,
  beanie:c=>`<path d="M13 28Q13 8 32 8Q51 8 51 28Z" fill="${c.a}"/><path d="M11 24H53V31H11Z" fill="${c.b}"/><circle cx="32" cy="7" r="3.500" fill="${c.b}"/>`,
+ mane:c=>`<path d="M32 6L38 11L46 8L48 15L56 16L54 24L61 29L56 35L61 42L54 46L55 54L47 55L44 62L37 58L32 63L27 58L20 62L17 55L9 54L10 46L3 42L8 35L3 29L10 24L8 16L16 15L18 8L26 11Z" fill="${c.a}"/>`,
+ kcrown:c=>`<path d="M14 23L11 7L22 15L32 3L42 15L53 7L50 23Q32 17 14 23Z" fill="#e6b93e"/><circle cx="32" cy="14" r="2.400" fill="${c.b}" stroke-width="1.2"/>`,
  hood:c=>`<path d="M32 3Q58 6 57 40Q56 54 48 60H52Q62 48 61 34Q60 4 32 1Q4 4 3 34Q2 48 12 60H16Q8 54 7 40Q6 6 32 3Z" fill="${c.a}"/>`,
  helm:c=>`<path d="M11 28Q10 8 32 7Q54 8 53 28H35.500V41H28.500V28Z" fill="${c.a}"/><path d="M11 23.500H53" fill="none"/><path d="M32 8V2" stroke-width="3" fill="none"/>`,
  coif:c=>`<path d="M32 13Q54 14 54 38Q54 54 44 60H50Q60 50 58 34Q56 10 32 8Q8 10 6 34Q4 50 14 60H20Q10 54 10 38Q10 14 32 13Z" fill="${c.a}"/>`,
@@ -203,6 +205,7 @@ const SPEC={
  owl:{head:'round',ears:'tuft',snout:'hook',fur:'#9a7b57',light:'#efe2c8',mark:'disc'},
  hawk:{head:'wedge',ears:'none',snout:'hook',fur:'#a8763f',light:'#f2e6cf',mark:'cheeks'},
  crow:{head:'wedge',ears:'none',snout:'beak',fur:'#33313b',light:'#4a4856',beak:'#8a8794'},
+ lion:{head:'round',ears:'round',snout:'short',fur:'#e0a94e',light:'#f7e9c8',in:'#b9772f'},
  toad:{head:'wide',ears:'none',snout:'toad',fur:'#6fae7a',light:'#b9e0a8',dark:'#3f7a55',mark:'warts'}};
 const LANDC={street:{accent:'#ff3d9a',bg:'#17141b',wa:'#1f1d24'},medieval:{accent:'#e8742a',bg:'#1a1512',wa:'#8d939c'},greek:{accent:'#e2c170',bg:'#141a26',wa:'#6fae5b'},fantasy:{accent:'#b18cff',bg:'#17122a',wa:'#3a2a63'},throne:{accent:'#e0263f',bg:'#120c0e',wa:'#7d7870'}};
 // name: [species, eyes, headwear, fur override, headwear colour override]
@@ -227,24 +230,39 @@ const FACES={
   'Echo Castellan':['hound','hollow','coif'],'Broken Diadem':['crow','hollow','crown'],'Gallery Revenant':['cat','hollow','hood'],
   'Stable Mourner':['goat','hollow','hood'],'Pale Bridgekeeper':['hare','hollow','coif','#c9c5c6'],'Black Cavalier':['wolf','hollow','crest','#2b2a30'],
   'Tribute Bailiff':['rat','hollow','feather'],'Vault Confessor':['bear','hollow','hood'],'Debtor Wraith':['fox','hollow','none','#77737a']}};
+// v192: Circuit Bosses (gold ring) and the rule-named opponents of the Ruler's Road and Crown Match. Same format; a 6th item overrides parts.
+const BOSSES={
+ street:{'Rush Hour Rex':['hound','glare','cap','#8f6a48'],'Skyline Sal':['hawk','sly','shades'],'Dockmaster Dee':['bear','calm','beanie','#5f4636','#2f4f6b'],'Night Owl Nico':['owl','big','hood']},
+ medieval:{'Sir Swiftblade':['hare','glare','helm'],'Prince Garran the Red':['fox','sly','circlet','#c8322a'],'Bran Horse-Lord':['boar','glare','crest',null,'#e8742a'],'Master Corvin':['crow','tired','hood','#676178','#4a3a5c']},
+ greek:{'Atalanta the Swift':['doe','glare','band'],'Heracles':['lion','glare','mane',null,'#8a5a2c'],'Hector of Troy':['wolf','calm','crest','#8f7a66'],'King Aeëtes':['ram','glare','kcrown','#e9cf8a']},
+ fantasy:{'Zephyra the Stormborn':['lynx','glare','circlet','#8fa3c9'],'Veyl of the Crystal Eye':['cat','big','hood','#9fd3e6','#2a3f6b'],'Seraphon Skyclaw':['hawk','glare','circlet','#d9d3e8'],'Goblin King Grubnik':['toad','glare','kcrown']},
+ throne:{'The Ash Herald':['hawk','hollow','hood'],'The Hollow Crown':['ram','hollow','crown',null,null,{mark2:'crack'}],'The Ruined Knight':['hound','hollow','helm',null,null,{mark2:'crack'}],'The Tithe Lord':['boar','hollow','circlet']}};
+const OTHERS={
+ street:{'Joyride Jimmy':['raccoon','round','cap'],'Landlord Lou':['toad','tired','cap','#8a9a6a'],'Big Boss Mack':['bear','glare','shades','#4f3a30']},
+ medieval:{'The Hourglass Knight':['rat','calm','helm'],'The Iron Baron':['bear','glare','helm','#4a4046'],'The Horse Thief':['raccoon','sly','hood',null,'#4a3a2a'],'The Twin Knights':['mouse','glare','helm'],'The Tax Lord':['toad','tired','feather',null,'#5a2a3a'],'The High King':['ram','glare','kcrown']},
+ greek:{'Kronos, Lord of Time':['goat','tired','kcrown','#8f8f99'],'Atlas the Unmoving':['bear','glare','band','#6a5a52'],'Poseidon, Tamer of Horses':['otter','glare','kcrown','#5f8f9a'],'Hermes the Swift':['hare','sly','feather','#d9c7a8','#e2c170'],'Plutus the Rich':['boar','calm','circlet','#d9a96a'],'Apollo the Radiant':['hawk','calm','laurel','#e6c15a']},
+ fantasy:{'The Timewarden':['owl','tired','hood','#8f86b3'],'The Stone Golem':['bear','calm','leaf','#8d9096',null,{mark2:'crack'}],'The Unicorn Warden':['doe','calm','circlet','#f0edf6'],'The Two-Headed Ogre':['boar','glare','band','#7f9a62'],'The Dragon Hoarder':['toad','glare','none','#c2543e',null,{ears:'horn',horn:'#e6b93e',dark:'#7a2a22',light:'#e89a6a'}],'The Archmage':['lynx','calm','witch','#e9e6f2']},
+ throne:{'The Hourglass Wraith':['rat','hollow','hood'],'The Obsidian Wall':['bear','hollow','helm','#2b2a30'],'The Stablebane':['hound','hollow','crest'],'The Twin Shadows':['lynx','hollow','hood','#2b2a30'],'The Tithe Collector':['toad','hollow','feather'],'The Fallen Grandmaster':['owl','hollow','circlet']}};
 const ASH={fur:'#6d6a70',light:'#9a969c',in:'#4a474d',dark:'#3a373c',horn:'#8f8a80',beak:'#3a373c',eye:'#e0263f'};
 function draw(s){
   const f={fur:s.fur,light:s.light||'#f1e7d3',in:s.in||s.light||'#e9b7a6',dark:s.dark||INK,eye:s.eye||'#ffd95a',beak:s.beak||'#e9a13b',horn:s.horn||'#e8dfc8'};
-  const c={a:s.wa,b:s.wb}, under=s.wear==='hood'||s.wear==='coif';
+  const c={a:s.wa,b:s.wb}, under=s.wear==='hood'||s.wear==='coif'||s.wear==='mane';
   return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke="${INK}" stroke-width="2.200" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">`
    +(under?WEAR[s.wear](c):'')+EARS[s.ears||'none'](f)+`<path d="${HEAD[s.head]}" fill="${f.fur}"/>`
    +MARK[s.mark||'none'](f)+(s.mark2?MARK[s.mark2](f):'')+SNOUT[s.snout](f)+EYES[s.eyes](f)+(!under?WEAR[s.wear||'none'](c):'')+`</svg>`;
 }
 function spec(name){
-  for(const land in FACES){const r=FACES[land][name]; if(!r) continue;
+  if(typeof name!=='string'||!name) return null;
+  for(const land in FACES){const boss=!!(BOSSES[land]&&BOSSES[land][name]), r=FACES[land][name]||(BOSSES[land]||{})[name]||(OTHERS[land]||{})[name]; if(!r) continue;
     const L=LANDC[land], s={...SPEC[r[0]],...(land==='throne'?ASH:{}),eyes:r[1],wear:r[2],accent:L.accent,bg:L.bg,wa:L.wa,wb:L.accent};
     if(r[3]){s.fur=r[3]; if(land==='throne')s.light=r[3]==='#2b2a30'?'#4a4850':'#e2dfe0';}
-    if(r[4]){ if(['feather','hood','beanie'].includes(r[2])) s.wa=r[4]; else s.wb=r[4]; }
+    if(r[4]){ if(['feather','hood','beanie','mane'].includes(r[2])) s.wa=r[4]; else s.wb=r[4]; }
+    if(r[5]) Object.assign(s,r[5]); s.boss=boss;
     if(land==='throne'&&name==='Broken Diadem')s.mark2='crack'; if(land==='throne'&&name==='Debtor Wraith')s.mark2='crack';
     return s;}
   return null;
 }
 const cache={};
-function campaignOpponentFace(name){ if(!(name in cache)){const s=spec(name); cache[name]=s?{svg:draw(s),accent:s.accent,bg:s.bg}:null;} return cache[name]; }
-globalThis.campaignOpponentFace=campaignOpponentFace; globalThis.CAMPAIGN_FACES=FACES;
+function campaignOpponentFace(name){ if(!(name in cache)){const s=spec(name); cache[name]=s?{svg:draw(s),accent:s.accent,bg:s.bg,boss:s.boss}:null;} return cache[name]; }
+globalThis.campaignOpponentFace=campaignOpponentFace; globalThis.CAMPAIGN_FACES=FACES; globalThis.CAMPAIGN_BOSS_FACES=BOSSES; globalThis.CAMPAIGN_OTHER_FACES=OTHERS;
 })();

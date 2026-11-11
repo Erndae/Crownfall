@@ -179,3 +179,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **60 faces.** Each named Campaign opponent now has their own face in the battle speech bubble, the win and loss quotes, and the intro card before the fight. They are animal people like the Rulers: Crown City wears caps, beanies and hoods; the Iron Kingdom helms and coifs; Olympus laurels and crests; the Shattered Realm witch hats and circlets. Everyone in the Fallen Throne is ashen with hollow red eyes.
 - No land uses its own Ruler's species, and no two opponents share a face.
 - The faces are drawn in code from a small kit of parts inside `campaign-opponents.js`, so there are no new image downloads. Rulers keep their painted portraits; Circuit Bosses and Crown Match opponents keep the chess-piece badge for now.
+
+## v192 — faces for the Circuit Bosses and everyone else
+
+- **Circuit Bosses.** All 20 (Rush Hour Rex, Heracles, Goblin King Grubnik, The Hollow Crown and the rest) have their own face, with a gold ring so a boss reads as a boss.
+- **The Ruler's Road and Crown Match.** The 27 remaining rule-named opponents (Big Boss Mack, The High King, Kronos, The Dragon Hoarder, The Fallen Grandmaster and the rest) have faces too. Every named opponent in the game is now drawn; only the five Rulers keep their painted portraits. 107 faces, no two alike.
+- New parts for them: a lion and its mane, and a whole gold crown for the kings.
