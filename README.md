@@ -66,3 +66,17 @@ Confirm Move is now an accessible On/Off switch in the Campaign, Gauntlet and Cr
 Returning to title clears old fight dialogs, replay controls/timers, input-swallow state, and battle presentation. Delayed board messages and reward panels are scoped to their originating battle view so they cannot cover a later menu or fight. Save-and-title waits for an active move to finish, while allowing paused initiative and interrupted replies to remain saved for Continue. The shop also clears board replay state. Saved board, rewards and campaign progression retain the same schema.
 
 Validation: `node validate-menu-transitions.mjs` (requires happy-dom, or set `CROWNFALL_DOM_MODULE`). Covers blocked title from nested enemy-recovery/pause dialogs, active-move exit, pending initiative exit, leftover overlays, delayed speech, replay cleanup, repeated defeat exits, Campaign rewards/shop and stale Gauntlet rewards. Existing polish integration, design, character, gameplay and splash checks pass. Browser check covers Campaign setup, defeat, return to title and opening Records afterward. Exact mobile viewport testing was unavailable in this environment.
+
+
+## v177 — targets keep pace with the army
+
+Campaign score targets were falling behind by the end of Crown City. Four changes, all in the target formula:
+
+- Training is read from the two best-trained piece types (never less than the old five-type average), so an army that trains only Rooks and Knights no longer counts as 40% built.
+- From Circuit 3 each Stage adds a further 3%, so Harbor and Midnight climb about 6% per Stage instead of 3%. The Ruler's floor follows.
+- Scoring Relics and powers raise the target: multiplier Relic +10%, Brilliance Relic +5%, Material Relic +3% (at most +40%); Crystal +4%, Iron / Royal / Sharpened +2%, Blazing / Ascendant +1% per piece (at most +20%). Money, move, swap and defensive Relics and powers add nothing.
+- A move-limited boss never asks for less than 60% of the same Stage's Warm-up Game, and never more than the army can score inside the limit.
+
+A new army's first circuit is unchanged. A fight already shown keeps its saved target. Scoring, prices, Training, Relics, the Gauntlet and Crown Match are untouched; the save format is the same. These numbers come from simulation, not a measured playtest.
+
+Validation: `node validate-v177.cjs` and `node audit-balance.mjs`.

@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=176"></script>
-<script src="piece-designs.js?v=176"></script>
-<script src="character-style.js?v=176"></script>
-<script src="campaign-opponents.js?v=176"></script>
-<script src="campaign-dialogue.js?v=176"></script>
-<link rel="stylesheet" href="character-style.css?v=176">
+<script src="gameplay-polish.js?v=177"></script>
+<script src="piece-designs.js?v=177"></script>
+<script src="character-style.js?v=177"></script>
+<script src="campaign-opponents.js?v=177"></script>
+<script src="campaign-dialogue.js?v=177"></script>
+<link rel="stylesheet" href="character-style.css?v=177">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=176">
-<link rel="stylesheet" href="ruler-style.css?v=176">
-<link rel="stylesheet" href="gameplay-polish.css?v=176">
+<link rel="stylesheet" href="city-board.css?v=177">
+<link rel="stylesheet" href="ruler-style.css?v=177">
+<link rel="stylesheet" href="gameplay-polish.css?v=177">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3527,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 176;
+const GAME_VERSION = 177;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3575,13 +3575,19 @@ const freshCap = i => Math.round(325 * Math.pow(RUN.circuit !== 'ruler' ? 1.6 : 
 const targetOld = i => Math.round(freshCap(i) / 10) * 10;   // (kept for reference / tests)
 /* Progression target: what this point of the Land asks for (Land-wide Stage, fight type, circuit scale, rules).
    A Ruler's base is never below 5% above the Land's final Circuit 4 boss baseline (before rule modifiers). */
+/* v177: targets used to flatten in the second half of a Land (about 3% per Stage) while the army kept growing.
+   From Circuit 3 (Land-wide Stage 9) each Stage adds a further 3%, so Harbor and Midnight climb about 6% per Stage.
+   The Ruler's floor follows the same Circuit 4 baseline. Circuits 1 and 2 are unchanged. */
+const LATE_STAGE = 8, LATE_GROW = 1.03;
+const lateGrow = s => Math.pow(LATE_GROW, Math.max(0, s - LATE_STAGE));
 function progressionMoves(i){
   const P = TARGET_PLAN[planLand()];
   if(RUN.circuit === 'ruler' && i === 2){
-    const c4 = P.moves * Math.pow(P.grow, CIRCUITS.length * CIRCUIT_STAGES - 1) * BLINDS[2].mult * CIRCUIT_TARGET_SCALE.midnight;   // Circuit 4, Stage 4 boss
+    const last = CIRCUITS.length * CIRCUIT_STAGES;
+    const c4 = P.moves * Math.pow(P.grow, last - 1) * lateGrow(last) * BLINDS[2].mult * CIRCUIT_TARGET_SCALE.midnight;   // Circuit 4, Stage 4 boss
     return Math.max(P.ruler, c4 * 1.05 / CIRCUIT_TARGET_SCALE.ruler);
   }
-  return P.moves * Math.pow(P.grow, landStage() - 1) * BLINDS[i].mult;
+  return P.moves * Math.pow(P.grow, landStage() - 1) * lateGrow(landStage()) * BLINDS[i].mult;
 }
 const targetMods = i => DF_TARGET() * (i === 2 && ruleOf(bossAt(RUN.ante)).includes('crown') ? 1.4 : 1) * (isC('downtown') ? 1.1 : 1);
 function normalTarget(i){ return PPM_REF * progressionMoves(i) * targetMods(i); }
@@ -3593,21 +3599,41 @@ function armyTrainProgress(){ return Math.max(0, Math.min(1, TRAIN_TYPES.reduce(
 function armyForgePowers(){ return (RUN.roster || []).reduce((n, r) => n + (r ? eList(parseR(r).e).length : 0), 0); }
 function armyPower(){ return CAP_W_TRAIN * armyTrainProgress() + CAP_W_FORGE * Math.min(1, armyForgePowers() / CAP_FORGE_FULL); }
 function capacityPPM(){ return Math.round(CAP_PPM_MIN + armyPower() * (PPM_REF - CAP_PPM_MIN)); }
-function capacityTarget(i){ return capacityPPM() * progressionMoves(i) * targetMods(i); }   // same expected moves and modifiers, the army's own rate
+/* v177 Campaign capacity. An army scores with its best pieces, so Campaign targets read Training from the two
+   best-trained piece types (never less than the five-type average used before). Training only two types no longer
+   reads as a 40% built army. The Gauntlet keeps capacityPPM() exactly as it was. */
+function trainTopTwo(){ const l = TRAIN_TYPES.map(t => effLv(t) - 1).sort((a, b) => b - a); return Math.max(0, Math.min(1, ((l[0] || 0) + (l[1] || 0)) / (2 * (LV_MAX - 1)))); }
+function campaignPower(){ return CAP_W_TRAIN * Math.max(armyTrainProgress(), trainTopTwo()) + CAP_W_FORGE * Math.min(1, armyForgePowers() / CAP_FORGE_FULL); }
+function campaignPPM(){ return Math.round(CAP_PPM_MIN + campaignPower() * (PPM_REF - CAP_PPM_MIN)); }
+function capacityTarget(i){ return campaignPPM() * progressionMoves(i) * targetMods(i); }   // same expected moves and modifiers, the army's own rate
+/* v177 Build factor: scoring Relics and scoring powers were invisible to the target. Each one now raises it a little:
+   a multiplier Relic +10%, a Brilliance Relic +5%, a Material Relic +3% (at most +40% together); Crystal +4%, Iron /
+   Royal / Sharpened +2%, Blazing / Ascendant +1% per piece carrying it (at most +20% together). Money, move, swap and
+   defensive Relics and powers add nothing. A fight already shown keeps its fixed target (see targetFor). */
+const BUILD_RELIC_W = {x:0.10, m:0.05, c:0.03}, BUILD_RELIC_MAX = 0.40;
+const BUILD_POWER_W = {crystal:0.04, iron:0.02, royal:0.02, edge:0.02, fire:0.01, rise:0.01}, BUILD_POWER_MAX = 0.20;
+function buildFactor(){
+  const rel = ((RUN && RUN.relics) || []).reduce((s, id) => { const r = R(id) || {}; return s + (typeof r.on === 'function' ? (BUILD_RELIC_W[r.fc] || 0) : 0); }, 0);
+  const pow = ((RUN && RUN.roster) || []).reduce((s, r) => s + (r ? eList(parseR(r).e).reduce((a, e) => a + (BUILD_POWER_W[e] || 0), 0) : 0), 0);
+  return 1 + Math.min(BUILD_RELIC_MAX, rel) + Math.min(BUILD_POWER_MAX, pow);
+}
+const BLITZ_FLOOR = 0.6;   // v177: a move-limited Stage Battle never asks for less than 60% of the same Stage's Warm-up Game (and never more than the army can score inside the limit)
 const betaRatio = () => Math.min(1, ((RUN.roster || []).filter(Boolean).length) / 15);
 const betaSizeF = () => Math.max(0.6, betaRatio());   // beta: 9 pieces → ×0.6, 15+ → ×1
 const betaBlitzF = () => Math.max(0.35, Math.pow(betaRatio(), 2.5));   // beta Blitz: 9 → ×0.35, 11 → ×0.46, 13 → ×0.70, 15+ → ×1
 const CC_TARGET = {downtown:1, rooftop:0.60, harbor:0.84, midnight:0.70, ruler:1};   // beta 2 (see the build notes)
 function targetParts(i){
   const prog = normalTarget(i), cap = capacityTarget(i), fresh = armyLands() < 1 ? freshCap(i) : null;
-  const lim = i === 2 ? moveLimitFor(parFor(true), bossAt(RUN.ante), true) : null, blitz = lim ? capacityPPM() * lim * 0.45 : null;   // what this army can score inside the move limit
+  const lim = i === 2 ? moveLimitFor(parFor(true), bossAt(RUN.ante), true) : null, blitz = lim ? campaignPPM() * lim * 0.45 : null;   // what this army can score inside the move limit
   let t = Math.min(prog, cap); if(fresh != null) t = Math.min(t, fresh); if(blitz != null) t = Math.min(t, blitz);
   t *= lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF();   // beta: army-size factor (beta 2: Blitz after Crown City uses ratio^1.5, was ratio^2.5)
   if(!lim && land() === 'street') t *= CC_TARGET[RUN.circuit] || 1;   // beta 2: Crown City share calibration
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante))) t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
+  const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
+  if(lim) t = Math.max(t, Math.min(blitz * bf, BLITZ_FLOOR * targetParts(0).final));   // v177: Blitz floor (the Warm-up already includes the build factor)
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
-  return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), ppm:capacityPPM(), power:+armyPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
+  return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), build:+bf.toFixed(2), ppm:campaignPPM(), power:+campaignPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
 // a fight's target is fixed the first time it is shown or played, so Training bought afterwards never changes it
 function targetFor(i){

@@ -31,7 +31,7 @@ assert(source.includes('scoreGoalReady() && (secured || !pw.guard)'));
 assert(source.includes('score0 < B.target || guardBefore > 0'));
 assert(source.includes('guardCaptureFailed = !!pw.guard'));
 assert(source.includes("if(!B || (!B.mate && guardsLeft() > 0)) return;"));
-assert(source.includes('const GAME_VERSION = 176;'));assert(fs.readFileSync(__dirname+'/sw.js','utf8').includes('crownfall-v176'));
+assert(/const GAME_VERSION = (\d+);/.test(source)&&+RegExp.$1>=176);assert(/crownfall-v(\d+)/.test(fs.readFileSync(__dirname+'/sw.js','utf8'))&&+RegExp.$1>=176);
 console.log('PASS: score threat / recapture defense, budget fallback, state isolation, scope exclusions, 100 guard schedule positions, save compatibility, scoring gates, defection and version.');
 (async()=>{
  setup();E(`B.guardIds=[4];B.score=1000;B.board[11]={t:'R',side:'en',id:5};B.board[56]={t:'R',side:'me',id:6};B.moveCount=0;B.movesStart=20;B.capBy=[];B.log=[];B.swaps=0;B.wave=1;B.seenEn={};RUN.cards=[];RUN.stats={};
