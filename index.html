@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=183"></script>
-<script src="piece-designs.js?v=183"></script>
-<script src="character-style.js?v=183"></script>
-<script src="campaign-opponents.js?v=183"></script>
-<script src="campaign-dialogue.js?v=183"></script>
-<link rel="stylesheet" href="character-style.css?v=183">
+<script src="gameplay-polish.js?v=184"></script>
+<script src="piece-designs.js?v=184"></script>
+<script src="character-style.js?v=184"></script>
+<script src="campaign-opponents.js?v=184"></script>
+<script src="campaign-dialogue.js?v=184"></script>
+<link rel="stylesheet" href="character-style.css?v=184">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=183">
-<link rel="stylesheet" href="ruler-style.css?v=183">
-<link rel="stylesheet" href="gameplay-polish.css?v=183">
+<link rel="stylesheet" href="city-board.css?v=184">
+<link rel="stylesheet" href="ruler-style.css?v=184">
+<link rel="stylesheet" href="gameplay-polish.css?v=184">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3527,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 183;
+const GAME_VERSION = 184;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5580,7 +5580,7 @@ function coach(key){
 function coachReady(){ coachCool = false; setTimeout(coachNext, 350); }
 function coachNext(){
   if(coachOn || !coachQ.length || coachCool) return;
-  if(busy || document.querySelector('.modal, .vict, .ending, .landintro') || document.getElementById('splash')){ setTimeout(coachNext, 500); return; }
+  if(busy || document.querySelector('.modal, .vict, .ending, .landintro, .oppin, #tip') || document.getElementById('splash')){ setTimeout(coachNext, 500); return; }   // v184: never over the opponent card or a tip
   coachQ.sort((x, y) => COACH[y].pri - COACH[x].pri);
   const key = coachQ.shift(), sv = coachSeen(); if(sv[key] || sv.skipped){ coachNext(); return; }
   const [t, body] = COACH[key].text();
@@ -5841,7 +5841,9 @@ function startBlind(){ try{ laClear(); }catch(e){}
     const en = B.board.filter(q => q && q.side === 'en'), comp = 'KQRBNP'.split('').map(t => t + en.filter(q => q.t === t).length).filter(x => x[1] !== '0').join(' ');
     B.ai = {rating: aiRating(), n: en.length, comp, style: P && P.style, prot: aiSlot().prot, sig: P && P.sig ? sigBase(P.sig) : null};
     B.cp = (P && P.cp) || null;   // v134
-    if(P && P.sig && ARCHE[sigBase(P.sig)].tag && !coachSeen().sig){ coachMark('sig'); setTimeout(() => showTip(`<b>${ARCHE[sigBase(P.sig)].tag}</b><br>Some bosses break the usual rules of army composition.`), 1600); }
+    if(P && P.sig && ARCHE[sigBase(P.sig)].tag && !coachSeen().sig){ coachMark('sig'); { const tip = `<b>${ARCHE[sigBase(P.sig)].tag}</b><br>Some bosses break the usual rules of army composition.`; let tries = 0;   // v184: one message at a time, after the opponent card and any tutorial card
+      const later = () => { if(!app.classList.contains('play') || !B || B.done) return; if((document.querySelector('.oppin, .coach, .modal') || coachOn || (coachQ.length && !coachCool)) && tries++ < 150) return setTimeout(later, 400); showTip(tip); };
+      setTimeout(later, 1600); } }
     B.aiRef = CFAI.material(B.board); if(!RUN.gauntlet || MATCH || gOpeningOK()) break; (window.__gOpen = window.__gOpen || []).push(RUN.gWave); }
   B.startVal = enemyValue(B.board);
   B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; B.cmd = null; cmdState(); crInit();   // castling rights for this fight's own King/Rook pairs

@@ -118,3 +118,12 @@ The title screen opens on the painted city with a larger logo and the game's mot
 ## v183 — title screen fixes for every Land
 
 v182 was only correct while the current Land was Crown City. In the other four Lands the motto took the Land's wide display font and was cut off, and the Land's own backdrop replaced the city. The title now paints the city on its own fixed layer in every Land (also more reliable on iOS than a fixed body background), the motto keeps the condensed face, and small phones get tighter secondary buttons. Checked in all five Lands at 390 px and in the Fallen Throne at 320 and 430 px.
+
+
+## v184 — one message at a time, and readable small print
+
+- The first fight no longer stacks messages. The opponent card shows alone; the tutorial card and the formation tip each wait for the card, the initiative roll and each other. Measured on a new campaign: overlapping messages went from 7–9 half-second ticks to 0.
+- Battle and menu labels that were 8 to 9.5px are now 10px: board coordinates, Material and Brilliance captions, Score, card and Relic captions, and (in Crown City's condensed face) the Swaps / Tactic / Cash captions and the opponent role tag. The en passant tag is 9px. Each label keeps its original line box.
+- Left alone on purpose: the opponent's rule chips (a long chip wraps at 10px) and the stat captions in the four Lands that use the wide display face (they wrap at 10px and are already legible).
+
+Layout was compared before and after with identical seeded battles in all five Lands at 390×844, 390×664 and 320×568: 15 scenarios, 0 position or size differences in the HUD, board, info row or action row.

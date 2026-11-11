@@ -59,3 +59,19 @@ body .screen .mc-gaunt .gstats small{font-size:10px}
 .titlenav > .btn{display:flex!important;align-items:center;justify-content:center;gap:8px;min-height:54px;margin:0;padding-inline:8px;line-height:1.1}
 .titlenav .crowns{display:inline-flex}
 @media (max-width:360px){.titlenav > .btn{font-size:13px!important;gap:5px;padding-inline:4px} section.screen:has(> h1.logoimg) .setg .btn{font-size:11px!important;padding-inline:2px!important;letter-spacing:0!important}}
+
+/* v184 readable small print: battle and menu labels that were 8 to 9.5px are now 10px (the en passant tag, which sits
+   inside a square, is 9px). Each keeps its original line box, so no row changes height. The opponent's rule chips stay
+   at 9px: at 10px a long chip wraps and pushes the board down. Checked in all five Lands at 390x844, 390x664 and 320x568. */
+.coord{font-size:10px!important;line-height:10.8px!important}
+.eptag{font-size:9px!important}
+/* the stat captions and the opponent role tag grow only in Crown City's condensed face; the other Lands' wide display face is already legible at 8.5px and wraps at 10px */
+body[data-pack="street"] .pstats small,body[data-pack="street"] .play .pstats small,body[data-pack="street"] .play .tacbtn small{font-size:10px!important;line-height:11.475px!important}
+.pscore .sc small{font-size:10px!important;line-height:9.5px!important}
+.pscore .cbox small{font-size:10px!important;line-height:8.925px!important}
+.relic .rn,.play .relic .rn{font-size:10px!important;line-height:8.925px!important}
+.gmc small{font-size:10px!important;line-height:9.5px!important}
+body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4px!important}
+.combo,.lp .lk,.shd,.jslot em,.bcard.done::after,.tacrow[data-st="ready"]::after{font-size:10px!important}
+.piece-set-choice small,.character-form header small,.look-colors .character-option{font-size:10px!important}
+.training-head small{font-size:10px!important}
