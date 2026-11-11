@@ -80,3 +80,10 @@ Campaign score targets were falling behind by the end of Crown City. Four change
 A new army's first circuit is unchanged. A fight already shown keeps its saved target. Scoring, prices, Training, Relics, the Gauntlet and Crown Match are untouched; the save format is the same. These numbers come from simulation, not a measured playtest.
 
 Validation: `node validate-v177.cjs` and `node audit-balance.mjs`.
+
+
+## v178 — every opponent has a voice
+
+The 60 named Campaign opponents used 13 shared lines chosen by formation, so a Crown City street player could open with a cavalry line. Each one now opens and concedes with a line of their own, and capture, hurt, check and win reactions follow the Land (Crown City, Iron Kingdom, Olympian Court, Shattered Realm, Fallen Throne). The formation lines remain as the fallback. Circuit bosses, Rulers, the Gauntlet and Crown Match keep their existing dialogue. Presentation only: no rule, target or save reads these lines.
+
+Validation: `node validate-v178.mjs`.
