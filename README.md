@@ -99,3 +99,12 @@ Earlier builds not listed above: v172 step-by-step capture combos; v173 capture 
 ## v180 — Legacy Campaign retired
 
 `legacy.html` (the original 245-battle game, v150) and the title-screen link to it are removed, along with the files only it used: seven root music tracks and six old portraits. The repository drops from about 33 MB to about 20 MB. The current Campaign, the Gauntlet, Crown Match, the twelve-track soundtrack in `soundtrack/` and all current saves are unchanged. Old Legacy saves stay on the device but are no longer playable.
+
+
+## v181 — the ending carries into the next campaign
+
+When the Crown of Crowns is claimed, the winning King's name and soldiers' names are remembered on the device. In a later campaign, the Crownless King speaks of them, and tapping his pieces shows those names ("Ike · Enemy Rook", "Enemy King · once <name>"). Each enemy piece keeps the name it is first given through captures, promotions and reloads.
+
+Presentation only: his army, rules, AI, targets and the save format are unchanged. Nothing appears until an ending has been earned on the device, and never in the campaign that earned it, so the twist cannot be revealed early. Names are reduced to letters, digits, spaces and simple punctuation. The record is local and is not part of cloud saves.
+
+Validation: `node validate-v181.cjs`.

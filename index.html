@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=180"></script>
-<script src="piece-designs.js?v=180"></script>
-<script src="character-style.js?v=180"></script>
-<script src="campaign-opponents.js?v=180"></script>
-<script src="campaign-dialogue.js?v=180"></script>
-<link rel="stylesheet" href="character-style.css?v=180">
+<script src="gameplay-polish.js?v=181"></script>
+<script src="piece-designs.js?v=181"></script>
+<script src="character-style.js?v=181"></script>
+<script src="campaign-opponents.js?v=181"></script>
+<script src="campaign-dialogue.js?v=181"></script>
+<link rel="stylesheet" href="character-style.css?v=181">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=180">
-<link rel="stylesheet" href="ruler-style.css?v=180">
-<link rel="stylesheet" href="gameplay-polish.css?v=180">
+<link rel="stylesheet" href="city-board.css?v=181">
+<link rel="stylesheet" href="ruler-style.css?v=181">
+<link rel="stylesheet" href="gameplay-polish.css?v=181">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3527,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 180;
+const GAME_VERSION = 181;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4892,6 +4892,11 @@ function storyLines(o){
     o.check = 'Kneel, Bearer, before the throne you cannot hold.';
     o.win = 'Leave the crowns, Bearer. You were only ever carrying them for me.';
     o.lose = 'The Crown of Crowns is whole again, Bearer. The question is yours now: what will you do with it?';
+    const F = fallenRecord();                                         // v181: a later campaign, after an ending
+    if(F){ const a = F.army[0] && F.army[0].n, b = F.army[1] && F.army[1].n;
+      o.intro = a && b ? `I climbed these steps once, with ${a} and ${b} beside me. Look closely, Bearer. They never left.` : 'I climbed these steps once, as you do now. Look closely at my army, Bearer.';
+      o.hurt = ['They fought for me before they ever saw you.', 'I have lost more than that, Bearer.'];
+      o.lose = F.king ? `They called me ${F.king}, once. Now the question is yours, Bearer: what will they call you?` : 'I carried it as far as I could. Now the question is yours, Bearer: what will they call you?'; }
   }
   // v143: the Crownrunner mystery, first clear only (a Circuit or crown already won keeps its usual lines)
   const fresh = RUN && !MATCH && !(o.ruler ? landWon(land()) : circuitDone(land(), RUN.circuit));
@@ -8370,7 +8375,7 @@ function pieceInfo(p){
   } else {
     const val = p.t === 'P' && RULE('wall') ? 0 : T0.val;
     el.className = 'pinfo enemy'; el.style.setProperty('--pc', '#ff5a72');
-    el.innerHTML = `<span class="pi">${pieceSVG(p.t,'en')}</span><div class="pt"><b>Enemy ${T0.name}</b>
+    el.innerHTML = `<span class="pi">${pieceSVG(p.t,'en')}</span><div class="pt"><b>${fallenNameOf(p) ? (p.t === 'K' ? `Enemy King · once ${fallenNameOf(p)}` : `${fallenNameOf(p)} · Enemy ${T0.name}`) : `Enemy ${T0.name}`}</b>
       <span>${p.t === 'K' ? 'Can’t be captured. Give <b>check</b> to score, <b>checkmate</b> to win.' : `Worth <b class="fxc">+${val} Material</b> when you capture it`}</span>
       <span class="ab">${MOVES_TXT[p.t]}</span></div>`;
   }
@@ -9569,6 +9574,39 @@ function circuitCleared(l, cid, fresh, rebuilt){
     <button class="btn" id="go">${won ? `Back to ${pk}` : nx === 'ruler' ? `Face ${rulerShort(l)}` : `On to ${nxName}`}</button>`, '#go', () => circuitSelect(l, won ? null : nx));
   ccm.classList.add('ccmodal');
 }
+/* ---------- v181 The Fallen: the ending carries into the next campaign ----------
+   When the Crown of Crowns is claimed, the winning King's name and soldiers' names are remembered on this device.
+   In a LATER campaign (a different campaign_epoch), the Crownless King's pieces carry those names and he speaks of them.
+   Presentation only: his army, rules, AI, targets and saves are unchanged. Nothing shows until an ending has been earned,
+   so it can never reveal the twist early. Names are reduced to letters, digits, spaces and simple punctuation. */
+const FALLEN_KEY = 'crownfall-fallen';
+const fallenClean = (x, n) => String(x == null ? '' : x).replace(/[^\p{L}\p{N} '’.\-]/gu, '').trim().slice(0, n);
+function fallenRemember(){
+  try{
+    if(!RUN || RUN.gauntlet || MATCH || !Array.isArray(RUN.roster)) return;
+    const army = RUN.roster.map(r => r ? laParse(r) : null).filter(c => c && c.t !== 'K').map(c => ({t:c.t, n:fallenClean(c.n, 14)})).filter(c => c.n && TYPE[c.t]).slice(0, 15);
+    let king = ''; try{ king = fallenClean(CrownfallCharacter.get().name, 20); }catch(e){}
+    localStorage.setItem(FALLEN_KEY, JSON.stringify({v:1, ep:+ACH.campaign_epoch || 0, king, army, at:Date.now()}));
+  }catch(e){}
+}
+function fallenRecord(){
+  try{
+    if(!RUN || RUN.gauntlet || MATCH || RUN.land !== 'throne' || RUN.circuit !== 'ruler') return null;
+    const f = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null');
+    if(!f || !Array.isArray(f.army) || (+f.ep || 0) === (+ACH.campaign_epoch || 0)) return null;   // never the campaign that made it
+    return {king:fallenClean(f.king, 20), army:f.army.map(c => ({t:c && c.t, n:fallenClean(c && c.n, 14)})).filter(c => c.n && TYPE[c.t])};
+  }catch(e){ return null; }
+}
+// each enemy piece keeps the name it is first given (B.fallen: piece id → name), so captures, promotions and reloads never reshuffle them
+function fallenNameOf(p){
+  const f = fallenRecord(); if(!f || !B || !p || p.side !== 'en') return null;
+  if(p.t === 'K') return f.king || null;
+  if(!B.fallen || typeof B.fallen !== 'object') B.fallen = {};
+  if(Object.hasOwn(B.fallen, p.id)) return B.fallen[p.id] || null;
+  const used = Object.values(B.fallen), pick = f.army.find(c => c.t === p.t && !used.includes(c.n));
+  B.fallen[p.id] = pick ? pick.n : '';
+  return B.fallen[p.id] || null;
+}
 /* ---------- the standard ending (modular: a future true ending can branch here) ---------- */
 const ENDING_ART = 'assets/rulers/stag.webp'; // only ever shown inside playEnding()
 /* ---------- endings ----------
@@ -9784,6 +9822,7 @@ const CROWN_ART = {
 const crownArt = (l, d) => CROWN_ART[l + '|' + d] || null;
 function crownCeremony(l, fresh){
   if(typeof fresh === 'string') fresh = arguments[2];   // older call shape (land, tier, fresh)
+  if(l === 'throne') fallenRemember();                  // v181: the army that took the throne is remembered for a later campaign
   clearRun();
   if(l === 'throne'){ const k = landCrownId('throne'); ACH[k] = ACH[k] || Date.now(); saveAch(); return playEnding('standard', {fresh, done:() => title()}); } // the final reward is the ending itself
   if(fresh){ coach('crown'); return landConquered(l); }   // (the coach tip is queued: it shows after the presentation closes)
