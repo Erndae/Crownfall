@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=186"></script>
-<script src="piece-designs.js?v=186"></script>
-<script src="character-style.js?v=186"></script>
-<script src="campaign-opponents.js?v=186"></script>
-<script src="campaign-dialogue.js?v=186"></script>
-<link rel="stylesheet" href="character-style.css?v=186">
+<script src="gameplay-polish.js?v=187"></script>
+<script src="piece-designs.js?v=187"></script>
+<script src="character-style.js?v=187"></script>
+<script src="campaign-opponents.js?v=187"></script>
+<script src="campaign-dialogue.js?v=187"></script>
+<link rel="stylesheet" href="character-style.css?v=187">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=186">
-<link rel="stylesheet" href="ruler-style.css?v=186">
-<link rel="stylesheet" href="gameplay-polish.css?v=186">
+<link rel="stylesheet" href="city-board.css?v=187">
+<link rel="stylesheet" href="ruler-style.css?v=187">
+<link rel="stylesheet" href="gameplay-polish.css?v=187">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3533,7 +3533,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 186;
+const GAME_VERSION = 187;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5746,12 +5746,12 @@ function blindSelect(){
       <small>Reward $${bl.reward}</small>
       ${i===2 ? `<div class="bchips">${bossChips(boss.id).map(c => `<small class="bsig rule">${c}</small>`).join('')}${(() => { const a = SIG_BOSS[bossRuleName(boss.id)], t = a && ARCHE[sigBase(a)] && ARCHE[sigBase(a)].tag; return t ? `<small class="bsig">${t}</small>${DOUBLE_MARCH.has(sigBase(a)) ? '<small class="bsig dm">Double March</small>' : ''}` : ''; })()}</div>` : ''}
       ${i===2 && personaOf(boss.id) && personaOf(boss.id).style ? `<small class="bstyle">${STYLE_TXT[personaOf(boss.id).style].replace(/: (.)/, (m, c) => ' · ' + c.toUpperCase())}</small>` : ''}
-      ${i===2 ? '<small class="bmore">Tap for rules</small>' : ''}
+      ${i===2 ? '<small class="bmore">Rules</small>' : ''}
       ${i===2 && boss.ruler ? `<span class="prize">${crownSVG(land(), 'hard', true)}<small>${landWon(land()) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</small></span>` : ''}
     </div>`).join('')}</div>
     <button class="btn" id="play">${RUN.blind===2 ? `Face ${bossName(boss.id)}` : `Play the ${roundName(RUN.blind)}`}</button>
-    <button class="btn ghost" id="stageShop">Store · buy and upgrade</button>
-    <button class="btn ghost" id="trainbtn">${UI.training} · <span class="money">$${RUN.money}</span></button>
+    <div class="stagerow"><button class="btn ghost" id="stageShop" aria-label="Store: buy and upgrade">Store</button>
+    <button class="btn ghost" id="trainbtn" aria-label="${UI.training}: you have $${RUN.money}">${UI.training}</button></div>
     <div class="levels">${Object.keys(TYPE).map(k => k === 'K' ? kingLvCell() : `<div class="lv">${pieceSVG(k,'me')}<div><b>${TYPE[k].name} ${lvLabel(k)}</b><br><span class="fxc">${TYPE[k].chips + TYPE[k].lc*(effLv(k)-1)}</span> × <span class="fxm">${TYPE[k].mult + TYPE[k].lm*(effLv(k)-1)}</span></div></div>`).join('')}</div>
     <p class="muted" style="font-size:13px;text-align:center">${UI.card}s: ${(RUN.cards||[]).map(id => `<b style="color:${C(id).col}">${C(id).name}</b>`).join(', ') || 'none'}</p>
     ${armyStrip()}

@@ -140,3 +140,12 @@ Battle layout re-checked in all five Lands at three sizes (15 scenarios, 0 diffe
 ## v186 — arrival banner you can read
 
 The Circuit arrival banner sat on a 62% scrim, so its lines collided with the stage screen behind it. The screen behind is now fully covered (and blurred where the browser supports it), the text block has more room, and the Circuit's skyline sits under the text instead of behind it. The new-recruit introduction, which used the same scrim, is darkened the same way. Checked in all five Lands at 390×844, 390×664 and 320×568: text and artwork never overlap and always fit the screen. No timing, rule or save change.
+
+
+## v187 — a shorter stage screen and small polish
+
+- **Stage screen.** The opponent card is a full-width two-column ticket (who, on the left; the score to beat and the reward, on the right) instead of a tall centred stack. The progress caption that repeated the header is hidden (it stays in the group's accessible name). Store and Training share one row; their longer descriptions stay as accessible labels. The page is about 185px shorter at 390px wide, so Store, Training and the piece levels sit on the first screen. "Tap for rules" is now "Rules"; the whole card still opens the rules.
+- **Journey.** An unearned World Crown is a compact row with a crown mark in the Land's colour instead of a large blank box. The crown's own artwork stays hidden until it is earned.
+- **Small phones.** On "Meet your army" quotes are no longer cut off and the personality line stays on one line; a rule chip wider than the opponent panel ends in an ellipsis instead of being cut mid-letter.
+
+Checked: stage screen in all five Lands, Stage and Ruler variants, at 390x844, 390x664 and 320x568 (24 scenarios, no clipped text, no sideways overflow, card aligned with the buttons); battle layout unchanged (15 scenarios, 0 differences).
