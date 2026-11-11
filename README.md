@@ -135,3 +135,8 @@ Layout was compared before and after with identical seeded battles in all five L
 - **Wagers.** A wager used to offer the Blitzer or the Strategist every time. It now draws one tempo Challenge (Blitzer, Hustler or the new One-Two: 2 captures in a row) and one steady Challenge (Strategist, or the new King's Hand: capture with your King, or Front Line: 2 captures with Pawns). Nine pairings, never the same pair twice running; the pair is saved with the pending event. Front Line needs at least 2 Pawns; the Gauntlet never gets a move-limited one. The three new Challenges are wager-only: they are never sold, gifted or dealt as cards, and completing one also gives +1 Tactic.
 
 Battle layout re-checked in all five Lands at three sizes (15 scenarios, 0 differences). Validation: `node validate-v185.cjs`.
+
+
+## v186 — arrival banner you can read
+
+The Circuit arrival banner sat on a 62% scrim, so its lines collided with the stage screen behind it. The screen behind is now fully covered (and blurred where the browser supports it), the text block has more room, and the Circuit's skyline sits under the text instead of behind it. The new-recruit introduction, which used the same scrim, is darkened the same way. Checked in all five Lands at 390×844, 390×664 and 320×568: text and artwork never overlap and always fit the screen. No timing, rule or save change.

@@ -87,3 +87,19 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
 #app:not(.play) .relic.empty{aspect-ratio:1!important;height:auto!important}
 .offer .tileprev .relic .rn{display:none!important}
 
+
+/* v186 arrival banner: it used to be a 62% scrim, so its text collided with the stage screen behind it. The screen behind
+   is now fully covered (and blurred where supported), the text block has room to breathe, and the Circuit's skyline
+   sits under the text instead of behind it. Every Land. */
+.carrive{background:rgba(7,9,12,.95)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 22px;box-sizing:border-box}
+.carrive .ca-txt{order:1;gap:8px!important;transform:none!important;max-width:340px}
+.carrive.in .ca-txt{transform:none!important}
+.carrive .ca-art{order:2;position:static!important;transform:none!important;width:100vw;height:16vh!important;flex:none;opacity:.9}
+.carrive small{font-size:13px!important;opacity:1!important;color:#cfc8ba!important}
+.carrive b{margin-block:2px}
+.carrive span{font-size:12px!important}
+.carrive .catr{margin-top:14px!important;gap:6px!important;font-size:14.5px!important;line-height:1.4!important;color:#eee6d6!important}
+.carrive .catr b{font-size:12.5px!important}
+.carrive .camyst{margin-top:12px!important;font-size:14px!important;color:#d8d0c2!important}
+/* the new-recruit introduction used the same 62% scrim over a live screen */
+.recintro{background:rgba(7,9,12,.9)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
