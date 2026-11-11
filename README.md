@@ -156,3 +156,12 @@ Checked: stage screen in all five Lands, Stage and Ruler variants, at 390x844, 3
 In the installed (home-screen) app, iOS dims and blurs a band under the status bar on top of the page. It reaches below the notch's safe area, so the top of every screen sat inside it; in a fight that was the opponent panel and the Swaps / Tactic / Cash tiles. In the installed app on iOS only (`display-mode: standalone` and an iOS-only `@supports` test), the page now starts 44px lower, top messages and dialogs move with it, and the page height is `100dvh` so the room is taken from the unused strip at the bottom of the screen rather than from the board. Browsers and other devices are unchanged.
 
 This effect is drawn by iOS, not by the page, so it could not be reproduced in a desktop browser. The layout was checked by forcing the rule on with a simulated 59px notch at 393x852, 402x874 and 375x667: the action row stays in place and nothing scrolls. The 44px figure is an estimate from a device screenshot and may need one adjustment.
+
+
+## v189 — a lighter page and an update notice
+
+- **Lighter page.** `index.html` drops from 1.69 MB to 1.23 MB. Eight CSS rules carried nine embedded board textures (surfaces: asphalt, timber, marble, crystal; frames: paint, ironwood, marble, rift) for `data-bsurface` and `data-bframe` values that no Land theme sets any more, so they were downloaded on every load and never drawn. The rules are removed. The board was compared pixel for pixel before and after in all five Lands and both Ruler fights: identical.
+- **Update notice.** After an update the title screen says "Updated to vN" once. The last build seen is remembered on the device; a first visit says nothing, so the first notice appears with the update after this one.
+- **Tests.** `validate-v168.mjs` is a one-time comparison that needs a v167 copy of `index.html`; without `CROWNFALL_BASELINE` it now reports SKIP instead of failing.
+
+Not done: vibration on captures. Browsers on iPhone do not support it, so it would only reach Android players.
