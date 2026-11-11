@@ -87,3 +87,10 @@ Validation: `node validate-v177.cjs` and `node audit-balance.mjs`.
 The 60 named Campaign opponents used 13 shared lines chosen by formation, so a Crown City street player could open with a cavalry line. Each one now opens and concedes with a line of their own, and capture, hurt, check and win reactions follow the Land (Crown City, Iron Kingdom, Olympian Court, Shattered Realm, Fallen Throne). The formation lines remain as the fallback. Circuit bosses, Rulers, the Gauntlet and Crown Match keep their existing dialogue. Presentation only: no rule, target or save reads these lines.
 
 Validation: `node validate-v178.mjs`.
+
+
+## v179 — lighter install and repo cleanup
+
+The offline cache no longer downloads `legacy.html` or the five portraits only that page uses (about 2.1 MB less on first install); they still load normally online. Five files nothing referenced are removed: `icon-192.png`, `icon-512.png`, `favicon-32.png`, `apple-touch-icon.png` (byte-for-byte copies of the `cf-` icons) and `icon.svg`. No gameplay, save or art change. `legacy.html` and the root music and portraits it uses are kept.
+
+Earlier builds not listed above: v172 step-by-step capture combos; v173 capture bonus previews and run records; v174 campaign continuation between circuits; v175 stores stay available across transitions; v176 scoring defense and late-campaign guard encounters (v171's Downtown Blitz encounters were reverted).
