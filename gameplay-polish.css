@@ -144,3 +144,19 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
 
 /* v187: a rule chip wider than the opponent panel ends in an ellipsis instead of being cut mid-letter */
 .pblind .ochips small{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}
+
+/* v188 iPhone home-screen app: iOS dims and blurs a band under the status bar, on top of the page, and it reaches
+   below the notch's safe area, so the top of every screen (in a fight: the opponent panel and Swaps / Tactic / Cash)
+   sat inside it. In the installed app on iOS only, the page now starts --topfade lower, top messages and dialogs move
+   with it, and the page uses the full screen height so the room comes from the unused strip at the bottom rather than
+   from the board. Browsers and other devices are unchanged. */
+@media (display-mode:standalone){
+@supports (-webkit-touch-callout:none){
+  :root{--topfade:44px;height:100dvh!important;padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade))!important}
+  .achtoast{top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 14px)!important}
+  .nowplay,.coach:not(.bottom){top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 10px)!important}
+  .modal{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade))!important}
+  .modal.journey{padding-top:0!important}
+  .modal.journey > .box{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 14px)!important}
+}
+}

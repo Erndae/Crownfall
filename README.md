@@ -149,3 +149,10 @@ The Circuit arrival banner sat on a 62% scrim, so its lines collided with the st
 - **Small phones.** On "Meet your army" quotes are no longer cut off and the personality line stays on one line; a rule chip wider than the opponent panel ends in an ellipsis instead of being cut mid-letter.
 
 Checked: stage screen in all five Lands, Stage and Ruler variants, at 390x844, 390x664 and 320x568 (24 scenarios, no clipped text, no sideways overflow, card aligned with the buttons); battle layout unchanged (15 scenarios, 0 differences).
+
+
+## v188 — iPhone home-screen app: content starts below the status-bar blur
+
+In the installed (home-screen) app, iOS dims and blurs a band under the status bar on top of the page. It reaches below the notch's safe area, so the top of every screen sat inside it; in a fight that was the opponent panel and the Swaps / Tactic / Cash tiles. In the installed app on iOS only (`display-mode: standalone` and an iOS-only `@supports` test), the page now starts 44px lower, top messages and dialogs move with it, and the page height is `100dvh` so the room is taken from the unused strip at the bottom of the screen rather than from the board. Browsers and other devices are unchanged.
+
+This effect is drawn by iOS, not by the page, so it could not be reproduced in a desktop browser. The layout was checked by forcing the rule on with a simulated 59px notch at 393x852, 402x874 and 375x667: the action row stays in place and nothing scrolls. The 44px figure is an estimate from a device screenshot and may need one adjustment.
