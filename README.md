@@ -194,3 +194,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 ## v194 — the Land's picture is visible again
 
 - Behind the stage and store screens, each Land's picture was drawn at 13% under a heavy shade and read as nearly black. It now shows clearly at the top of the screen and fades into the dark behind the cards, in the Iron Kingdom, the Olympian Court, the Shattered Realm and the Fallen Throne, on every stage. Crown City has its own backdrop and is unchanged.
+
+## v195 — Green Lights, the Downtown Blitz encounter
+
+- Downtown fights that have a move limit now mark two green lights on the board, three at the Circuit Boss, in every Land.
+- Move one of your pieces onto a light and you get 1 move back on the Blitz clock. If an enemy piece lands there first, you lose 1 move instead, but never your last one. Each light works once and no piece is removed.
+- Lights sit on open squares of the fifth and sixth ranks, spread across the board, never where a first pawn move reaches.
+- The opponent's intro, the stage ticket, the move preview and the fight rules all explain them. Lights are saved with the battle; fights saved before this update have none.

@@ -199,3 +199,7 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
    clearly at the top and fades down into the dark behind the cards. (Crown City has its own backdrop and is unchanged.) */
 body[data-art="1"]:not([data-pack="street"])::before{opacity:.62}
 body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(180deg,rgba(10,9,12,.5),rgba(10,9,12,.34) 22%,rgba(10,9,12,.72) 52%,rgba(10,9,12,.93) 78%)}
+/* v195: Green Lights (Downtown Blitz encounter) */
+.green-light{position:absolute;inset:14%;pointer-events:none;z-index:1}.green-light svg{width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(61,220,132,.7))}
+.sq:has(.green-light){outline:2px dashed #3ddc84;outline-offset:-3px}.sq:has(.green-light) .pc{position:relative;z-index:2}
+@media (prefers-reduced-motion:no-preference){.green-light svg{animation:glpulse 1.8s ease-in-out infinite}@keyframes glpulse{50%{opacity:.62}}}
