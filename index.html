@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=189"></script>
-<script src="piece-designs.js?v=189"></script>
-<script src="character-style.js?v=189"></script>
-<script src="campaign-opponents.js?v=189"></script>
-<script src="campaign-dialogue.js?v=189"></script>
-<link rel="stylesheet" href="character-style.css?v=189">
+<script src="gameplay-polish.js?v=190"></script>
+<script src="piece-designs.js?v=190"></script>
+<script src="character-style.js?v=190"></script>
+<script src="campaign-opponents.js?v=190"></script>
+<script src="campaign-dialogue.js?v=190"></script>
+<link rel="stylesheet" href="character-style.css?v=190">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=189">
-<link rel="stylesheet" href="ruler-style.css?v=189">
-<link rel="stylesheet" href="gameplay-polish.css?v=189">
+<link rel="stylesheet" href="city-board.css?v=190">
+<link rel="stylesheet" href="ruler-style.css?v=190">
+<link rel="stylesheet" href="gameplay-polish.css?v=190">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3522,7 +3522,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 189;
+const GAME_VERSION = 190;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -9217,6 +9217,25 @@ const CROWN_MYST = [
   ['The three Crowns resonate.', 'For an instant you hear something like a distant crowd.', 'Then nothing.'],
   ['All four Crowns answer at once.', 'Somewhere far away, something answers back.'],
 ];
+/* v190: after each World Crown, the longest-serving soldier says what the army is starting to notice. One line, in a
+   voice that follows their personality (bold, wary or warm). Hints only: nothing here states what the throne does. */
+const CROWN_SAY = [
+  {bold:'One down. Funny. It sits on you like it has done this before.', wary:'That was too easy to take. Rulers do not smile when they lose.', warm:'Looks good on you, boss. Almost like it was kept for you.'},
+  {bold:'Two crowns. Did you hear them hum? I am choosing not to worry.', wary:'That broken crown is carved on every gate we pass. Somebody wants it remembered.', warm:'He counted your crowns before he counted his soldiers. Odd thing for a king to care about.'},
+  {bold:'Three. Whoever else is playing, they are behind us.', wary:'Those statues had their names cut away. I keep wondering who held the chisel.', warm:'She looked at you like she had met you before. Have you two met?'},
+  {bold:'All four. So why does it feel like we are being led, not chased?', wary:'Nobody guards the road to the throne. Nobody has to. Think about that.', warm:'Whatever is up there, we climb it with you. Just promise you will still know our names.'},
+];
+const CROWN_TONE = {F:'bold', A:'bold', M:'bold', C:'wary', K:'wary', V:'wary', L:'warm', S:'warm'};
+function crownSay(n){
+  try{
+    const L = CROWN_SAY[Math.min(n, WORLD_TOTAL) - 1]; if(!L || !laOn()) return null;
+    const src = (RUN && RUN.roster) || (getCarry() || {}).roster || [];
+    const army = src.map(x => x ? laParse(x) : null).filter(c => c && c.t !== 'K' && TYPE[c.t] && fallenClean(c.n, 14));
+    if(!army.length) return null;
+    const ch = army.reduce((a, c) => c.b > a.b ? c : a, army[0]);     // the longest-serving; the first listed on a tie
+    return {who:`${fallenClean(ch.n, 14)} · ${TYPE[ch.t].name}`, line:L[CROWN_TONE[ch.p] || 'wary']};
+  }catch(e){ return null; }
+}
 async function landConquered(l){
   const pk = PACKS.find(x => x.id === l), n = worldCrowns(), all = n >= WORLD_TOTAL, art = crownArt(l, WORLD_TIER(l));
   sfx.win(); musicDip(0.55);
@@ -9244,7 +9263,9 @@ async function landConquered(l){
   await T.wait(1100);
   // v143: the Crowns react to one another before the ability choice (first claim only; this screen only plays then)
   { const M = CROWN_MYST[Math.min(n, WORLD_TOTAL) - 1]; const vm = ov.querySelector('.vmyst');
-    if(M && vm){ vm.innerHTML = M.map(x => `<span>${x}</span>`).join(''); beat('bm'); for(let t = 900 + M.join(' ').length * 38; t > 0 && !T.skipped(); t -= 700) await T.wait(Math.min(700, t)); } }   // (full reading time under reduced motion too)
+    if(M && vm){ const S = crownSay(n);
+      vm.innerHTML = M.map(x => `<span>${x}</span>`).join('') + (S ? `<span class="vsay"><b>${S.who}</b>“${S.line}”</span>` : ''); beat('bm');
+      for(let t = 900 + (M.join(' ') + (S ? S.line : '')).length * 38; t > 0 && !T.skipped(); t -= 700) await T.wait(Math.min(700, t)); } }   // (full reading time under reduced motion too)
   // v130: the Crown's permanent ability is chosen right here, over the ceremony (same choice, same rule: one of three, for good)
   if(crownChoicesDue().length) await new Promise(res => crownChoiceFlow(res));
   if(all){ ov.classList.add('out'); await new Promise(r => setTimeout(r, 400)); ov.remove(); musicDip(1); return fourthReveal(l); }
@@ -9323,7 +9344,7 @@ function winBlind(){
       cp.mid = null;
       if(cp.replay === l && cc === REBUILD_CIRCUIT) cp.replay = null; cp.cur = null; setCheckpoint(cp);
       if(!rebuilt) unlockAch(cc + '_conq'); const k = conqKey(l, cc), fresh = !ACH[k]; ACH[k] = ACH[k] || Date.now(); saveAch(); fin = () => circuitCleared(l, cc, fresh, rebuilt); }
-    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne') endingPending('standard', 'crown');
+    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne'){ endingPending('standard', 'crown'); fallenRemember(); }   // v190: remembered here, while the run still exists
       { const cp = cpGet(); if(cp.ruler && cp.ruler.land === l) cp.ruler = null; if(cp.rulerMid && cp.rulerMid.land === l) cp.rulerMid = null; cp.mid = null; if(cp.replay === l) cp.replay = null; cp.cur = null; setCheckpoint(cp); }   // the Ruler fell: this Land's checkpoints end
       CIRCUITS.forEach(c => { ACH[conqKey(l, c.id)] = ACH[conqKey(l, c.id)] || Date.now(); });
       ACH[cid] = ACH[cid] || Date.now(); saveAch(); fin = () => crownCeremony(l, fresh); }
@@ -9615,7 +9636,8 @@ function fallenRemember(){
     if(!RUN || RUN.gauntlet || MATCH || !Array.isArray(RUN.roster)) return;
     const army = RUN.roster.map(r => r ? laParse(r) : null).filter(c => c && c.t !== 'K').map(c => ({t:c.t, n:fallenClean(c.n, 14)})).filter(c => c.n && TYPE[c.t]).slice(0, 15);
     let king = ''; try{ king = fallenClean(CrownfallCharacter.get().name, 20); }catch(e){}
-    localStorage.setItem(FALLEN_KEY, JSON.stringify({v:1, ep:+ACH.campaign_epoch || 0, king, army, at:Date.now()}));
+    const was = fallenRecord();                                    // v190: who the Crownless King was in this campaign, if anyone
+    localStorage.setItem(FALLEN_KEY, JSON.stringify({v:1, ep:+ACH.campaign_epoch || 0, king, army, at:Date.now(), was:was ? {king:was.king, army:was.army.slice(0, 15)} : null}));
   }catch(e){}
 }
 function fallenRecord(){
@@ -9661,6 +9683,7 @@ function endingResume(){
   if(endingOn) return false;
   const p = endingSave().pending; if(!p) return false;
   if(!ENDINGS[p.type] || !ACH[crownId('throne', 'hard')]){ endingPending(p.type, null); return false; }   // never completes a save that didn't earn it
+  if(p.step === 'choice'){ const ask = () => document.getElementById('splash') ? setTimeout(ask, 300) : endingChoose({fresh:false, done:() => title()}); ask(); return true; }   // v190
   endingOn = true;
   const go = () => document.getElementById('splash') ? setTimeout(go, 300) : (endingOn = false, playEnding(p.type, {resume:p.step, done:() => title()}));
   go(); return true;
@@ -9706,7 +9729,86 @@ function endingKit(ov){
   E.load = url => Promise.race([new Promise(r => { if(!url) return r(); const im = new Image(); im.onload = im.onerror = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(r); im.src = url; }), new Promise(r => setTimeout(r, 5000))]);
   return E;
 }
-const ENDINGS = { standard: endingStandard };
+const ENDINGS = { standard: endingStandard, true: endingTrue };
+/* v190 The true ending. Only a player who has already seen the standard ending on this device is ever asked: after the
+   Crownless King falls again, the Crown of Crowns can be taken (the standard ending, exactly as before) or broken.
+   Nothing about it is shown before that. The question is saved as a pending step, so a refresh asks it again. */
+function endingChoose(opts){
+  endingPending('standard', 'choice'); busy = false;
+  document.querySelectorAll('.endhold').forEach(x => x.remove());
+  const m = modal(`<p class="evkick">The Crown of Crowns</p><h2>The throne is waiting.</h2>
+    <p style="margin:0">You have stood here before. You know what it wants.</p>
+    <div class="endopts"><button class="btn ghost" id="endtake">Take the crown</button><button class="btn ghost" id="endbreak">Break the crown</button></div>`);
+  m.classList.add('endchoice');
+  const go = type => { m.remove(); playEnding(type, opts); };
+  m.querySelector('#endtake').onclick = () => go('standard');
+  m.querySelector('#endbreak').onclick = () => go('true');
+}
+function fallenWas(){ try{ const f = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'), w = f && f.was; if(!w) return null;
+  return {king:fallenClean(w.king, 20), army:(Array.isArray(w.army) ? w.army : []).map(c => fallenClean(c && c.n, 14)).filter(Boolean)}; }catch(e){ return null; } }
+async function endingTrue(E, o){
+  const ov = E.ov, q = x => ov.querySelector(x), snd = endingSounds(), was = fallenWas();
+  const art = {crown:crownArt('throne', 'hard'), throne:LAND_ART.throne, city:LAND_ART.street};
+  const ready = {}; for(const k in art) ready[k] = E.load(art[k]);
+  const bg = (el, k) => { if(el && art[k]) el.style.backgroundImage = `url("${art[k]}")`; };
+  bg(q('.en-cimg'), 'crown'); bg(q('.en-throne'), 'throne'); bg(q('.en-city'), 'city');
+  ov.classList.add('dawn');
+  if(o.resume !== 'city'){
+    // 1) the Crown of Crowns, whole again
+    await E.wait(o.resume ? 900 : 2000);
+    await ready.crown; E.scene('crown'); snd.resonance(.8);
+    await E.wait(1700);
+    q('.en-crownbox').classList.add('whole');
+    await E.say('THE CROWN IS WHOLE.', 2400, 'lower', 'caps');
+    await E.wait(400);
+    q('.en-crownbox').classList.add('waiting'); snd.rumble();
+    await E.say('THE THRONE HAS BEEN WAITING.', 2600, 'lower', 'caps red');
+    await E.black(1400);
+    // 2) the approach, remembered
+    await ready.throne; endingFrame(ov); E.scene('approach'); snd.wind(10); snd.stone(.6);
+    await E.wait(300); ov.classList.add('walk');
+    await E.wait(1600);
+    await E.say('You have climbed these steps before.', 2600, 'top', 'story');
+    await E.wait(250);
+    await E.say('You know what the throne is claiming.', 2600, 'top', 'story');
+    await E.wait(250);
+    await E.say('The crown was never waiting for a king.', 2500, 'top', 'story');
+    await E.wait(250);
+    await E.say('This time, you let it wait.', 2800, 'top', 'story red');
+    await E.black(1400);
+    // 3) the crown is broken
+    E.scene('crown'); q('.en-crownbox').classList.remove('waiting');
+    await E.wait(1500);
+    q('.en-crownbox').classList.add('breaking'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);
+    await E.wait(2600);
+    q('.en-crownbox').classList.add('broken'); snd.shatter();
+    await E.wait(2400);
+    await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
+    await E.wait(400);
+    await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
+    await E.black(1400);
+    // 4) the one who came before
+    E.scene('approach'); snd.wind(9);
+    await E.wait(1500);
+    await E.say('The Crownless King lowers his head.', 2600, 'top', 'story');
+    await E.wait(250);
+    await E.say(was && was.king ? `“They called me ${was.king}, once.”` : '“I had a name, once.”', 2800, 'top', 'story');
+    await E.wait(250);
+    await E.say('He remembers the rest of it now.', 2500, 'top', 'story');
+    await E.wait(250);
+    await E.say(was && was.army.length >= 2 ? `${was.army[0]} and ${was.army[1]} lay down their arms. So does every army that ever climbed here.` : 'His army lays down its arms. So does every army that ever climbed here.', 3600, 'top', 'story');
+    endingPending('true', 'city');                                    // the story has been told: a refresh from here resumes at the city
+    try{ localStorage.removeItem(FALLEN_KEY); }catch(e){}             // the cycle is broken: no one is kept
+    await E.black(1600);
+    await E.wait(1000);
+  } else { try{ localStorage.removeItem(FALLEN_KEY); }catch(e){} await E.wait(1000); }
+  // 5) morning
+  await ready.city; E.scene('city'); ov.classList.add('drift'); snd.wind(9);
+  await E.wait(1900);
+  await E.say('EVERYBODY WANTED A CROWN.', 1900, 'lower', 'caps echo');
+  await E.say('SOMEWHERE IN CROWN CITY…', 2300, 'lower', 'caps small');
+  await E.say('SOMEONE SETS UP A BOARD, JUST TO PLAY.', 3800, 'lower', 'caps final');
+}
 // fetch + decode the ending's images off-screen (never inserted into the page) so the transformation needs no network
 const ENDING_PRE = [];
 function endingPrefetch(){
@@ -9851,9 +9953,9 @@ const CROWN_ART = {
 const crownArt = (l, d) => CROWN_ART[l + '|' + d] || null;
 function crownCeremony(l, fresh){
   if(typeof fresh === 'string') fresh = arguments[2];   // older call shape (land, tier, fresh)
-  if(l === 'throne') fallenRemember();                  // v181: the army that took the throne is remembered for a later campaign
   clearRun();
-  if(l === 'throne'){ const k = landCrownId('throne'); ACH[k] = ACH[k] || Date.now(); saveAch(); return playEnding('standard', {fresh, done:() => title()}); } // the final reward is the ending itself
+  if(l === 'throne'){ const k = landCrownId('throne'); ACH[k] = ACH[k] || Date.now(); saveAch();
+    return endingSave().seen.standard ? endingChoose({fresh, done:() => title()}) : playEnding('standard', {fresh, done:() => title()}); } // the final reward is the ending itself (v190: a Bearer who has seen it once is asked)
   if(fresh){ coach('crown'); return landConquered(l); }   // (the coach tip is queued: it shows after the presentation closes)
   sfx.win(); setTimeout(() => { try{ kit.horn(0, 0.6); }catch(e){} }, 500);
   const art = crownArt(l, WORLD_TIER(l));

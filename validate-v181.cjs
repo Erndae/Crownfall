@@ -12,7 +12,7 @@ const base=E(`storyLines({name:'The Crownless King',ruler:true}).intro`);assert(
 // claiming the throne remembers the army (before the run is cleared)
 E('fallenRemember()');const saved=JSON.parse(E('localStorage.getItem(FALLEN_KEY)'));
 assert.equal(saved.ep,1000);assert.equal(saved.king,'Ernesto b');assert.deepEqual(saved.army,[{t:'R',n:'Ike'},{t:'B',n:'Fang'},{t:'N',n:'Pike'},{t:'P',n:'Dime'},{t:'Q',n:'Juno'}]);
-assert(fs.readFileSync(__dirname+'/index.html','utf8').includes("if(l === 'throne') fallenRemember();"));
+assert(/if\(l === 'throne'\)\{[^}]*fallenRemember\(\);[^}]*\}[\s\S]{0,2500}storeCarry\(\); clearRun\(\);/.test(fs.readFileSync(__dirname+'/index.html','utf8')),'Remembered in winBlind, before the run is cleared (v190)');
 // never in the campaign that made it
 assert.equal(E('fallenRecord()'),null);assert.equal(E(`storyLines({name:'The Crownless King',ruler:true}).intro`),base);
 // a later campaign: only the Fallen Throne's Ruler fight

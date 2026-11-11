@@ -160,3 +160,27 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
   .modal.journey > .box{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 14px)!important}
 }
 }
+
+/* v190 the true ending: the question, the crown breaking, and morning over Crown City */
+.modal.endchoice{background:rgba(4,3,6,.94)}
+.modal.endchoice .box{text-align:center;gap:12px;border-color:#6b5a2c!important}
+.modal.endchoice h2{margin:0;font-size:clamp(24px,7vw,30px)}
+.endopts{display:grid;gap:10px;margin-top:6px}
+.endopts .btn{margin:0;padding-block:16px}
+.en-crownbox.breaking{filter:brightness(1.35) saturate(.6) contrast(1.15)!important;animation:enbreak .42s steps(2) 6}
+@keyframes enbreak{0%,100%{translate:0 0}50%{translate:-3px 2px}}
+.en-crownbox.broken{opacity:0;filter:brightness(2.2) saturate(0) blur(7px)!important;scale:1.22;transition:opacity 1.7s ease,scale 1.9s ease-out,filter 1.7s ease}
+.ending.calm .en-crownbox.breaking{animation:none}
+.ending.calm .en-crownbox.broken{scale:1}
+.ending.dawn .en-city{filter:brightness(.8) saturate(.92) sepia(.38) hue-rotate(-10deg)}
+.ending.dawn .en-scene[data-s=city]::after{background:linear-gradient(180deg,rgba(255,186,116,.2),transparent 42%,transparent 56%,rgba(0,0,0,.8) 82%)}
+/* v190 a soldier's remark under the Crown lines */
+.vict.land .vmyst .vsay{margin-top:10px;font-style:normal;font-size:13.5px;line-height:1.35;color:#f0e6cc;display:flex;flex-direction:column;gap:2px}
+.vict.land .vmyst .vsay b{font-family:var(--display);font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--lt-accent,#ffd27a)}
+
+/* v190: on short phones the crown art steps back when the Crowns and the soldier speak, so the words fit */
+@media (max-height:620px){
+  .vict.land .vsig{transition:width .5s ease}
+  .vict.land.bm .vsig{width:min(104px,30vw)}
+  .vict.land[data-land="street"].bm .vsig{width:min(150px,44vw)}
+}

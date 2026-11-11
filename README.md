@@ -165,3 +165,11 @@ This effect is drawn by iOS, not by the page, so it could not be reproduced in a
 - **Tests.** `validate-v168.mjs` is a one-time comparison that needs a v167 copy of `index.html`; without `CROWNFALL_BASELINE` it now reports SKIP instead of failing.
 
 Not done: vibration on captures. Browsers on iPhone do not support it, so it would only reach Android players.
+
+## v190 — the true ending, and an army that starts to notice
+
+- **A second ending.** A Bearer who has already seen the ending is asked at the throne: *Take the crown* or *Break the crown*. Taking it plays the ending as before. Breaking it plays a new one: the crown shatters, the Crownless King remembers the name he had, the armies lay down their arms, and Crown City wakes to someone setting up a board just to play. The first time through there is no choice, so the original twist lands first. The question survives a refresh, and so does the new ending.
+- **Who the King was.** Each claim of the throne now also keeps the king it replaced, so the true ending can name him. Breaking the crown clears the remembered army: nobody is left standing on the throne's side.
+- **Soldiers notice.** After each World Crown, the longest-serving named soldier says one line about what feels wrong, in a bold, wary or warm voice that follows their personality. Twelve lines, hints only.
+- **Fix: the remembered army (v181) never recorded in real play.** It was saved after the run had already been cleared, so the final fight in a later campaign never named anyone. It is now saved at the moment of victory. Campaigns finished before this update were not recorded.
+- Short phones: the crown art steps back when the Crowns and the soldier speak, so the words fit.
