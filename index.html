@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=184"></script>
-<script src="piece-designs.js?v=184"></script>
-<script src="character-style.js?v=184"></script>
-<script src="campaign-opponents.js?v=184"></script>
-<script src="campaign-dialogue.js?v=184"></script>
-<link rel="stylesheet" href="character-style.css?v=184">
+<script src="gameplay-polish.js?v=185"></script>
+<script src="piece-designs.js?v=185"></script>
+<script src="character-style.js?v=185"></script>
+<script src="campaign-opponents.js?v=185"></script>
+<script src="campaign-dialogue.js?v=185"></script>
+<link rel="stylesheet" href="character-style.css?v=185">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,9 +2413,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=184">
-<link rel="stylesheet" href="ruler-style.css?v=184">
-<link rel="stylesheet" href="gameplay-polish.css?v=184">
+<link rel="stylesheet" href="city-board.css?v=185">
+<link rel="stylesheet" href="ruler-style.css?v=185">
+<link rel="stylesheet" href="gameplay-polish.css?v=185">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2547,6 +2547,12 @@ CARDS.push(
   {id:'pawnbroker', circuit:'midnight', name:'The Pawnbroker', cost:3, col:'#ffe14d', desc:'Get <b class="fxg">$3</b> for every Pawn in your army.'},
   {id:'loanshark',  circuit:'midnight', name:'The Loan Shark', cost:2, col:'#ffe14d', desc:'Get <b class="fxg">$12</b> now. Your next round pays no round reward.'},
   {id:'appraiser',  circuit:'midnight', name:'The Appraiser',  cost:4, col:'#ffe14d', desc:'Every capture this round also earns <b class="fxg">$1</b>.'},
+);
+// v185: identities for the wager-only Challenges. circuit:'wager' matches no Circuit, so shops, gifts and the Gauntlet never offer them.
+CARDS.push(
+  {id:'streak',  circuit:'wager', name:'The One-Two',     cost:0, col:'#ffb15c', challenge:true, desc:'<b>Challenge:</b> make 2 captures on back-to-back moves. Reward: <b>+1 Tactic</b>.'},
+  {id:'kingcap', circuit:'wager', name:'The King’s Hand', cost:0, col:'#ffe14d', challenge:true, desc:'<b>Challenge:</b> capture a piece with your King. Reward: <b>+1 Tactic</b>.'},
+  {id:'pawncap', circuit:'wager', name:'The Front Line',  cost:0, col:'#5fe08a', challenge:true, desc:'<b>Challenge:</b> make 2 captures with Pawns. Reward: <b>+1 Tactic</b>.'},
 );
 const C = id => CARDS.find(c => c.id === id);
 
@@ -3527,7 +3533,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 184;
+const GAME_VERSION = 185;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -8482,6 +8488,10 @@ const CHALLENGES = {
   strategist: {                         goal:'Don’t lose a piece',        reward:'+$8 · +1 next-round Swap', cash:8, swap:1},
   blitzer:    {moves:5, captures:3,     goal:'3 captures in 5 moves',     reward:'+150 Material',          material:150},
   recruiter:  {knightCaps:2,            goal:'2 Knight captures',         reward:'A Knight joins your army'},
+  // v185 wager-only Challenges (never sold or dealt as cards): a capture counter, optionally by piece type or in a row
+  streak:     {need:2, streak:true,     goal:'2 captures in a row',       reward:'+1 Tactic', label:'Captures in a row'},
+  kingcap:    {need:1, by:'K',          goal:'Capture a piece with your King', reward:'+1 Tactic', label:'King captures'},
+  pawncap:    {need:2, by:'P',          goal:'2 captures with Pawns',     reward:'+1 Tactic', label:'Pawn captures'},
 };
 const chalOn = () => !!(B && B.challenge && !B.challenge.done && !B.challenge.failed);
 function chalStart(id){
@@ -8507,6 +8517,9 @@ function chalAfterMove(mover, victim){
       if(betaCan('N')){ recruitAdd('N'); chalToast('Challenge complete', 'A Knight joins your army', 'ok'); }
       else { RUN.money += 4; chalToast('Challenge complete', paceOK() ? 'Army full: +$4 instead' : 'Recruit used this Circuit: +$4 instead', 'ok'); }
       save(); } }
+  if(R0.need){ const hit = !!victim && (!R0.by || !!(mover && mover.t === R0.by));   // v185: generic capture counters
+    c.n = R0.streak ? (hit ? (c.n || 0) + 1 : 0) : (c.n || 0) + (hit ? 1 : 0);
+    if(c.n >= R0.need){ c.done = true; tacGain(1, 'challenge'); chalToast('Challenge complete', R0.reward, 'ok'); } }
   save();
 }
 // after a move that didn't win: has a move window closed?
@@ -8545,8 +8558,8 @@ function chalHud(){
 // what the chip and its detail card say (one place)
 function chalState(w, wOn){
   if(chalOn()){ const c = B.challenge, R0 = CHALLENGES[c.id], left = R0.moves ? Math.max(0, R0.moves - c.used) : null;
-    const prog = c.id === 'hustler' ? `${left} left` : c.id === 'strategist' ? (B.lost ? '✗' : '✓') : c.id === 'blitzer' ? `${c.caps}/${R0.captures}` : `${c.kcaps}/${R0.knightCaps}`;
-    const status = c.id === 'hustler' ? `${left} move${left === 1 ? '' : 's'} left` : c.id === 'strategist' ? (B.lost ? 'A piece was lost' : 'No pieces lost so far') : c.id === 'blitzer' ? `Captures ${c.caps}/${R0.captures} · ${left} move${left === 1 ? '' : 's'} left` : `Knight captures ${c.kcaps}/${R0.knightCaps}`;
+    const prog = R0.need ? `${Math.min(c.n || 0, R0.need)}/${R0.need}` : c.id === 'hustler' ? `${left} left` : c.id === 'strategist' ? (B.lost ? '✗' : '✓') : c.id === 'blitzer' ? `${c.caps}/${R0.captures}` : `${c.kcaps}/${R0.knightCaps}`;
+    const status = R0.need ? `${R0.label} ${Math.min(c.n || 0, R0.need)}/${R0.need}` : c.id === 'hustler' ? `${left} move${left === 1 ? '' : 's'} left` : c.id === 'strategist' ? (B.lost ? 'A piece was lost' : 'No pieces lost so far') : c.id === 'blitzer' ? `Captures ${c.caps}/${R0.captures} · ${left} move${left === 1 ? '' : 's'} left` : `Knight captures ${c.kcaps}/${R0.knightCaps}`;
     return {name:C(c.id).name, short:C(c.id).name.replace(/^The /, ''), prog, status, goal:R0.goal, reward:R0.reward, col:C(c.id).col,
       wager: wOn ? (w.kind === 'double' ? `Double Down ${w.n - w.left + 1}/${w.n} · $${w.pay}` : `Wager · +$${w.pay}`) : ''}; }
   return {name:evWName(w), short:evWName(w), prog:w.kind === 'double' ? `${w.n - w.left + 1}/${w.n}` : `+$${w.pay}`, col:'#ffe14d',
@@ -9509,12 +9522,26 @@ function evChoose(e, o){
 }
 // v141 wager steps: choose how to prove it (Play fast · Blitzer / Play clean · Strategist), then confirm. Nothing is
 // charged before ACCEPT; each step is saved in the pending event, so a refresh comes back to the same step.
-const EV_WCH = [['blitzer', 'Play fast'], ['strategist', 'Play clean']], EV_WBASE = {blitzer:'Blitzer', strategist:'Strategist'};
+const EV_WLAB = {blitzer:'Play fast', hustler:'Play to finish', streak:'Play sharp', strategist:'Play clean', kingcap:'Play bold', pawncap:'Play small'};
+const EV_WBASE = {blitzer:'Blitzer', strategist:'Strategist', hustler:'Hustler', streak:'One-Two', kingcap:'King’s Hand', pawncap:'Front Line'};
+/* v185: a wager offers one tempo Challenge and one steady Challenge, drawn fresh each time (it used to be Blitzer or
+   Strategist every time). The pair is saved in the pending event, so a refresh shows the same two, and the same pair is
+   never offered twice running. Pawn captures are only offered to an army with at least 2 Pawns; the Gauntlet never
+   gets a move-limited one. */
+function evWagerOptions(e){
+  if(Array.isArray(e.wch) && e.wch.length === 2 && e.wch.every(id => CHALLENGES[id] && C(id) && EV_WLAB[id])) return e.wch;
+  const g = !!(RUN && RUN.gauntlet), pawns = ((RUN && RUN.roster) || []).filter(x => x && parseR(x).t === 'P').length;
+  const fast = ['blitzer', 'hustler', 'streak'].filter(id => !(g && G_MOVE_CARDS.includes(id))), steady = ['strategist', 'kingcap'].concat(pawns >= 2 ? ['pawncap'] : []);
+  const last = (RUN && RUN.wLast) || ''; let a, b, n = 0;
+  do { a = pick(fast); b = pick(steady); } while(`${a}|${b}` === last && ++n < 12);
+  e.wch = [a, b]; if(RUN) RUN.wLast = `${a}|${b}`; save();
+  return e.wch;
+}
 function evWagerChoose(e){
   const dd = e.sel.k === 'stake', st = dd ? e.v.stake : (e.v.stake || 0);
   const m = modal(`<p class="evkick">${dd ? 'Double Down' : 'Wager'} · stake $${st}</p><h2 class="evtitle">Choose your wager</h2>
     <p class="evtext">${dd ? 'Complete this Challenge once in your next 2 fights.' : 'Complete this Challenge in your next fight.'}</p>
-    <div class="evopts">${EV_WCH.map(([id, lab]) => `<button class="evopt evch" data-c="${id}"><b>${lab} · ${EV_WBASE[id]}</b><span><b>${C(id).name}</b> · ${CHALLENGES[id].goal}</span></button>`).join('')}</div>
+    <div class="evopts">${evWagerOptions(e).map(id => `<button class="evopt evch" data-c="${id}"><b>${EV_WLAB[id]} · ${EV_WBASE[id]}</b><span><b>${C(id).name}</b> · ${CHALLENGES[id].goal}</span></button>`).join('')}</div>
     <button class="btn ghost" id="evback">Back</button>`);
   m.classList.add('evmodal'); m.style.setProperty('--c2', (csDef(land(), RUN.circuit) || {}).c2 || (CIR() || {}).col);
   m.querySelector('#evback').onclick = () => { m.remove(); e.sel = null; save(); evShow(); };

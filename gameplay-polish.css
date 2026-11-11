@@ -69,9 +69,21 @@ body .screen .mc-gaunt .gstats small{font-size:10px}
 body[data-pack="street"] .pstats small,body[data-pack="street"] .play .pstats small,body[data-pack="street"] .play .tacbtn small{font-size:10px!important;line-height:11.475px!important}
 .pscore .sc small{font-size:10px!important;line-height:9.5px!important}
 .pscore .cbox small{font-size:10px!important;line-height:8.925px!important}
-.relic .rn,.play .relic .rn{font-size:10px!important;line-height:8.925px!important}
 .gmc small{font-size:10px!important;line-height:9.5px!important}
 body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4px!important}
 .combo,.lp .lk,.shd,.jslot em,.bcard.done::after,.tacrow[data-st="ready"]::after{font-size:10px!important}
 .piece-set-choice small,.character-form header small,.look-colors .character-option{font-size:10px!important}
 .training-head small{font-size:10px!important}
+
+/* v185 cover tokens: the token carries only its symbol; the name sits underneath on up to two lines, so it is never
+   cut off or squeezed inside the shape. The value tag moves to the top right, clear of the name. Fights keep the
+   compact symbol-only row. Applies to every Land's token shape. */
+:not(.play) > .relics, .relics{row-gap:0}
+#app:not(.play) .relics{padding-bottom:30px;column-gap:10px}
+#app:not(.play) .relic:not(.empty){justify-content:center!important}
+#app:not(.play) .relic .rg{width:54%!important;height:54%!important}
+#app:not(.play) .relic .fx{top:-6px;right:-7px;bottom:auto!important;font-size:12px!important;padding:2px 5px;box-shadow:0 0 0 2px #0d0d0d}
+#app:not(.play) .relic .rn{position:absolute;top:calc(100% + 7px);left:-5px;right:-5px;margin:0!important;max-width:none!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal!important;overflow:hidden;text-overflow:clip;text-align:center;font-family:var(--body,inherit);font-size:10.5px!important;font-weight:600!important;line-height:1.15!important;letter-spacing:0;color:var(--text,#eee6d6)!important;text-shadow:0 1px 2px #000a;overflow-wrap:anywhere}
+#app:not(.play) .relic.empty{aspect-ratio:1!important;height:auto!important}
+.offer .tileprev .relic .rn{display:none!important}
+

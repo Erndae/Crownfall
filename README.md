@@ -127,3 +127,11 @@ v182 was only correct while the current Land was Crown City. In the other four L
 - Left alone on purpose: the opponent's rule chips (a long chip wraps at 10px) and the stat captions in the four Lands that use the wide display face (they wrap at 10px and are already legible).
 
 Layout was compared before and after with identical seeded battles in all five Lands at 390×844, 390×664 and 320×568: 15 scenarios, 0 position or size differences in the HUD, board, info row or action row.
+
+
+## v185 — cover tokens you can read, and wagers that change
+
+- **Tokens.** On the stage and store screens a token now carries only its symbol; its name sits underneath on up to two lines, so "Tower Block" and "Switch-Up" are no longer cut off or squeezed inside the shape. The value tag moves to the top right. Every Land's token shape gets the same layout; fights keep the compact symbol-only row. (v184 had made this worse by enlarging the name inside the token; that rule is removed.)
+- **Wagers.** A wager used to offer the Blitzer or the Strategist every time. It now draws one tempo Challenge (Blitzer, Hustler or the new One-Two: 2 captures in a row) and one steady Challenge (Strategist, or the new King's Hand: capture with your King, or Front Line: 2 captures with Pawns). Nine pairings, never the same pair twice running; the pair is saved with the pending event. Front Line needs at least 2 Pawns; the Gauntlet never gets a move-limited one. The three new Challenges are wager-only: they are never sold, gifted or dealt as cards, and completing one also gives +1 Tactic.
+
+Battle layout re-checked in all five Lands at three sizes (15 scenarios, 0 differences). Validation: `node validate-v185.cjs`.
