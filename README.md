@@ -113,3 +113,8 @@ Validation: `node validate-v181.cjs`.
 ## v182 — poster title screen
 
 The title screen opens on the painted city with a larger logo and the game's motto, "Everybody wants a crown." The panel is clear behind them and fades in below. Campaign is one large crimson button (Continue Campaign when a save exists, with New Campaign beneath it); the Campaign heading remains for screen readers. Journey, Achievements, How to play and Customize share a 2 × 2 grid, and the Gauntlet card is more compact. Title screen only: no rule, save or other screen changes. Checked at 320, 390 × 664 and 390 × 844 with no horizontal overflow.
+
+
+## v183 — title screen fixes for every Land
+
+v182 was only correct while the current Land was Crown City. In the other four Lands the motto took the Land's wide display font and was cut off, and the Land's own backdrop replaced the city. The title now paints the city on its own fixed layer in every Land (also more reliable on iOS than a fixed body background), the motto keeps the condensed face, and small phones get tighter secondary buttons. Checked in all five Lands at 390 px and in the Fallen Throne at 320 and 430 px.
