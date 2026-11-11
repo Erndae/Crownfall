@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=179"></script>
-<script src="piece-designs.js?v=179"></script>
-<script src="character-style.js?v=179"></script>
-<script src="campaign-opponents.js?v=179"></script>
-<script src="campaign-dialogue.js?v=179"></script>
-<link rel="stylesheet" href="character-style.css?v=179">
+<script src="gameplay-polish.js?v=180"></script>
+<script src="piece-designs.js?v=180"></script>
+<script src="character-style.js?v=180"></script>
+<script src="campaign-opponents.js?v=180"></script>
+<script src="campaign-dialogue.js?v=180"></script>
+<link rel="stylesheet" href="character-style.css?v=180">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2413,15 +2413,15 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=179">
-<link rel="stylesheet" href="ruler-style.css?v=179">
-<link rel="stylesheet" href="gameplay-polish.css?v=179">
+<link rel="stylesheet" href="city-board.css?v=180">
+<link rel="stylesheet" href="ruler-style.css?v=180">
+<link rel="stylesheet" href="gameplay-polish.css?v=180">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
 <script>
 /* ===== CROWNFALL v151 · storage worlds =====
-   Legacy v150 keeps the original unprefixed keys (only legacy.html uses them, so every old save stays exactly as it was).
+   Legacy v150 kept the original unprefixed keys. legacy.html was retired in v180; its old saves are left untouched on the device and nothing here reads them.
    v151 Campaign lives under cf151c-*, The Gauntlet under cf151g-*: the mode is fixed before the game reads anything, and
    switching mode reloads the page, so nothing from one world can stay in memory in the other. Shared: preferences, the
    mode switch itself and the Gauntlet records (best run, history). */
@@ -3527,7 +3527,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 179;
+const GAME_VERSION = 180;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5308,7 +5308,6 @@ function title(){
     ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span></div>` : ''}
     <div class="setg three"><button class="btn ghost" id="mus">Music: ${musicOn?'On':'Off'}</button><button class="btn ghost" id="snd">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="spd">Speed: ${fast?'Fast':'Normal'}</button></div>
     ${musicControls('mvol')}
-    <a class="legacylink" id="legacy" href="legacy.html">Legacy Campaign · the original 245-battle game (v150)</a>
     <div class="gver" id="gver">Crownfall ${VERSION_LABEL()}</div>
   </section>`;
   { const c = $('#cont'); if(c) c.onclick = () => inC ? continueCampaign() : goMode('campaign', 'cont'); }

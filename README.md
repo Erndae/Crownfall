@@ -94,3 +94,8 @@ Validation: `node validate-v178.mjs`.
 The offline cache no longer downloads `legacy.html` or the five portraits only that page uses (about 2.1 MB less on first install); they still load normally online. Five files nothing referenced are removed: `icon-192.png`, `icon-512.png`, `favicon-32.png`, `apple-touch-icon.png` (byte-for-byte copies of the `cf-` icons) and `icon.svg`. No gameplay, save or art change. `legacy.html` and the root music and portraits it uses are kept.
 
 Earlier builds not listed above: v172 step-by-step capture combos; v173 capture bonus previews and run records; v174 campaign continuation between circuits; v175 stores stay available across transitions; v176 scoring defense and late-campaign guard encounters (v171's Downtown Blitz encounters were reverted).
+
+
+## v180 — Legacy Campaign retired
+
+`legacy.html` (the original 245-battle game, v150) and the title-screen link to it are removed, along with the files only it used: seven root music tracks and six old portraits. The repository drops from about 33 MB to about 20 MB. The current Campaign, the Gauntlet, Crown Match, the twelve-track soundtrack in `soundtrack/` and all current saves are unchanged. Old Legacy saves stay on the device but are no longer playable.
