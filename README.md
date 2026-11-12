@@ -201,3 +201,11 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - Move one of your pieces onto a light and you get 1 move back on the Blitz clock. If an enemy piece lands there first, you lose 1 move instead, but never your last one. Each light works once and no piece is removed.
 - Lights sit on open squares of the fifth and sixth ranks, spread across the board, never where a first pawn move reaches.
 - The opponent's intro, the stage ticket, the move preview and the fight rules all explain them. Lights are saved with the battle; fights saved before this update have none.
+
+## v196 — Crown Command retired
+
+- **Crown Command is gone.** It went unused: almost every ability only reached pieces beside the King, and it never recharged. The Command button, the ability choice after each World Crown and its tutorial are removed.
+- **World Crowns now start your fights with Tactics ready:** 1 Tactic from your first World Crown, 2 from your third. Nothing to tap or choose. Crown City and Crown Match are unchanged.
+- The land-conquered screen and the King's panel say what your Crowns give you. The guide has a short "World Crowns" section in place of the two Command sections.
+- Campaigns that had already chosen abilities, and fights saved mid-battle with Command charges, load normally; the charges are simply no longer offered. The ability code is still in the file, switched off, and can be deleted in a later cleanup.
+- Fix (since v190): on phones shorter than about 840px the land-conquered screen could push "See my crowns" off the bottom once the soldier's line was added. The crown art now steps back when the buttons arrive.

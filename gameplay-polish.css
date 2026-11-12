@@ -203,3 +203,19 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .green-light{position:absolute;inset:14%;pointer-events:none;z-index:1}.green-light svg{width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(61,220,132,.7))}
 .sq:has(.green-light){outline:2px dashed #3ddc84;outline-offset:-3px}.sq:has(.green-light) .pc{position:relative;z-index:2}
 @media (prefers-reduced-motion:no-preference){.green-light svg{animation:glpulse 1.8s ease-in-out infinite}@keyframes glpulse{50%{opacity:.62}}}
+/* v196: what a World Crown gives, shown on the land-conquered screen */
+.vict.land .vmyst .vperk{display:block;margin-top:9px;font:600 12px/1.3 var(--body);letter-spacing:.02em;color:#ffd23d}
+@media (max-height:900px){
+  /* when the buttons arrive, the crown art steps back so both buttons stay on screen (it disappears on shorter phones, below) */
+  .vict.land .vsig{transition:width .5s ease}
+  .vict.land.b6 .vsig{width:min(120px,32vw)}
+  .vict.land[data-land="street"].b6 .vsig{width:min(170px,46vw)}
+}
+@media (max-height:770px){
+  /* once the buttons arrive on a shorter phone, the crown art makes room so both buttons stay on screen */
+  .vict.land.b6 .vsig,.vict.land[data-land="street"].b6 .vsig{width:0;min-width:0;border-width:0;margin:0;padding:0;opacity:0!important;overflow:hidden}
+}
+@media (max-height:620px){
+  /* on the smallest phones the Crowns' lines (already read) and the kicker step back too */
+  .vict.land.b6 .vmyst > span:not(.vsay):not(.vperk),.vict.land.b6 .vkick{display:none}
+}

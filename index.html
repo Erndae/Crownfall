@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=195"></script>
-<script src="piece-designs.js?v=195"></script>
-<script src="character-style.js?v=195"></script>
-<script src="campaign-opponents.js?v=195"></script>
-<script src="campaign-dialogue.js?v=195"></script>
-<link rel="stylesheet" href="character-style.css?v=195">
+<script src="gameplay-polish.js?v=196"></script>
+<script src="piece-designs.js?v=196"></script>
+<script src="character-style.js?v=196"></script>
+<script src="campaign-opponents.js?v=196"></script>
+<script src="campaign-dialogue.js?v=196"></script>
+<link rel="stylesheet" href="character-style.css?v=196">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=195">
-<link rel="stylesheet" href="ruler-style.css?v=195">
-<link rel="stylesheet" href="gameplay-polish.css?v=195">
+<link rel="stylesheet" href="city-board.css?v=196">
+<link rel="stylesheet" href="ruler-style.css?v=196">
+<link rel="stylesheet" href="gameplay-polish.css?v=196">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3522,7 +3522,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 195;
+const GAME_VERSION = 196;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5333,7 +5333,7 @@ function title(){
   $('#grec').onclick = () => gRecords();
   $('#how').onclick = () => howTo(false);
   if(inC){ setTimeout(() => crownChoiceFlow(), 700);
-    if(kingTrainRefunded > 0){ const r = kingTrainRefunded; kingTrainRefunded = 0; setTimeout(() => showTip(`<b>King Training retired: +$${r} refunded</b><br>The King no longer trains. Your King grows through World Crowns and Crown Command.`), 600); }
+    if(kingTrainRefunded > 0){ const r = kingTrainRefunded; kingTrainRefunded = 0; setTimeout(() => showTip(`<b>King Training retired: +$${r} refunded</b><br>The King no longer trains. Your King grows through World Crowns.`), 600); }
     if(worldCrowns() > 0 && coachSeen().crown) coach('journey'); }
   $('#achb').onclick = () => inC ? achScreen() : goMode('campaign', 'ach');
   $('#lands').onclick = () => inC ? landsScreen(title) : goMode('campaign', 'journey');
@@ -5505,11 +5505,9 @@ function fullGuide(){
     ${sec('Castling & en passant', `
       <p><b>Castling:</b> if your King and a Rook have not moved, the squares between them are empty, and the King is not in check and doesn’t move through or into check, the King may castle: it moves two squares toward the Rook, and the Rook jumps to its other side. Only a King and Rook that start the fight on their home squares can castle.</p>
       <p><b>En passant:</b> if an opposing Pawn advances two squares past a square your Pawn attacks, you may capture it on your very next turn as though it had moved only one square.</p>`)}
-    ${sec('World Crowns & Crown Command', `
-      <p>Each World Crown grants <b>+1 Crown Command</b> every fight and lets you choose one <b>permanent Crown ability</b> for this campaign. Crown City is played without Command; it unlocks with your first World Crown.</p>
-      <p><b>Build your Crownrunner.</b> Every Crown offers an Offensive, a Defensive and a Support ability. Choose freely: specialize in one style or mix them.</p>
-      <p>Each ability costs 1 Command and doesn’t use your move. <b>Only one Crown ability per turn.</b> Command does not recharge during battle, and unused Command doesn’t carry over. Abilities normally reach pieces within ${CMD_RADIUS} squares of your King.</p>`)}
-    ${sec('Crown Powers', BASE_LANDS.map(l => `<p style="margin:8px 0 2px"><b>${landCrownName(l)}</b>${crownPower(l) ? ` · <span class="fxg">you chose ${CMD_INFO[crownPower(l)].name}</span>` : ''}</p><div class="tacrules">${['offensive','defensive','support'].map(r => { const k = CROWN_POWERS[l][r]; return `<b>${CMD_INFO[k].name} · ${ROLE_NAME[r]}</b><span>${CMD_INFO[k].desc}</span>`; }).join('')}</div>`).join(''))}
+    ${sec('World Crowns', `
+      <p>Each Land you conquer gives you its <b>World Crown</b>. World Crowns start every fight with <b>Tactics ready</b>: 1 Tactic from your first Crown, 2 from your third. Crown City is played without them.</p>
+      <p>Four World Crowns open the road to the Fallen Throne.</p>`)}
     ${sec('Crowns', `
       <p>Each of the four Lands has one <b>World Crown</b>. Conquer the Land’s four circuits in order, then defeat its <b>Ruler</b> to claim it. That conquers the Land and opens the next one.</p>
       <p>Collect all 4 <b>World Crowns</b> to open The Fallen Throne.</p>`)}
@@ -5521,7 +5519,7 @@ function fullGuide(){
       <p>After a round, tap <b>Review the round</b> to step through every move.</p>`)}
     ${sec('Building your army', `
       <p>Win money, then buy <b>${UI.tiles}</b> that bend the rules (hold up to 5), new pieces, and training that levels up a piece type (up to Level ${LV_MAX}).</p>
-      <p><b>Training:</b> train your Pawns, Knights, Bishops, Rooks and Queens to improve your army’s scoring potential. The King does not train. Your King grows through World Crowns and Crown Command.</p>
+      <p><b>Training:</b> train your Pawns, Knights, Bishops, Rooks and Queens to improve your army’s scoring potential. The King does not train. Your King grows through World Crowns.</p>
       <p><b>Armored:</b> some ${UI.tiles.toLowerCase()} give a piece armor, so it can survive multiple captures. The number on the piece shows how many hits it can take. A King that attacks an Armored piece breaks one layer and is knocked back. When an Armored piece gives check, all of its Armor breaks at once (<b>Armor broken · Check</b>): the piece stays on the board, the opponent answers the check normally, and from then on it can be captured like any other piece.</p>
       <p><b>Traps:</b> a trap ${UI.tile.toLowerCase()} lets you tap it during a round to hide a trap on the board.</p>
       <p><b>Promotion:</b> when a Pawn reaches the farthest rank, promote it to a Queen, Rook, Bishop or Knight. The promoted piece becomes part of your army. Queen is usually strongest, but another piece can sometimes create a better tactic.</p>
@@ -5859,6 +5857,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
     B.aiRef = CFAI.material(B.board); if(!RUN.gauntlet || MATCH || gOpeningOK()) break; (window.__gOpen = window.__gOpen || []).push(RUN.gWave); }
   B.startVal = enemyValue(B.board);
   B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; B.cmd = null; cmdState(); crInit();   // castling rights for this fight's own King/Rook pairs
+  B.tac.n = crownTactics();   // v196: World Crowns start the fight with Tactics ready (not counted as earned)
   cpChallenge();   // v134: some Circuits open with a free existing Challenge
   evStartFight();   // v139: next-fight event effects (once)
   B.roll = window.__noRoll ? {state:'done', first:'me', me:6, en:1, ties:[]} : {state:'pending'};   // Initiative Roll: who moves first (once per fight)   // Crown Command: full every fight
@@ -5924,7 +5923,7 @@ function playBlind(resumed){
   else {
     if(!resumed && curPersona()) later(() => { if(!(B && B.introSaid)) say('intro', true); }, boss && !boss.ruler ? 1750 : 1300);   // v132: after the name card (v154: the card already carries the line)
     if(resumed && B.promoPending) later(() => { if(B && B.promoPending && !busy) resumePromo(); }, 500);   // a promotion choice was open
-    if(!resumed && !MATCH && !coachSeen().command && baseCrowns() > 0 && !crownChoicesDue().length) later(() => { if(B && !B.done && !busy && !document.querySelector('.modal') && !coachSeen().command){ coachMark('command'); cmdRules(); } }, 2600);   // first time Command is introduced (after the first win)
+    if(CROWN_COMMAND && !resumed && !MATCH && !coachSeen().command && baseCrowns() > 0 && !crownChoicesDue().length) later(() => { if(B && !B.done && !busy && !document.querySelector('.modal') && !coachSeen().command){ coachMark('command'); cmdRules(); } }, 2600);   // first time Command is introduced (after the first win)
     if(!resumed && !(boss && !boss.ruler && !MATCH)) later(() => brilliant(MATCH ? 'Crown Match' : rulerRoad() ? 'The Ruler’s Road' : stageName(RUN.ante)), 250);   // (Rivals/Bosses get their name card instead)
     if(resumed) later(() => { if(B && B.pendingWin && !B.done && !busy && !document.querySelector('.modal')){ busy = true; return enemyPhase(-1); } if(B && !B.done && !busy && !document.querySelector('.modal') && loneKing()) return loneKingDefeat(); if(B && !B.done && !busy && !document.querySelector('.modal') && !canPlay()) gameOver(inCheck(B.board, 'me') ? 'Checkmate. Your King is trapped.' : 'Stalemate. You have no legal moves left.'); }, 700);   // a saved dead position
   }
@@ -7577,7 +7576,7 @@ function kingTrainMigrate(){
   kingTrainRefunded += live;
   return live;
 }
-const kingLvCell = () => `<div class="lv">${pieceSVG('K','me')}<div><b>King</b><br><span class="muted">Crown Command</span></div></div>`;   // v142: no King XP / Level
+const kingLvCell = () => `<div class="lv">${pieceSVG('K','me')}<div><b>King</b><br><span class="muted">World Crowns</span></div></div>`;   // v142: no King XP / Level
 /* ---------- CROWN COMMAND (v108): World Crown ability builds ----------
    Command per fight = World Crowns owned (0-4). Each World Crown offers an Offensive, Defensive and Support ability;
    the player picks one per Crown for the whole campaign (ACH.cpow_<land>, a campaign key: kept through refresh,
@@ -7607,8 +7606,14 @@ const CMD_INFO = {
 const CMD_COST = Object.fromEntries(Object.keys(CMD_INFO).map(k => [k, 1]));
 const cpowKey = l => 'cpow_' + l;
 const crownPower = l => { const k = ACH[cpowKey(l)]; return k && CMD_INFO[k] ? k : null; };
-const crownCmdMax = () => MATCH ? 0 : baseCrowns();                                    // 0-4 World Crowns → 0-4 Command
-const crownChoicesDue = () => BASE_LANDS.filter(l => landWon(l) && !crownPower(l));
+/* v196: Crown Command is retired. It went unused: almost every ability only reached pieces beside the King. World Crowns now
+   start each fight with Tactics ready instead (crownTactics). The ability code below is kept inert so fights and campaigns
+   saved before v196 still load; nothing can open it. */
+const CROWN_COMMAND = false;
+const crownCmdMax = () => CROWN_COMMAND && !MATCH ? baseCrowns() : 0;
+const crownTactics = () => MATCH ? 0 : Math.min(TAC_MAX, Math.ceil(baseCrowns() / 2));   // 1 Tactic with the first World Crown, 2 with the third
+const crownTacticsText = n => n ? `Fights start with ${n} Tactic${n > 1 ? 's' : ''} ready` : 'World Crowns start your fights with Tactics ready';
+const crownChoicesDue = () => CROWN_COMMAND ? BASE_LANDS.filter(l => landWon(l) && !crownPower(l)) : [];
 const myPowers = () => BASE_LANDS.map(crownPower).filter(Boolean);
 let choiceOpen = false;
 // one Crown Choice screen per World Crown owned without a choice, in Land order; never auto-picks
@@ -7680,6 +7685,7 @@ function cmdMenu(){
   if(busy || !B || B.done || pending !== null) return;
   if(cmdMode){ return cmdCancel(); }
   const c = cmdState();
+  if(!CROWN_COMMAND) return;
   if(!c.max){ showTip('<b>Crown Command · Locked</b><br>Claim a World Crown to unlock Crown Command.'); return; }
   if(crownChoicesDue().length) return crownChoiceFlow(cmdMenu);
   if(!coachSeen().command){ coachMark('command'); return cmdRules(cmdMenu); }
@@ -8390,7 +8396,7 @@ async function playScore(res, at, capture = false){
 const MOVES_TXT = {P:'Moves forward, captures diagonally', N:'Jumps in an L shape', B:'Slides diagonally', R:'Slides straight', Q:'Slides any direction', K:'One square any direction'};
 function pieceInfo(p){
   const el = $('#pinfo'); if(!el) return;
-  const cmdBtn = () => { if(MATCH) return ''; const c = cmdState(); return `<button class="btn cmdbtn${cmdMode ? ' on' : ''}${c.max ? '' : ' locked'}" id="cmdBtn" aria-label="Crown Command"><small>${cmdMode ? 'Cancel' : 'Command'}</small><span class="cmdpips">${c.max ? cmdPips(c) : '🔒'}</span></button>`; };
+  const cmdBtn = () => { if(MATCH || !CROWN_COMMAND) return ''; const c = cmdState(); return `<button class="btn cmdbtn${cmdMode ? ' on' : ''}${c.max ? '' : ' locked'}" id="cmdBtn" aria-label="Crown Command"><small>${cmdMode ? 'Cancel' : 'Command'}</small><span class="cmdpips">${c.max ? cmdPips(c) : '🔒'}</span></button>`; };
   const bindCmd = () => { const b = el.querySelector('#cmdBtn'); if(b) b.onclick = e => { e.stopPropagation(); cmdMenu(); }; };
   if(!p){ el.className = 'pinfo idle'; el.innerHTML = `<span class="muted">Tap any piece to see its level and powers</span>${B && !B.done ? cmdBtn() : ''}`; bindCmd(); return; }
   const T0 = TYPE[p.t];
@@ -8399,7 +8405,7 @@ function pieceInfo(p){
     el.className = 'pinfo kingp'; el.style.setProperty('--pc', 'var(--brass)');
     el.innerHTML = `<span class="pi">${pieceSVG('K','me',p.e)}</span><div class="pt"><b><span data-character-name>You</span> <span class="lvtag">King</span></b>
       <span class="cs">World Crowns ${baseCrowns()}/${WORLD_TOTAL}</span>
-      <span class="cs">${c.max ? `Crown Command <span class="cmdpips">${cmdPips(c)}</span> ${c.left}/${c.max}` : 'Crown Command · <b>Locked</b>: claim a World Crown'}</span></div>${cmdBtn()}`;
+      <span class="cs">${CROWN_COMMAND ? (c.max ? `Crown Command <span class="cmdpips">${cmdPips(c)}</span> ${c.left}/${c.max}` : 'Crown Command · <b>Locked</b>: claim a World Crown') : crownTacticsText(crownTactics())}</span></div>${cmdBtn()}`;
     el.querySelector('[data-character-name]').textContent=CrownfallCharacter.get().name;
     bindCmd(); return;
   }
@@ -8502,7 +8508,7 @@ async function targetCard(i){
   }
   if(p.side !== 'me' || (c.target === 'pawn' && p.t !== 'P') || (c.id === 'alchemist' && p.t === 'K')){ sfx.bad(); return; }
   if(c.id === 'wizard'){ B.board[i] = {...p, t:'Q'}; keepPromotion(B.board[i], i, 'card'); logPos(`Card: ${c.name} makes a Queen`, i, i, 'fx'); }
-  if(c.id === 'mentor' && p.t === 'K'){ sfx.bad(); showTip('<b>The King does not train</b><br>Your King grows through World Crowns and Crown Command. Tap another piece.'); return; }
+  if(c.id === 'mentor' && p.t === 'K'){ sfx.bad(); showTip('<b>The King does not train</b><br>Your King grows through World Crowns. Tap another piece.'); return; }
   if(c.id === 'mentor'){ if(effLv(p.t) >= LV_MAX){ sfx.bad(); showTip(`<b>${TYPE[p.t].name}: MAX LEVEL</b><br>Tap a piece whose type can still train.`); return; } RUN.lv[p.t] = effLv(p.t) + 1; pop(i, `${TYPE[p.t].name} Lv.${RUN.lv[p.t]}`, 'fxc'); }
   if(c.id === 'alchemist'){ const have = eList(p.e);
     if(have.length >= MAX_POWERS){ sfx.bad(); showTip(`<b>That piece is full</b><br>A piece can hold up to ${MAX_POWERS} enhancements. Pick another piece.`); return; }
@@ -9298,7 +9304,7 @@ async function landConquered(l){
   // v143: the Crowns react to one another before the ability choice (first claim only; this screen only plays then)
   { const M = CROWN_MYST[Math.min(n, WORLD_TOTAL) - 1]; const vm = ov.querySelector('.vmyst');
     if(M && vm){ const S = crownSay(n);
-      vm.innerHTML = M.map(x => `<span>${x}</span>`).join('') + (S ? `<span class="vsay"><b>${S.who}</b>“${S.line}”</span>` : ''); beat('bm');
+      vm.innerHTML = M.map(x => `<span>${x}</span>`).join('') + (S ? `<span class="vsay"><b>${S.who}</b>“${S.line}”</span>` : '') + `<span class="vperk">${crownTacticsText(crownTactics())}</span>`; beat('bm');   // v196: what the Crown gives, in place of the ability choice
       for(let t = 900 + (M.join(' ') + (S ? S.line : '')).length * 38; t > 0 && !T.skipped(); t -= 700) await T.wait(Math.min(700, t)); } }   // (full reading time under reduced motion too)
   // v130: the Crown's permanent ability is chosen right here, over the ceremony (same choice, same rule: one of three, for good)
   if(crownChoicesDue().length) await new Promise(res => crownChoiceFlow(res));
@@ -10418,7 +10424,7 @@ function trainPanelHTML(inShop){
 }
 function bindTraining(root, redraw){ root.querySelectorAll('[data-train]').forEach(b => b.onclick = () => { if(buyTraining(b.dataset.train)) redraw(); }); }
 function trainingModal(after){
-  const m = modal(`<h2>${UI.training}</h2><p class="muted" style="margin:0;font-size:13px">Permanent: every piece of that type scores more from now on. Upgrades count from your next fight. The King does not train: it grows through World Crowns and Crown Command.</p><div id="tpbox">${trainPanelHTML()}</div><button class="btn" id="tpdone">Done</button>`, '#tpdone', after);
+  const m = modal(`<h2>${UI.training}</h2><p class="muted" style="margin:0;font-size:13px">Permanent: every piece of that type scores more from now on. Upgrades count from your next fight. The King does not train: it grows through World Crowns.</p><div id="tpbox">${trainPanelHTML()}</div><button class="btn" id="tpdone">Done</button>`, '#tpdone', after);
   const draw = () => { const box = m.querySelector('#tpbox'); box.innerHTML = trainPanelHTML(); bindTraining(box, draw); };
   bindTraining(m, draw);
 }
