@@ -240,3 +240,8 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 
 - **Store screens (iPhone home-screen app):** the store header left an empty dark band above its Back button, because it added the status-bar space a second time. It showed up once the Land's picture became visible in v194. The header now sits right under the status area and stays there when the store scrolls.
 - **Card names under the board:** a long name such as "Zeus's Thunderbolt" was cut off at both ends. Names now wrap to two lines and shrink until they fit their button, in every Land's lettering. Button size is unchanged.
+
+## v202 — two more display fixes
+
+- **Store:** a long restock label ("Conjure new wares · $5" in the Shattered Realm) ran out of its button into Next round and lost its price. It now wraps to two lines.
+- **World Crown and victory screens (iPhone home-screen app):** these started inside the status area, so the top line ("World Crown acquired") read blurred. They now start below it, and the crown art steps back a little more when the buttons arrive so both stay on screen.

@@ -158,6 +158,9 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
   .modal{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade))!important}
   .modal.journey{padding-top:0!important}
   .modal.journey > .box{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 14px)!important}
+  /* v202: the victory and World Crown screens started inside the status band, so their top line read blurred */
+  .vict{padding-top:calc(env(safe-area-inset-top,0px) + var(--topfade) + 8px)!important}
+  .vict.land.b6 .vsig{width:min(84px,24vw)!important}   /* the screen is shorter here, so the art steps back a little more when the buttons arrive */
   /* v201: the store header added the safe area a second time, leaving an empty dark band above its title.
      It now sits right under the status band, and stays there when the store scrolls. */
   .shophead{padding-top:8px!important;top:calc(env(safe-area-inset-top,0px) + var(--topfade))!important}
@@ -262,3 +265,7 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 /* v201: card names under the board wrap to two lines and shrink to fit (renderCards sizes them), instead of being cut at both ends */
 .gmc .gmn{display:block;max-width:100%;white-space:normal;text-align:center;line-height:1.02;letter-spacing:0}
 .play .actions .gmc{max-height:44px;justify-content:center}
+/* v202: the store's restock button wraps to two lines when a Land's name for it is long, instead of running into Next round */
+.shopfoot #reroll{white-space:normal;line-height:1.1;overflow-wrap:break-word;text-wrap:balance;font-size:13px}
+.shopfoot #next{line-height:1.05}
+@media (max-width:340px){.shopfoot #reroll{font-size:12px}.shopfoot #next{font-size:18px}}
