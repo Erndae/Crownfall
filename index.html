@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=198"></script>
-<script src="piece-designs.js?v=198"></script>
-<script src="character-style.js?v=198"></script>
-<script src="campaign-opponents.js?v=198"></script>
-<script src="campaign-dialogue.js?v=198"></script>
-<link rel="stylesheet" href="character-style.css?v=198">
+<script src="gameplay-polish.js?v=199"></script>
+<script src="piece-designs.js?v=199"></script>
+<script src="character-style.js?v=199"></script>
+<script src="campaign-opponents.js?v=199"></script>
+<script src="campaign-dialogue.js?v=199"></script>
+<link rel="stylesheet" href="character-style.css?v=199">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=198">
-<link rel="stylesheet" href="ruler-style.css?v=198">
-<link rel="stylesheet" href="gameplay-polish.css?v=198">
+<link rel="stylesheet" href="city-board.css?v=199">
+<link rel="stylesheet" href="ruler-style.css?v=199">
+<link rel="stylesheet" href="gameplay-polish.css?v=199">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3561,7 +3561,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 198;
+const GAME_VERSION = 199;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -7037,6 +7037,30 @@ function toggleSwap(){
   $('#hand').textContent = swapMode ? 'Swap: tap the first of your pieces' : 'Tap a piece, then a target';
   $('#swapBtn').classList.toggle('red', swapMode); $('#swapBtn').textContent = swapMode ? 'Cancel' : `Swap (${B.swaps})`;
 }
+/* v199 Board key: a reminder of what the marks on the board do. boardMarks() lists the ones in this fight right now.
+   Tap an empty marked square for its reminder, tap a marked or Armored enemy to read it in the info bar, or open the
+   Board key button in the idle info bar for the whole list. Nothing here changes the rules. */
+const BK_ICON = {
+  light:'<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0f2a1c" stroke="#0d0d0d" stroke-width="2"/><circle cx="20" cy="20" r="9" fill="#3ddc84"/><path d="M15 21L20 14L25 21M20 14.5V27" fill="none" stroke="#0d2a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  crate:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 11H33V31H7Z" fill="#ffb347" stroke="#0d0d0d" stroke-width="2.5"/><path d="M9 13L31 29M31 13L9 29M7 21H33" stroke="#0d0d0d" stroke-width="2.5"/></svg>',
+  guard:'<span class="bk-glyph" style="color:#ff5a72">⛨</span>',
+  armor:'<span class="bk-glyph" style="color:#6fb7ff">⛊</span>',
+  trap:'<span class="bk-glyph" style="color:#ffd23d">✸</span>',
+};
+function boardMarks(){
+  if(!B || !Array.isArray(B.board)) return [];
+  const out = [], n = k => (B[k] || []).length, g = guardsLeft();
+  if(n('lights')) out.push({k:'light', name:`Green light${n('lights') > 1 ? 's' : ''} · ${n('lights')} left`, text:'Move one of your pieces onto it and get <b>1 move back</b> on the Blitz clock. If an enemy piece gets there first, you <b>lose 1 move</b> (never your last one). Each works once.'});
+  if(n('crates')) out.push({k:'crate', name:`Crate trap${n('crates') > 1 ? 's' : ''} · ${n('crates')} left`, text:'Land one of your pieces on it and you <b>lose up to $2</b>. If an enemy piece lands on it, you <b>gain $2</b>. Each works once, and no piece is removed.'});
+  if(g) out.push({k:'guard', name:`Marked defender${g > 1 ? 's' : ''} · ${g} left`, text:'Enemy pieces with a shield mark. <b>Capture them all</b>, then reach the score target to win. Checkmate still wins at once.'});
+  if(n('trapSq')) out.push({k:'trap', name:`Your ${R('trap').name}`, text:'Hidden by you. The first enemy piece to land there (not the King) is either <b>destroyed</b> for 3× its value or <b>turns to your side</b> for the round.'});
+  if(B.board.some(p => p && p.sh > 0)) out.push({k:'armor', name:'Armor', text:'A shield with a number on a piece. It <b>blocks that many captures</b> against the piece. Your own Armor is off while that piece is giving check.'});
+  return out;
+}
+const boardMarkAt = i => { if(!B) return ''; const k = (B.lights || []).includes(i) ? 'light' : (B.crates || []).includes(i) ? 'crate' : (B.trapSq || []).includes(i) ? 'trap' : ''; const m = k && boardMarks().find(x => x.k === k);
+  return m ? `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${{light:'Green light', crate:'Crate trap'}[k] || m.name} on ${sqName(i)}</b><br>${m.text}</span></span>` : ''; };
+function boardKey(){ const L = boardMarks(); if(!L.length) return;
+  showTip('<b>Board key</b>' + L.map(m => `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${m.name}</b><br>${m.text}</span></span>`).join('')); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = setTimeout(hideTip, 12000); } }
 async function tapSquare(i){
   if(busy || !B || B.done || document.body.classList.contains('peeking')) return;
   const p = B.board[i];
@@ -7080,6 +7104,7 @@ async function tapSquare(i){
     return;
   }
   if(!busy && mateNow()) return;                                            // v156
+  if(!p && !swapMode && !(sel !== null && legalMoves(sel).includes(i))){ const mk = boardMarkAt(i); if(mk){ showTip(mk); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = setTimeout(hideTip, 9000); } return; } }   // v199: what this mark does
   if(sel !== null && legalMoves(sel).includes(i)){
     if(confirmMoves()){previewMove(sel,i);return;}
     const from=sel;movePreview=null;pieceInfo(null);await doMove(from,i);return;
@@ -8438,7 +8463,9 @@ function pieceInfo(p){
   const el = $('#pinfo'); if(!el) return;
   const cmdBtn = () => { if(MATCH || !CROWN_COMMAND) return ''; const c = cmdState(); return `<button class="btn cmdbtn${cmdMode ? ' on' : ''}${c.max ? '' : ' locked'}" id="cmdBtn" aria-label="Crown Command"><small>${cmdMode ? 'Cancel' : 'Command'}</small><span class="cmdpips">${c.max ? cmdPips(c) : '🔒'}</span></button>`; };
   const bindCmd = () => { const b = el.querySelector('#cmdBtn'); if(b) b.onclick = e => { e.stopPropagation(); cmdMenu(); }; };
-  if(!p){ el.className = 'pinfo idle'; el.innerHTML = `<span class="muted">Tap any piece to see its level and powers</span>${B && !B.done ? cmdBtn() : ''}`; bindCmd(); return; }
+  if(!p){ const marks = B && !B.done ? boardMarks() : [];
+    el.className = 'pinfo idle'; el.innerHTML = `<span class="muted">${marks.length ? 'Tap a piece or a mark to see what it does' : 'Tap any piece to see its level and powers'}</span>${marks.length ? `<button class="btn ghost keybtn" id="keyBtn" aria-label="Board key: what the marks on the board do">Board key</button>` : ''}${B && !B.done ? cmdBtn() : ''}`; bindCmd();
+    const kb = el.querySelector('#keyBtn'); if(kb) kb.onclick = e => { e.stopPropagation(); boardKey(); }; return; }
   const T0 = TYPE[p.t];
   if(p.side === 'me' && p.t === 'K' && !MATCH){                       // the Crownrunner
     const c = cmdState();
@@ -8464,7 +8491,7 @@ function pieceInfo(p){
     const val = p.t === 'P' && RULE('wall') ? 0 : T0.val;
     el.className = 'pinfo enemy'; el.style.setProperty('--pc', '#ff5a72');
     el.innerHTML = `<span class="pi">${pieceSVG(p.t,'en')}</span><div class="pt"><b>${fallenNameOf(p) ? (p.t === 'K' ? `Enemy King · once ${fallenNameOf(p)}` : `${fallenNameOf(p)} · Enemy ${T0.name}`) : `Enemy ${T0.name}`}</b>
-      <span>${p.t === 'K' ? 'Can’t be captured. Give <b>check</b> to score, <b>checkmate</b> to win.' : `Worth <b class="fxc">+${val} Material</b> when you capture it`}</span>
+      <span>${p.t === 'K' ? 'Can’t be captured. Give <b>check</b> to score, <b>checkmate</b> to win.' : `${B && B.guardIds?.includes(p.id) ? '<b class="fxm">Marked defender</b> · capture to unlock the score win · ' : ''}${p.sh > 0 ? `<b class="fxg">Armored</b> · blocks ${p.sh} capture${p.sh > 1 ? 's' : ''} · ` : ''}Worth <b class="fxc">+${val} Material</b>${B && B.guardIds?.includes(p.id) || p.sh > 0 ? '' : ' when you capture it'}`}</span>
       <span class="ab">${MOVES_TXT[p.t]}</span></div>`;
   }
 }

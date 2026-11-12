@@ -221,3 +221,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **A story beat after every circuit.** The circuit-cleared screen now adds one or two sentences each time you conquer a circuit for the first time. They follow how many of the Land's circuits are yours (you can win them in any order) and build toward its Ruler, who arrives on the fourth: Vex's black car at the curb, Aldric seated with his sword, Athena waiting on your move, Morwen walking beside you. The Fallen Throne's beats hint and never name what sits there.
 - Twenty beats, four per Land. Replaying a cleared circuit, or a Land you already hold, shows none.
 - On short phones the art shrinks and the reminder line steps aside so the button stays on screen.
+
+## v199 — Board key: reminders for the marks on the board
+
+- **Tap a mark.** Tapping an empty marked square (a green light, a crate trap, your own hidden trap) shows what it does. Moving onto it still works the same: select a piece first and it is a move.
+- **Board key button.** When a fight has marks, the info bar under the board reads "Tap a piece or a mark to see what it does" and shows a **Board key** button listing every mark in that fight with its picture, how many are left and what it does: green lights, crate traps, marked defenders, your trap and Armor.
+- **Marked and Armored enemies.** Tapping one now says so in the info bar.
+- Fights with no marks look exactly as before. Rules are unchanged.

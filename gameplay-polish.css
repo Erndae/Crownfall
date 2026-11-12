@@ -246,3 +246,9 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
   .ccmodal:has(.ccstory) .muted{display:none}
 }
 @media (max-height:600px){ .ccmodal:has(.ccstory) .ceremony{display:none} }
+/* v199: Board key */
+.pinfo.idle .keybtn{flex:none;width:auto;margin:0;padding:6px 10px;font-size:12px;min-height:34px;white-space:nowrap}
+.pinfo.idle:has(.keybtn){justify-content:space-between}.pinfo.idle:has(.keybtn) .muted{flex:1 1 auto;min-width:0;font-size:12px;line-height:1.25;text-align:left}
+.tip .bk-row{display:flex;gap:10px;align-items:flex-start;margin-top:9px;text-align:left}
+.tip .bk-ic{flex:none;width:28px;height:28px;display:grid;place-items:center;font-style:normal}.tip .bk-ic svg{width:28px;height:28px}
+.tip .bk-glyph{font-size:22px;line-height:1}
