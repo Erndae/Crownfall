@@ -235,3 +235,8 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Midnight Market: Bounty.** From stage 2, the most valuable enemy piece wears a **$** tag. Capture it for +$3 (+$4 at the Circuit Boss). Every time it captures one of your pieces, you lose $1.
 - Both appear in every Land, are explained in the opponent’s intro, on the stage ticket, in the move preview and the fight rules, and are listed in the Board key during the fight. Both are saved with the battle.
 - With Downtown's Green Lights and Harbor's Crate traps, all four circuits now have something on the board.
+
+## v201 — two display fixes
+
+- **Store screens (iPhone home-screen app):** the store header left an empty dark band above its Back button, because it added the status-bar space a second time. It showed up once the Land's picture became visible in v194. The header now sits right under the status area and stays there when the store scrolls.
+- **Card names under the board:** a long name such as "Zeus's Thunderbolt" was cut off at both ends. Names now wrap to two lines and shrink until they fit their button, in every Land's lettering. Button size is unchanged.
