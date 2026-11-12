@@ -237,3 +237,12 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .passage.calm,.passage.calm img,.passage.calm .pa-txt p,.passage.calm .pa-txt .btn{animation:none;transition:none}
 @media (max-height:600px){.passage .pa-txt{gap:8px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}.passage .pa-txt p{font-size:15px;line-height:1.4}}
 @media (max-height:700px){.passage .pa-shade{background:linear-gradient(180deg,rgba(11,10,13,.3),rgba(11,10,13,.62) 26%,rgba(11,10,13,.9) 50%,rgba(11,10,13,.97))}}
+/* v198: the story beat on the circuit-cleared screen */
+.ccmodal .ccstory{margin:2px 0;padding:10px 12px;border-left:3px solid var(--brass,#e6b85c);background:rgba(255,255,255,.05);font:italic 14.5px/1.45 var(--body);color:#f1ece2;text-align:left}
+@media (max-height:600px){.ccmodal .ccstory{font-size:13.5px;padding:8px 10px}}
+@media (max-height:700px){
+  /* with a story beat on a short phone, the art shrinks and the reminder line steps aside so the button stays on screen */
+  .ccmodal:has(.ccstory) .ceremony{height:60px!important}
+  .ccmodal:has(.ccstory) .muted{display:none}
+}
+@media (max-height:600px){ .ccmodal:has(.ccstory) .ceremony{display:none} }

@@ -215,3 +215,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **A short story between Lands.** The first time you reach a newly opened Land, a passage tells how you got there: four lines over the Land you are leaving, which fades into the one ahead, then "Enter The Iron Kingdom". The Crowns pull you on like a compass, each road further in. Hints only.
 - Four passages: Crown City to the Iron Kingdom, on to the Olympian Court, to the Shattered Realm, and the climb to the Fallen Throne.
 - Shown once per campaign, however you arrive (the Continue button, the Lands screen or reopening the game). Tap moves to the next line. A Land you are already playing is not re-introduced. Reduced motion shows all four lines at once.
+
+## v198 — the story inside each Land
+
+- **A story beat after every circuit.** The circuit-cleared screen now adds one or two sentences each time you conquer a circuit for the first time. They follow how many of the Land's circuits are yours (you can win them in any order) and build toward its Ruler, who arrives on the fourth: Vex's black car at the curb, Aldric seated with his sword, Athena waiting on your move, Morwen walking beside you. The Fallen Throne's beats hint and never name what sits there.
+- Twenty beats, four per Land. Replaying a cleared circuit, or a Land you already hold, shows none.
+- On short phones the art shrinks and the reminder line steps aside so the button stays on screen.

@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=197"></script>
-<script src="piece-designs.js?v=197"></script>
-<script src="character-style.js?v=197"></script>
-<script src="campaign-opponents.js?v=197"></script>
-<script src="campaign-dialogue.js?v=197"></script>
-<link rel="stylesheet" href="character-style.css?v=197">
+<script src="gameplay-polish.js?v=198"></script>
+<script src="piece-designs.js?v=198"></script>
+<script src="character-style.js?v=198"></script>
+<script src="campaign-opponents.js?v=198"></script>
+<script src="campaign-dialogue.js?v=198"></script>
+<link rel="stylesheet" href="character-style.css?v=198">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=197">
-<link rel="stylesheet" href="ruler-style.css?v=197">
-<link rel="stylesheet" href="gameplay-polish.css?v=197">
+<link rel="stylesheet" href="city-board.css?v=198">
+<link rel="stylesheet" href="ruler-style.css?v=198">
+<link rel="stylesheet" href="gameplay-polish.css?v=198">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3561,7 +3561,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 197;
+const GAME_VERSION = 198;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -9688,6 +9688,31 @@ function evChalCheck(){
 }
 // a life is lost in the fight a wager is bound to: the wager is lost
 function evLoseLife(){ const w = RUN && RUN.evFx && RUN.evFx.wager; if(w && w.cur === RUN.ante * 10 + RUN.blind){ delete RUN.evFx.wager; if(window.__eLog) window.__eLog.push({k:'evlost', kind:w.kind, stake:w.stake || 0, why:'first try', chal:w.chal}); return w.kind === 'double' ? `Double Down lost · $${w.stake}.` : `Wager lost · $${w.stake || 0}.`; } return ''; }
+/* v198: the story inside each Land. Each circuit conquered for the first time adds one beat, counted by how many of the
+   Land's circuits are now yours (they can be won in any order), building toward its Ruler. Hints only for the Fallen Throne. */
+const CIRCUIT_STORY = {
+  street:  ['Word travels fast in Crown City. By nightfall, someone has painted over one of Vex’s tags with yours.',
+            'Two crews down. The corner boys stop asking who you are and start asking who you work for.',
+            'Vex’s collectors skip your block tonight. Nobody skips a block in Crown City.',
+            'The whole city has gone quiet. A black car idles at the curb with its door open. Kingpin Vex would like a word.'],
+  medieval:['A bell rings once from the keep. The soldiers on the wall turn to look at you, then turn back.',
+            'Two banners come down. In the villages, people leave bread on the road and close their doors.',
+            'The drawbridge that has stood raised for a hundred years begins, slowly, to lower.',
+            'No guard stops you at the last gate. In the great hall King Aldric is already seated, sword across his knees.'],
+  greek:   ['Somewhere above, a single owl lifts from a column and follows you from roof to roof.',
+            'Two trials passed. The statues along the stair have been turned to face the way you will come.',
+            'A place has been set for you at the high table. The cup was poured before you arrived.',
+            'The last doors open on their own. Athena does not look up from the board. She has been waiting on your move.'],
+  fantasy: ['Your shadow walks a step behind you now. It did not, this morning.',
+            'The rifts close as you pass, as if something does not want you going back.',
+            'Ravens line every broken arch. None of them makes a sound.',
+            'The dark ahead is not empty. Morwen the Shadow Queen has been walking beside you for some time.'],
+  throne:  ['The ash holds footprints. All of them lead up. None lead down.',
+            'Two gates behind you. The defenders do not shout or curse. They only look tired.',
+            'Your Crowns have stopped pulling. They are simply still, like something that has arrived.',
+            'The last stair is short. Whatever sits on the throne has not moved in all the time you have been climbing.'],
+};
+const circuitStory = (l, n, fresh, won, rebuilt) => (fresh && !won && !rebuilt && CIRCUIT_STORY[l] && CIRCUIT_STORY[l][n - 1]) || '';
 function circuitCleared(l, cid, fresh, rebuilt){
   const c = CIRCUITS.find(x => x.id === cid), n = conqCount(l), R = RULERS[l], boss = (MINIS[l] || MINIS.street)[cid], won = landWon(l), nx = nextStep(l);
   const pk = PACKS.find(x => x.id === l).name, nxName = nx === 'ruler' ? '' : CIRCUITS.find(x => x.id === nx).name;
@@ -9698,6 +9723,7 @@ function circuitCleared(l, cid, fresh, rebuilt){
     <p class="cckick">${boss} has fallen · ${fresh ? 'Circuit conquered!' : 'Circuit cleared!'}</p>
     <h2 class="cctitle" style="--cc:${c.col};--c2:${csd.c2 || c.col}">${csd.ic ? `<i class="cic">${csd.ic}&#xFE0E;</i>` : ''}${c.name}<span>Cleared</span></h2>
     <div class="ccprog" style="--lc:${R.gem}"><span class="ccpips">${pips}</span><b>${n} of ${CIRCUITS.length} ${pk} Circuits Complete</b></div>
+    ${circuitStory(l, n, fresh, won, rebuilt) ? `<p class="ccstory">${circuitStory(l, n, fresh, won, rebuilt)}</p>` : ''}
     ${rebuilt ? `<p class="rbnote"><b>Circuit 4 is cleared again.</b><br>Return to the Ruler.</p>` : ''}
     <p style="text-align:center;font-size:14px;margin:0">${rebuilt ? '' : won ? `${pk} is already yours.` : nx === 'ruler' ? `<b style="color:${R.gem}">Every circuit is yours. ${R.name} will see you now!</b>` : `Next: <b>${nxName}</b>.`}</p>
     <p class="muted" style="text-align:center;font-size:12.5px;margin:0">Your army, ${UI.tiles.toLowerCase()}, cards, money and lives come with you.</p>
