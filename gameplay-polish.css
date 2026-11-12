@@ -252,3 +252,7 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .tip .bk-row{display:flex;gap:10px;align-items:flex-start;margin-top:9px;text-align:left}
 .tip .bk-ic{flex:none;width:28px;height:28px;display:grid;place-items:center;font-style:normal}.tip .bk-ic svg{width:28px;height:28px}
 .tip .bk-glyph{font-size:22px;line-height:1}
+/* v200: Vantage points (Rooftop) and Bounty (Midnight Market) */
+.vantage-mark{position:absolute;inset:14%;pointer-events:none;z-index:1}.vantage-mark svg{width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(25,227,201,.65))}
+.sq:has(.vantage-mark){outline:2px dashed #19e3c9;outline-offset:-3px}.sq:has(.vantage-mark) .pc{position:relative;z-index:2}
+.bounty-mark{position:absolute;right:3%;top:2%;z-index:5;color:#1b1400;background:#ffe14d;border:1px solid #0d0d0d;border-radius:50%;width:clamp(14px,4.2vw,20px);height:clamp(14px,4.2vw,20px);display:grid;place-items:center;font:800 clamp(10px,3vw,14px)/1 system-ui;pointer-events:none;box-shadow:0 0 6px rgba(255,225,77,.7)}

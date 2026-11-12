@@ -228,3 +228,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Board key button.** When a fight has marks, the info bar under the board reads "Tap a piece or a mark to see what it does" and shows a **Board key** button listing every mark in that fight with its picture, how many are left and what it does: green lights, crate traps, marked defenders, your trap and Armor.
 - **Marked and Armored enemies.** Tapping one now says so in the info bar.
 - Fights with no marks look exactly as before. Rules are unchanged.
+
+## v200 — every circuit has its own encounter
+
+- **Rooftop Kings: Vantage points.** From stage 2, two squares are marked on your side of the board, three at the Circuit Boss. Only your **King** can claim one: step onto it for +1 Tactic (+1 swap when your Tactics are full). If an enemy piece lands there first, you lose 1 swap. Each works once; your other pieces can stand there without using it.
+- **Midnight Market: Bounty.** From stage 2, the most valuable enemy piece wears a **$** tag. Capture it for +$3 (+$4 at the Circuit Boss). Every time it captures one of your pieces, you lose $1.
+- Both appear in every Land, are explained in the opponent’s intro, on the stage ticket, in the move preview and the fight rules, and are listed in the Board key during the fight. Both are saved with the battle.
+- With Downtown's Green Lights and Harbor's Crate traps, all four circuits now have something on the board.
