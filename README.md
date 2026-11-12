@@ -209,3 +209,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - The land-conquered screen and the King's panel say what your Crowns give you. The guide has a short "World Crowns" section in place of the two Command sections.
 - Campaigns that had already chosen abilities, and fights saved mid-battle with Command charges, load normally; the charges are simply no longer offered. The ability code is still in the file, switched off, and can be deleted in a later cleanup.
 - Fix (since v190): on phones shorter than about 840px the land-conquered screen could push "See my crowns" off the bottom once the soldier's line was added. The crown art now steps back when the buttons arrive.
+
+## v197 — the road between Lands
+
+- **A short story between Lands.** The first time you reach a newly opened Land, a passage tells how you got there: four lines over the Land you are leaving, which fades into the one ahead, then "Enter The Iron Kingdom". The Crowns pull you on like a compass, each road further in. Hints only.
+- Four passages: Crown City to the Iron Kingdom, on to the Olympian Court, to the Shattered Realm, and the climb to the Fallen Throne.
+- Shown once per campaign, however you arrive (the Continue button, the Lands screen or reopening the game). Tap moves to the next line. A Land you are already playing is not re-introduced. Reduced motion shows all four lines at once.

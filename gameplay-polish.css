@@ -219,3 +219,21 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
   /* on the smallest phones the Crowns' lines (already read) and the kicker step back too */
   .vict.land.b6 .vmyst > span:not(.vsay):not(.vperk),.vict.land.b6 .vkick{display:none}
 }
+/* v197: the road between Lands */
+.passage{position:fixed;inset:0;z-index:95;background:#0b0a0d;display:flex;align-items:flex-end;justify-content:center;opacity:1;transition:opacity .45s;animation:pain .5s ease-out}
+@keyframes pain{from{opacity:0}}
+.passage.out{opacity:0}
+.passage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 38%;transition:opacity 2.2s ease}
+.passage .pa-to{opacity:0}.passage.turn .pa-to{opacity:1}.passage.turn .pa-from{opacity:0}
+.passage .pa-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,10,13,.35),rgba(11,10,13,.2) 30%,rgba(11,10,13,.82) 62%,rgba(11,10,13,.96))}
+.passage .pa-txt{position:relative;width:min(100%,430px);box-sizing:border-box;padding:0 26px calc(30px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.passage .pa-txt small{font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass,#e6b85c)}
+.passage .pa-txt p{margin:0;font:italic 17px/1.45 var(--body);color:#f1ece2;text-shadow:0 1px 8px #000;opacity:0;transform:translateY(6px);transition:opacity .7s ease,transform .7s ease}
+.passage .pa-txt p.on{opacity:1;transform:none}
+.passage .pa-txt .btn{margin-top:8px;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.passage.done .pa-txt .btn{opacity:1;pointer-events:auto}
+.passage .pa-tap{font:11px var(--body);letter-spacing:.08em;color:#a59f94;text-align:center;transition:opacity .4s}
+.passage.done .pa-tap{opacity:0}
+.passage.calm,.passage.calm img,.passage.calm .pa-txt p,.passage.calm .pa-txt .btn{animation:none;transition:none}
+@media (max-height:600px){.passage .pa-txt{gap:8px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}.passage .pa-txt p{font-size:15px;line-height:1.4}}
+@media (max-height:700px){.passage .pa-shade{background:linear-gradient(180deg,rgba(11,10,13,.3),rgba(11,10,13,.62) 26%,rgba(11,10,13,.9) 50%,rgba(11,10,13,.97))}}

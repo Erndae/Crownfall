@@ -15,7 +15,7 @@ window.__storeTest={
  setup(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.money=172;RUN.ante=2;B=null;genShop();shop();},
  state:()=>JSON.stringify({shop:RUN.shop,money:RUN.money,roster:RUN.roster,restocks:RUN.restocks,ante:RUN.ante,land:RUN.land}),
  resume(){loadRun();continueCampaign();},
- carry(nextLand){storeCarry();clearRun();if(nextLand) {ACH[landCrownId('street')]=1;saveAch();}circuitSelect(nextLand||'street');},
+ carry(nextLand){storeCarry();clearRun();if(nextLand) {ACH[landCrownId('street')]=1;saveAch();localStorage.setItem(PASSAGE_KEY,JSON.stringify({ep:ACH.campaign_epoch||0,seen:[nextLand]}));/* v197: the road passage has its own test */}circuitSelect(nextLand||'street');},
  run:()=>({land:RUN.land,money:RUN.money,inShop:RUN.inShop,carried:RUN.carried})
 };`;
 for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi))if(!/src=/.test(m[1])){let s=m[2];if(s.includes('const GAME_VERSION')){const at=s.lastIndexOf('})();');s=s.slice(0,at)+bridge+s.slice(at);}window.eval(s);}

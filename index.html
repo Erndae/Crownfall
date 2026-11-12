@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=196"></script>
-<script src="piece-designs.js?v=196"></script>
-<script src="character-style.js?v=196"></script>
-<script src="campaign-opponents.js?v=196"></script>
-<script src="campaign-dialogue.js?v=196"></script>
-<link rel="stylesheet" href="character-style.css?v=196">
+<script src="gameplay-polish.js?v=197"></script>
+<script src="piece-designs.js?v=197"></script>
+<script src="character-style.js?v=197"></script>
+<script src="campaign-opponents.js?v=197"></script>
+<script src="campaign-dialogue.js?v=197"></script>
+<link rel="stylesheet" href="character-style.css?v=197">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=196">
-<link rel="stylesheet" href="ruler-style.css?v=196">
-<link rel="stylesheet" href="gameplay-polish.css?v=196">
+<link rel="stylesheet" href="city-board.css?v=197">
+<link rel="stylesheet" href="ruler-style.css?v=197">
+<link rel="stylesheet" href="gameplay-polish.css?v=197">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2833,6 +2833,45 @@ const LAND_CHAPTER = {
   fantasy: {d:'A broken world of rifts, shadows and monsters. Nothing here moves the way it should.', h:'Some enemies move twice in one turn. Leave nothing hanging. {R} rules the dark.'},
   throne:  {d:'The road ends at a ruined throne. Every Crown you have carried led you here.', h:'Its defenders bring full armies, and no one who climbed the steps has come back to say what waits on the throne.'},
 };
+/* v197: the road between Lands. Once per campaign, the first time a newly opened Land is reached, a short passage tells
+   how the Bearer got there: the Crowns pull like a compass, each Land further in. Hints only; nothing says what the throne does.
+   {C} is the World Crown just won. Tap moves to the next line; reduced motion shows every line at once. */
+const LAND_PASSAGE = {
+  medieval:{from:'street', lines:['Crown City sleeps for the first time in years.', 'In your hands, the {C} will not sit still.', 'It leans, like a compass needle, toward the old rail line out of the city.', 'At the end of the line stand walls of black iron, and a king who has never lost.']},
+  greek:   {from:'medieval', lines:['The gates of the Iron Kingdom stand open behind you.', 'Aldric’s soldiers do not follow. They only watch you go.', 'Two Crowns now, and both lean the same way: up the mountain road, into the clouds.', 'They say the queen at the top has already seen how this ends.']},
+  fantasy: {from:'greek', lines:['Athena does not see you off.', 'Her last words follow you down the marble steps: you are not the only one playing.', 'Past the last column the road cracks. The sky does too.', 'Three Crowns pull you on, into a land where nothing moves the way it should.']},
+  throne:  {from:'fantasy', lines:['The shadows let you pass.', 'Four Crowns, and you no longer choose the road. You only walk it.', 'It climbs through ash toward a ruined throne.', 'Your army is quiet. Nobody asks to turn back.']},
+};
+const PASSAGE_KEY = 'crownfall-passages';
+function passageSeen(){ const ep = ACH.campaign_epoch || 0; let st = {}; try{ st = JSON.parse(localStorage.getItem(PASSAGE_KEY) || '{}'); }catch(e){} return st && st.ep === ep && Array.isArray(st.seen) ? st : {ep, seen:[]}; }
+function landPassageDue(l){
+  try{
+    const P = LAND_PASSAGE[l]; if(!P || !RULERS[P.from] || !landOpen(l) || !landWon(P.from) || landWon(l)) return false;
+    if(passageSeen().seen.includes(l)) return false;
+    let ch = {}; try{ ch = JSON.parse(localStorage.getItem('crownfall-chapters') || '{}'); }catch(e){}
+    return !(ch.ep === (ACH.campaign_epoch || 0) && Array.isArray(ch.seen) && ch.seen.includes(l));   // a Land already being played is not re-introduced
+  }catch(e){ return false; }
+}
+function landPassage(l, then){
+  const go = () => { try{ then && then(); }catch(e){} };
+  try{
+    const P = LAND_PASSAGE[l], st = passageSeen(); st.seen.push(l); try{ localStorage.setItem(PASSAGE_KEY, JSON.stringify(st)); }catch(e){}
+    const name = PACKS.find(x => x.id === l).name, lines = P.lines.map(x => x.replace('{C}', landCrownName(P.from)));
+    const el = document.createElement('div'); el.className = 'passage' + (calm ? ' calm' : ''); el.dataset.land = l; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'The road to ' + name);
+    const img = (land, cls) => LAND_ART[land] ? `<img class="${cls}" src="${LAND_ART[land]}" alt=""${LAND_FOCUS[land] ? ` style="object-position:${LAND_FOCUS[land]}"` : ''}>` : '';
+    el.innerHTML = `${img(P.from, 'pa-from')}${img(l, 'pa-to')}<span class="pa-shade"></span>
+      <div class="pa-txt"><small>The road to ${name}</small>${lines.map(x => `<p>${x}</p>`).join('')}<button class="btn" id="paGo">Enter ${name}</button><span class="pa-tap">Tap to continue</span></div>`;
+    document.body.appendChild(el);
+    const ps = [...el.querySelectorAll('.pa-txt p')]; let i = 0, t = null, left = false;
+    const leave = () => { if(left) return; left = true; clearTimeout(t); el.classList.add('out'); setTimeout(() => { el.remove(); go(); }, calm ? 0 : 450); };
+    const step = () => { clearTimeout(t);
+      if(i < ps.length){ ps[i].classList.add('on'); i++; if(i === Math.ceil(ps.length / 2)) el.classList.add('turn');   // the picture crosses over halfway
+        if(i < ps.length) t = setTimeout(step, 1300 + ps[i - 1].textContent.length * 45); else { el.classList.add('done'); } } };
+    if(calm){ ps.forEach(x => x.classList.add('on')); i = ps.length; el.classList.add('turn', 'done'); } else setTimeout(step, 500);
+    el.addEventListener('pointerdown', e => { if(e.target.closest('#paGo')) return; if(i < ps.length) step(); });
+    el.querySelector('#paGo').onclick = leave;
+  }catch(e){ go(); }
+}
 function landChapter(l){
   try{
     const C = LAND_CHAPTER[l]; if(!C) return false;
@@ -3522,7 +3561,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 196;
+const GAME_VERSION = 197;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5374,6 +5413,7 @@ function circuitSelect(startLand, startCircuit){
   onTitle = false; setCircuitData('');
   if(startLand && PACKS.some(x => x.id === startLand) && landOpen(startLand) && PACK !== startLand){ setPack(startLand); musicRestart(); }
   if(!landOpen(PACK)){ setPack(frontierLand()); musicRestart(); }
+  if(landPassageDue(PACK)) return landPassage(PACK, () => circuitSelect(PACK, startCircuit));   // v197: the road here, once
   let pickC = startCircuit && canEnter(PACK, startCircuit) ? startCircuit : nextStep(PACK);
   const lname = l => PACKS.find(x => x.id === l).name;
   const draw = () => {
