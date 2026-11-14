@@ -252,3 +252,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Smaller savings bonus after Crown City:** capped at $3 instead of $5 (Midnight Market keeps its +$1, so $4).
 - Why: income was steady (about $20 a fight) while prices never rose and upgrades ran out, so by the third Land there was nothing left to buy. By a rough estimate from the price tables, a campaign's money used to cover every upgrade early in the third Land; now it takes until about the end of the fourth.
 - Score targets follow your army's real upgrades, so they ease if you buy less. Sell values, the Gauntlet and Crown Match are unchanged. Money already saved is kept.
+
+## v204 — the enemy goes for the marks
+
+- The enemy now wants green lights, vantage points and (from v205) the Ruler's banner: a safe one is worth about two Pawns to it, and it leans toward squares it can reach one from. Before, it only took them by accident, so the "you lose a move / a swap" side rarely happened.
+- It steps around crate traps, which pay you when it lands on them.
+- The pull is smaller than a Knight's value, so it will not throw a piece away for a mark.

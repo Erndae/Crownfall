@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=203"></script>
-<script src="piece-designs.js?v=203"></script>
-<script src="character-style.js?v=203"></script>
-<script src="campaign-opponents.js?v=203"></script>
-<script src="campaign-dialogue.js?v=203"></script>
-<link rel="stylesheet" href="character-style.css?v=203">
+<script src="gameplay-polish.js?v=204"></script>
+<script src="piece-designs.js?v=204"></script>
+<script src="character-style.js?v=204"></script>
+<script src="campaign-opponents.js?v=204"></script>
+<script src="campaign-dialogue.js?v=204"></script>
+<link rel="stylesheet" href="character-style.css?v=204">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=203">
-<link rel="stylesheet" href="ruler-style.css?v=203">
-<link rel="stylesheet" href="gameplay-polish.css?v=203">
+<link rel="stylesheet" href="city-board.css?v=204">
+<link rel="stylesheet" href="ruler-style.css?v=204">
+<link rel="stylesheet" href="gameplay-polish.css?v=204">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3569,7 +3569,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 203;
+const GAME_VERSION = 204;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -8078,6 +8078,19 @@ async function enemyPhaseRun(to){
   if(B.ckFinal && !B.ckStall && (B.ckMoves || 0) >= CK_STALL_MOVES && isCrownless()) await throneCrumbles();
   busy = false; drawBoard(); coachReady();
 }
+/* v204: the enemy goes for the marks on the board. A move that lands on a green light, a vantage point or the Ruler's banner
+   is worth about two Pawns to it when the square is safe, a little when it is not, and it leans toward squares from which it
+   can reach one next turn. It steps around crate traps (they pay the Bearer). Small enough that it never gives up a piece for one. */
+function enemyMarkValue(nb, to, mover, attacked){
+  if(!B || !mover) return 0;
+  const officer = mover.t !== 'P' && mover.t !== 'K', has = (k, i) => (B[k] || []).includes(i);
+  const takes = i => has('lights', i) || has('vantage', i) || (has('banner', i) && mover.t !== 'P');
+  let v = 0;
+  if(takes(to)) v += attacked ? 6 : 24;
+  else if(officer && attackSquares(nb, to).some(i => !nb[i] && takes(i))) v += 5;
+  if(has('crates', to)) v -= 8;
+  return v;
+}
 function enemyMoveValue(from, to){
   const b = B.board, mover = b[from], victim = b[to];
   const val = t => t === 'K' ? 400 : TYPE[t].val;
@@ -8089,6 +8102,7 @@ function enemyMoveValue(from, to){
   else if(gStaleDraw() && !anyLegal(nb, 'me')) score -= 3000;   // v152 Gauntlet: no stalemates on purpose
   const myAtt = new Set(attacksOn(nb, 'me'));
   if(myAtt.has(to)){ const defended = attacksOn(nb, 'en').includes(to); score -= val(nb[to].t) * (defended ? 0.55 : 1); }
+  score += enemyMarkValue(nb, to, mover, myAtt.has(to));   // v204
   if(myAtt.has(from) === false && attacksOn(b, 'me').includes(from)) score += val(mover.t) * 0.5; // escaped a threat
   const hits = attackSquares(nb, to).filter(x => nb[x] && nb[x].side === 'me');
   hits.forEach(x => { score += nb[x].t === 'K' ? 30 : val(nb[x].t) * 0.12; });
