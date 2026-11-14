@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=202"></script>
-<script src="piece-designs.js?v=202"></script>
-<script src="character-style.js?v=202"></script>
-<script src="campaign-opponents.js?v=202"></script>
-<script src="campaign-dialogue.js?v=202"></script>
-<link rel="stylesheet" href="character-style.css?v=202">
+<script src="gameplay-polish.js?v=203"></script>
+<script src="piece-designs.js?v=203"></script>
+<script src="character-style.js?v=203"></script>
+<script src="campaign-opponents.js?v=203"></script>
+<script src="campaign-dialogue.js?v=203"></script>
+<link rel="stylesheet" href="character-style.css?v=203">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=202">
-<link rel="stylesheet" href="ruler-style.css?v=202">
-<link rel="stylesheet" href="gameplay-polish.css?v=202">
+<link rel="stylesheet" href="city-board.css?v=203">
+<link rel="stylesheet" href="ruler-style.css?v=203">
+<link rel="stylesheet" href="gameplay-polish.css?v=203">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2554,7 +2554,7 @@ const CIRCUITS = [
   {id:'harbor', name:'Harbor Knights', col:'#ff7b1c', tag:'Jumps and forks',
    ability:'<b>Cavalry Yard:</b> start with an extra Knight, and Knights start at level 2.'},
   {id:'midnight', name:'Midnight Market', col:'#ffe14d', tag:'Money talks',
-   ability:'<b>Street Deals:</b> start with +$4, everything in the shop costs $1 less, and savings bonus goes up to $6.'},
+   ability:'<b>Street Deals:</b> start with +$4, everything in the shop costs $1 less, and the savings bonus cap is $1 higher.'},
 ];
 /* ---------- conquest scaling ----------
    Each Land is conquered once, in order: 4 circuits, then its Ruler. Where an encounter sits in that conquest
@@ -2585,7 +2585,15 @@ const DF = () => CONQUEST_SCALING[TIER()] || CONQUEST_SCALING.medium;
 const CIRCUIT_TARGET_SCALE = {downtown:0.85, rooftop:1.00, harbor:1.15, midnight:1.30, ruler:1.40};
 const DF_TARGET = () => CIRCUIT_TARGET_SCALE[RUN && RUN.circuit] || 1;
 const isC = id => RUN && RUN.circuit === id;
-function price(x){ return isC('midnight') && !(RUN && RUN.gauntlet) ? Math.max(1, x - 1) : x; }   // (v152: Gauntlet prices are fixed)
+/* v203 Economy: money piled up late because income stayed steady while prices never rose and upgrades ran out.
+   Every store price now rises 30% with each Land after Crown City (x1.3, x1.6, x1.9, x2.2), and the savings bonus is
+   capped at $3 instead of $5 outside Crown City. Targets follow the army's real upgrades, so they ease if it buys less.
+   Gauntlet and Crown Match prices are unchanged; sell values are unchanged. */
+const LAND_PRICE_STEP = 0.3, LAND_PRICE_ORDER = ['street', 'medieval', 'greek', 'fantasy', 'throne'];
+function landPriceMult(){ if(!RUN || RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH)) return 1; return 1 + LAND_PRICE_STEP * Math.max(0, LAND_PRICE_ORDER.indexOf(land())); }
+const savingsCap = () => (land() === 'street' ? 5 : 3) + (isC('midnight') ? 1 : 0);
+function price(x){ if(RUN && RUN.gauntlet) return x;   // (v152: Gauntlet prices are fixed)
+  return Math.max(1, Math.round((isC('midnight') ? Math.max(1, x - 1) : x) * landPriceMult())); }
 const ACHS = [];
 CIRCUITS.forEach(c => ACHS.push({id:c.id+'_conq', c:c.id, conq:true, name:c.name+': Conquered', desc:'Conquer this circuit.'}));   // (replaces Rookie / Regular / Legend)
 ACHS.push(
@@ -3561,7 +3569,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 202;
+const GAME_VERSION = 203;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -9468,7 +9476,7 @@ function winBlind(){
   const endingWin = RUN.blind === 2 && RUN.ante === nStages() && !RUN.won && RUN.circuit === 'ruler' && land() === 'throne';
   if(MM.want === 'crownless' && !endingWin) setMusicContext('silence');   // from here on nothing (including Score Damage) can undo the win
   if(!endingWin) sfx.win();   // the Crownless King's fall is not a triumph
-  const bl = BLINDS[RUN.blind], reward = RUN.debt ? 0 : bl.reward, blitzLeft = blitzOn() ? Math.max(0, B.moves) : 0, movesBonus = blitzLeft * (B.hustle ? 2 : 1), interest = CrownfallPolish.savings(RUN.money,RUN.circuit), piggy = RUN.relics.reduce((s,id)=>s+(R(id).endMoney||0),0);
+  const bl = BLINDS[RUN.blind], reward = RUN.debt ? 0 : bl.reward, blitzLeft = blitzOn() ? Math.max(0, B.moves) : 0, movesBonus = blitzLeft * (B.hustle ? 2 : 1), interest = CrownfallPolish.savings(RUN.money,RUN.circuit,land()), piggy = RUN.relics.reduce((s,id)=>s+(R(id).endMoney||0),0);
   const debtNote = RUN.debt; RUN.debt = false;
   const kx = {gain:0, from:1, to:1};             // v142: King XP retired (nothing is awarded or shown)
   if((B.moveCount || 99) <= 4) unlockAch('dt_speed');
@@ -9497,7 +9505,7 @@ function winBlind(){
     <div class="cash">
       <div class="kv"><span>${RUN.circuit === 'ruler' ? 'Ruler reward' : 'Stage reward'}${debtNote ? ` (${C('loanshark').name} took it)` : ''}</span><b class="money">$${reward}</b></div>
       ${blitzOn() ? `<div class="kv"><span>${blitzLeft} moves left ($${B.hustle ? 2 : 1} each)</span><b class="money">$${movesBonus}</b></div>` : `<div class="kv"><span>Moves used</span><b>${B.moveCount != null ? B.moveCount : B.movesStart - B.moves}</b></div>`}
-      <div class="kv"><span>Savings bonus ($1 per $5 saved, max $${isC('midnight') ? 6 : 5})</span><b class="money">$${interest}</b></div>
+      <div class="kv"><span>Savings bonus ($1 per $5 saved, max $${savingsCap()})</span><b class="money">$${interest}</b></div>
       ${piggy ? `<div class="kv"><span>Piggy Bank</span><b class="money">$${piggy}</b></div>` : ''}
       ${mateBonus ? `<div class="kv"><span>Checkmate bonus</span><b class="money">$${mateBonus}</b></div>` : ''}
       ${chal.cash ? `<div class="kv"><span>Challenge · ${chal.name}${chal.swap ? ' · +1 Swap next round' : ''}</span><b class="money">$${chal.cash}</b></div>` : ''}
@@ -10668,7 +10676,7 @@ function shop(){
   const L = lives(), full = L >= maxLives(), bought = lifeBoughtHere();
   renderShop(`<section class="screen shopscr">
     <div class="shophead">
-      <div class="topbar"><button class="btn ghost backbtn" id="sback">‹ Back</button><span class="muted">Saved · ${PACKS.find(x => x.id === land()).name}</span></div>
+      <div class="topbar"><button class="btn ghost backbtn" id="sback">‹ Back</button><span class="muted">${landPriceMult() > 1 ? `${PACKS.find(x => x.id === land()).name} · prices +${Math.round((landPriceMult() - 1) * 100)}%` : `Saved · ${PACKS.find(x => x.id === land()).name}`}</span></div>
       <div class="shoptitle"><h2>${RUN.gauntlet ? 'Armory' : UI.shop}</h2><span class="shopcash"><span class="money">$${RUN.money}</span>${hearts(L)}</span></div>
     </div>
     <div class="inv">

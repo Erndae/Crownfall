@@ -13,7 +13,7 @@ assert.equal(p.loss('Checkmate. Your King is trapped.',log).index,2);assert.matc
 assert.equal(p.loss('CONCEDED',[]).index,-1);assert.equal(p.escape('<img onerror="x">'),'&lt;img onerror=&quot;x&quot;&gt;');
 for(const sig of ['knightRush','phalanx','nightRaid','bishopCourt','twinQueens','mirror','rookFortress','knightPack+','royalGuard','merchant','bishopGuard','pawnWave','promotionHorde'])assert(p.formation(sig).tip.length>30);
 assert.equal(p.savings(4,'downtown'),0);assert.equal(p.savings(25,'downtown'),5);assert.equal(p.savings(1000,'downtown'),5);assert.equal(p.savings(1000,'midnight'),6);assert.equal(p.savings(-20,'midnight'),0);
-assert(game.includes('interest = CrownfallPolish.savings(RUN.money,RUN.circuit)'));
+assert(game.includes('interest = CrownfallPolish.savings(RUN.money,RUN.circuit,land())'));
 assert(game.includes('train:[8, 14, 24, 36, 52]'));
 assert(game.includes('previewMove(sel,i);return;'));assert(game.includes('B.board!==preview.board'));
 assert(game.includes('P.sig=plan.signature;P.style=plan.style'));assert(game.includes("enSafe('crate',()=>springDockCrate(to))"));

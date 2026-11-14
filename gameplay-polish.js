@@ -25,6 +25,6 @@
   for(let i=log.length-1;i>=0;i--)if((blitz?log[i].k==='me':log[i].k==='en')&&Number.isInteger(log[i].f)&&log[i].f>=0&&log[i].f!==log[i].t){index=i;break;}
   return {title:mate?'Your King ran out of safe replies':blitz?'The move limit ran out':army?'Only your King remained':concede?'You conceded this fight':'The round ended',tip:mate?'Before attacking, check the lines toward your King and keep escape squares covered.':blitz?'Use the move preview to compare captures. Spend limited moves on points or a direct mating attack.':army?'Support your attackers and check the reply before trading away your last defenders.':concede?'Review the last position before retrying; a different exchange or a saved swap may give you another route.':'Review the last exchange and the threats to your King before retrying.',index,note:index>=0?String(log[index].n||''):''};
  }
- const savings=(money,circuit)=>Math.min(circuit==='midnight'?6:5,Math.floor(Math.max(0,Number(money)||0)/5));
+ const savings=(money,circuit,land)=>Math.min((land&&land!=='street'?3:5)+(circuit==='midnight'?1:0),Math.floor(Math.max(0,Number(money)||0)/5));   // v203: $3 cap after Crown City
  window.CrownfallPolish={escape,formation,training,objective,loss,savings};
 })();

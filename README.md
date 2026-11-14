@@ -245,3 +245,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 
 - **Store:** a long restock label ("Conjure new wares · $5" in the Shattered Realm) ran out of its button into Next round and lost its price. It now wraps to two lines.
 - **World Crown and victory screens (iPhone home-screen app):** these started inside the status area, so the top line ("World Crown acquired") read blurred. They now start below it, and the crown art steps back a little more when the buttons arrive so both stay on screen.
+
+## v203 — money stays tight in the later Lands
+
+- **Prices rise with each Land.** Everything in the store (training, forging, restocks, recruits, cards, tiles, extra lives) costs 30% more per Land after Crown City: ×1.3 in the Iron Kingdom, ×1.6 in the Olympian Court, ×1.9 in the Shattered Realm, ×2.2 in the Fallen Throne. The store header shows the rise ("prices +60%"). Crown City is unchanged.
+- **Smaller savings bonus after Crown City:** capped at $3 instead of $5 (Midnight Market keeps its +$1, so $4).
+- Why: income was steady (about $20 a fight) while prices never rose and upgrades ran out, so by the third Land there was nothing left to buy. By a rough estimate from the price tables, a campaign's money used to cover every upgrade early in the third Land; now it takes until about the end of the fourth.
+- Score targets follow your army's real upgrades, so they ease if you buy less. Sell values, the Gauntlet and Crown Match are unchanged. Money already saved is kept.
