@@ -272,3 +272,9 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 /* v205: the Royal Banner (Ruler fights) */
 .banner-mark{position:absolute;inset:14%;pointer-events:none;z-index:1}.banner-mark svg{width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(255,210,61,.7))}
 .sq:has(.banner-mark){outline:2px dashed #ffd23d;outline-offset:-3px}.sq:has(.banner-mark) .pc{position:relative;z-index:2}
+/* v206: the Royal Treasury */
+.jtreasury{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 2px;padding:10px 12px;border:1px solid #6b5a22;border-radius:8px;background:rgba(255,210,61,.07)}
+.jtreasury span{display:flex;flex-direction:column;gap:2px}.jtreasury small{font:11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#bdb6aa}
+.jtreasury b{font:400 24px/1 var(--num,var(--display));color:#ffe14d}
+.jtreasury em{font:normal 12.5px/1.3 var(--body);color:#e9dfc6;text-align:right}
+.kv.treasury span{color:#ffe14d}

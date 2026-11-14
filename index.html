@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=205"></script>
-<script src="piece-designs.js?v=205"></script>
-<script src="character-style.js?v=205"></script>
-<script src="campaign-opponents.js?v=205"></script>
-<script src="campaign-dialogue.js?v=205"></script>
-<link rel="stylesheet" href="character-style.css?v=205">
+<script src="gameplay-polish.js?v=206"></script>
+<script src="piece-designs.js?v=206"></script>
+<script src="character-style.js?v=206"></script>
+<script src="campaign-opponents.js?v=206"></script>
+<script src="campaign-dialogue.js?v=206"></script>
+<link rel="stylesheet" href="character-style.css?v=206">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=205">
-<link rel="stylesheet" href="ruler-style.css?v=205">
-<link rel="stylesheet" href="gameplay-polish.css?v=205">
+<link rel="stylesheet" href="city-board.css?v=206">
+<link rel="stylesheet" href="ruler-style.css?v=206">
+<link rel="stylesheet" href="gameplay-polish.css?v=206">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3315,6 +3315,7 @@ function landsScreen(after){
       <div class="jone">${slot(l)}</div></section>`; };
   const m = modal(`<div class="jtop"><div><small>${runnerTitle()}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
+    ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}</em></div>` : ''}
     <div class="jpath"><svg class="jcracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${cracks}</svg>
       ${PACKS.map((x, i) => (i ? link(i - 1) : '') + chapter(x, i)).join('')}</div>`, '#pdone', after);
   m.classList.add('journey');
@@ -3569,7 +3570,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 205;
+const GAME_VERSION = 206;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4895,6 +4896,22 @@ const SIMPLE_TALK = {
 /* ---------- story: the Crownfall ---------- */
 const worldCrowns = () => baseCrowns();
 const throneCrowns = () => landWon('throne') ? 1 : 0;   // The Crown of Crowns (the Fallen Throne has no crown count of its own)
+/* v206 The Royal Treasury: something for the money left at the end. When the Fallen Throne is won, the Bearer's whole purse is
+   banked once per campaign into a lifetime total that survives new campaigns, with a rank shown on the Journey screen.
+   A record only: it buys nothing and changes no fight. */
+const TREASURY_RANKS = [[1000, 'Keeper of the Mint'], [600, 'Golden Hand'], [300, 'Merchant Prince'], [150, 'Paymaster'], [50, 'Coin Counter']];
+const treasuryTotal = () => Math.max(0, Math.floor(+ACH.treasury || 0));
+const treasuryRank = (n = treasuryTotal()) => (TREASURY_RANKS.find(r => n >= r[0]) || [0, ''])[1];
+const treasuryNext = (n = treasuryTotal()) => [...TREASURY_RANKS].reverse().find(r => n < r[0]) || null;
+const treasuryDue = () => (ACH.treasury_ep || 0) !== (ACH.campaign_epoch || 0) || ACH.treasury_ep == null;
+function treasuryBank(amount){ if(!treasuryDue()) return 0; const a = Math.max(0, Math.floor(+amount || 0));
+  ACH.treasury = treasuryTotal() + a; ACH.treasury_last = a; ACH.treasury_ep = ACH.campaign_epoch || 0; ACH.treasury_note = 1; saveAch(); return a; }
+// the ending starts the moment the throne is won, so the news waits for the title screen, once
+function treasuryNotice(){ if(!ACH.treasury_note) return;
+  const show = () => { if(document.getElementById('splash') || document.querySelector('.modal, .vict, .ending')) return setTimeout(show, 600);
+    if(!onTitle || !ACH.treasury_note) return; delete ACH.treasury_note; saveAch();
+    showTip(`<b>Royal Treasury · $${treasuryTotal().toLocaleString('en-US')}</b><br>The $${Math.max(0, +ACH.treasury_last || 0)} you carried to the throne is banked.${treasuryRank() ? ` Rank: <b>${treasuryRank()}</b>.` : ''}<br><span class="muted">See it on the Journey screen.</span>`); };
+  setTimeout(show, 1500); }
 function runnerTitle(){ const n = worldCrowns(); return n >= 4 ? 'Bearer of the Four Crowns' : n >= 2 ? 'The Crownrunner' : n >= 1 ? 'Crownrunner' : 'Unknown challenger'; }
 const CROWN_LORE = {
   street:   {easy:'Sprayed gold over something older. Under the paint, a hairline crack.', medium:'Polished so bright you can see your face in it, and a thin fracture running through the reflection.', hard:'Vex never took it off. Up close, the stones sit along a break that was never repaired.'},
@@ -5384,7 +5401,7 @@ function title(){
     if(worldCrowns() > 0 && coachSeen().crown) coach('journey'); }
   $('#achb').onclick = () => inC ? achScreen() : goMode('campaign', 'ach');
   $('#lands').onclick = () => inC ? landsScreen(title) : goMode('campaign', 'journey');
-  updateNotice();
+  updateNotice(); treasuryNotice();
   $('#mus').onclick = e => { setMusic(!musicOn); e.target.textContent = 'Music: ' + (musicOn?'On':'Off'); };
   bindMusicControls(app, 'mvol');
   $('#snd').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
@@ -9582,7 +9599,7 @@ function winBlind(){
       cp.mid = null;
       if(cp.replay === l && cc === REBUILD_CIRCUIT) cp.replay = null; cp.cur = null; setCheckpoint(cp);
       if(!rebuilt) unlockAch(cc + '_conq'); const k = conqKey(l, cc), fresh = !ACH[k]; ACH[k] = ACH[k] || Date.now(); saveAch(); fin = () => circuitCleared(l, cc, fresh, rebuilt); }
-    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne'){ endingPending('standard', 'crown'); fallenRemember(); }   // v190: remembered here, while the run still exists
+    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne'){ endingPending('standard', 'crown'); fallenRemember(); treasuryBank(RUN.money); }   // v190: remembered here, while the run still exists
       { const cp = cpGet(); if(cp.ruler && cp.ruler.land === l) cp.ruler = null; if(cp.rulerMid && cp.rulerMid.land === l) cp.rulerMid = null; cp.mid = null; if(cp.replay === l) cp.replay = null; cp.cur = null; setCheckpoint(cp); }   // the Ruler fell: this Land's checkpoints end
       CIRCUITS.forEach(c => { ACH[conqKey(l, c.id)] = ACH[conqKey(l, c.id)] || Date.now(); });
       ACH[cid] = ACH[cid] || Date.now(); saveAch(); fin = () => crownCeremony(l, fresh); }

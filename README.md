@@ -265,3 +265,9 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - Yours: +1 Tactic (+1 swap when your Tactics are full) and that piece gains 1 Armor. Theirs: you lose 1 Tactic, or 1 swap if you have none.
 - It is placed where no officer or King on either side can reach it with a first move, so it is a fair race, and from v204 the Ruler's army races for it.
 - Explained by a first-time hint, the move preview, the fight rules and the Board key.
+
+## v206 — the Royal Treasury
+
+- **Something for the money left at the end.** When you win the Fallen Throne, your whole purse is banked into the Royal Treasury, once per campaign. The total is kept across campaigns and earns a rank: Coin Counter ($50), Paymaster ($150), Merchant Prince ($300), Golden Hand ($600), Keeper of the Mint ($1,000).
+- It is a record only. It buys nothing and changes no fight.
+- You are told once on the title screen after the ending, and the total and rank are on the Journey screen from then on.
