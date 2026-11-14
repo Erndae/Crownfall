@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=206"></script>
-<script src="piece-designs.js?v=206"></script>
-<script src="character-style.js?v=206"></script>
-<script src="campaign-opponents.js?v=206"></script>
-<script src="campaign-dialogue.js?v=206"></script>
-<link rel="stylesheet" href="character-style.css?v=206">
+<script src="gameplay-polish.js?v=207"></script>
+<script src="piece-designs.js?v=207"></script>
+<script src="character-style.js?v=207"></script>
+<script src="campaign-opponents.js?v=207"></script>
+<script src="campaign-dialogue.js?v=207"></script>
+<link rel="stylesheet" href="character-style.css?v=207">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=206">
-<link rel="stylesheet" href="ruler-style.css?v=206">
-<link rel="stylesheet" href="gameplay-polish.css?v=206">
+<link rel="stylesheet" href="city-board.css?v=207">
+<link rel="stylesheet" href="ruler-style.css?v=207">
+<link rel="stylesheet" href="gameplay-polish.css?v=207">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3570,7 +3570,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 206;
+const GAME_VERSION = 207;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -7433,10 +7433,14 @@ function dockCrates(board){
 // 1 move back on the Blitz clock, or cost 1 if an enemy gets there first (never the last move). One use each, saved with the battle.
 function greenLights(board){
   if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'downtown' || !blitzOn()) return [];
-  // contested ground only: the fifth and sixth ranks, never a square the Bearer reaches with a first pawn move; spread across files
-  const n = RUN.ante === 4 ? 3 : 2, out = [];
-  for(const i of [27,28,26,29,19,20,25,30,18,21,24,31,17,22]){ if(out.length >= n) break;
-    if(!board[i] && out.every(j => Math.abs((j & 7) - (i & 7)) >= 2)) out.push(i); }
+  // v207: a fair race now that the enemy goes for them: squares in the middle that NO piece on either side, Pawns included,
+  // can reach with its first move. If the opening leaves too few, the old fifth- and sixth-rank squares fill in.
+  const n = RUN.ante === 4 ? 3 : 2, out = [], near = new Set();
+  try{ for(let i = 0; i < 64; i++) if(board[i]) for(const t of movesFor(board, i)) near.add(t); }catch(e){}
+  const take = (list, fair) => { for(const i of list){ if(out.length >= n) break;
+    if(!board[i] && !out.includes(i) && (!fair || !near.has(i)) && out.every(j => Math.abs((j & 7) - (i & 7)) >= 2)) out.push(i); } };
+  take([27,28,26,29,25,30,24,31,35,36,34,37,33,38,32,39], true);
+  take([27,28,26,29,19,20,25,30,18,21,24,31,17,22], false);
   return out;
 }
 function runGreenLight(at){

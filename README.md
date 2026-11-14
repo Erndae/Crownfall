@@ -271,3 +271,7 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Something for the money left at the end.** When you win the Fallen Throne, your whole purse is banked into the Royal Treasury, once per campaign. The total is kept across campaigns and earns a rank: Coin Counter ($50), Paymaster ($150), Merchant Prince ($300), Golden Hand ($600), Keeper of the Mint ($1,000).
 - It is a record only. It buys nothing and changes no fight.
 - You are told once on the title screen after the ending, and the total and rank are on the Journey screen from then on.
+
+## v207 — a fair race for the green lights
+
+- Now that the enemy goes for board marks, green lights are placed on middle squares that no piece on either side, Pawns included, can reach with its first move. Before, the enemy's Pawns could step onto them at once. If an opening leaves too few such squares, the earlier placement fills in.
