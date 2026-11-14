@@ -269,3 +269,6 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .shopfoot #reroll{white-space:normal;line-height:1.1;overflow-wrap:break-word;text-wrap:balance;font-size:13px}
 .shopfoot #next{line-height:1.05}
 @media (max-width:340px){.shopfoot #reroll{font-size:12px}.shopfoot #next{font-size:18px}}
+/* v205: the Royal Banner (Ruler fights) */
+.banner-mark{position:absolute;inset:14%;pointer-events:none;z-index:1}.banner-mark svg{width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(255,210,61,.7))}
+.sq:has(.banner-mark){outline:2px dashed #ffd23d;outline-offset:-3px}.sq:has(.banner-mark) .pc{position:relative;z-index:2}

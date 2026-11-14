@@ -258,3 +258,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - The enemy now wants green lights, vantage points and (from v205) the Ruler's banner: a safe one is worth about two Pawns to it, and it leans toward squares it can reach one from. Before, it only took them by accident, so the "you lose a move / a swap" side rarely happened.
 - It steps around crate traps, which pay you when it lands on them.
 - The pull is smaller than a Knight's value, so it will not throw a piece away for a mark.
+
+## v205 — the Royal Banner in Ruler fights
+
+- Every fight against a Ruler (all five) now has one marked square in the middle of the board: the Royal Banner. The first piece to land on it raises it; Pawns cannot.
+- Yours: +1 Tactic (+1 swap when your Tactics are full) and that piece gains 1 Armor. Theirs: you lose 1 Tactic, or 1 swap if you have none.
+- It is placed where no officer or King on either side can reach it with a first move, so it is a fair race, and from v204 the Ruler's army races for it.
+- Explained by a first-time hint, the move preview, the fight rules and the Board key.

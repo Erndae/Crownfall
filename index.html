@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=204"></script>
-<script src="piece-designs.js?v=204"></script>
-<script src="character-style.js?v=204"></script>
-<script src="campaign-opponents.js?v=204"></script>
-<script src="campaign-dialogue.js?v=204"></script>
-<link rel="stylesheet" href="character-style.css?v=204">
+<script src="gameplay-polish.js?v=205"></script>
+<script src="piece-designs.js?v=205"></script>
+<script src="character-style.js?v=205"></script>
+<script src="campaign-opponents.js?v=205"></script>
+<script src="campaign-dialogue.js?v=205"></script>
+<link rel="stylesheet" href="character-style.css?v=205">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=204">
-<link rel="stylesheet" href="ruler-style.css?v=204">
-<link rel="stylesheet" href="gameplay-polish.css?v=204">
+<link rel="stylesheet" href="city-board.css?v=205">
+<link rel="stylesheet" href="ruler-style.css?v=205">
+<link rel="stylesheet" href="gameplay-polish.css?v=205">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3569,7 +3569,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 204;
+const GAME_VERSION = 205;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5608,6 +5608,7 @@ const COACH = {
   swap:       {pri:3,  target:'#swapBtn',           text:() => ['Swap', `Trade places with two of your touching pieces. It's free: no move used and the enemy doesn't reply. You get 1 per round.`]},
   shop:       {pri:2,  target:null,                 text:() => [UI.shop, `Spend your cash here. <b>${UI.tiles}</b> bend the rules for your whole army (hold up to 5). You can also recruit pieces, train a piece type and buy extra lives.`]},
   promo:      {pri:2,  target:null,                 text:() => ['Promotion', `Get a Pawn to the far side and promote it to a <b>Queen</b>, Rook, Bishop or Knight. It stays in your army after the round.`]},
+  banner:     {pri:3,  target:'.banner-mark',       text:() => ['The Royal Banner', `Land a piece on the marked square, not a Pawn, for +1 Tactic and 1 Armor. If the Ruler’s side gets there first, you lose 1 Tactic.`]},
   armor:      {pri:2,  target:null,                 text:() => ['Armored', `The number on this piece is its armor. It can survive that many extra captures before it falls.`]},
   trap:       {pri:2,  target:'#trapBtn',           text:() => ['Traps', `Tap <b>Trap</b>, then an empty square or one of your pieces to hide a trap there. The first enemy to land on it gets caught.`]},
   circuit:    {pri:2,  target:null,                 text:() => ['Choosing a route', `Each land has <b>circuits</b> of 4 Stages. Every Stage is one battle against one opponent, and Stage 4 is the <b>circuit boss</b>. Conquer all four, in order, to open the <b>Ruler’s Road</b> and fight for that land’s crown.`]},
@@ -5696,6 +5697,7 @@ function bossChips(id){
   if(id === 'mini' && RUN && !RUN.gauntlet && RUN.land === 'street' && RUN.circuit === 'harbor' && (!B || B.crates?.length)) out.push('Crate traps · up to $2');
   if(RUN && !RUN.gauntlet && !MATCH && RUN.circuit === 'downtown' && (B ? B.lights?.length : lim)) out.push('Green lights');
   // on the stage ticket only: in battle the header row has no room on small phones, and the Board key button covers it
+  if(!B && rulerFight()) out.push('Royal banner');
   if(RUN && !RUN.gauntlet && !MATCH && !B && RUN.circuit === 'rooftop' && RUN.ante >= 2) out.push('Vantage points');
   if(RUN && !RUN.gauntlet && !MATCH && !B && RUN.circuit === 'midnight' && RUN.ante >= 2) out.push('Bounty');
   if(lim && !ruleOf(id).includes('clock')) out.unshift(`Blitz · ${lim} moves`);
@@ -5916,6 +5918,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   B.crates = dockCrates(B.board);
   B.lights = greenLights(B.board);   // v195: Downtown Blitz fights
   B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);   // v200: Rooftop Kings and Midnight Market fights
+  B.banner = bannerSquare(B.board);   // v205: Ruler fights
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
   if(has('aegis')){ const bi = aegisIdx(B.board); if(bi >= 0) B.board[bi].sh = Math.max(B.board[bi].sh || 0, 2); }   // (the same piece the Fallen Throne opening check armed)
   if(!MATCH && RUN.evFx && RUN.evFx.armor){ const ei = evArmorIdx(B.board, RUN.evFx.armor); if(ei >= 0) B.board[ei].sh = Math.max(B.board[ei].sh || 0, 1); delete RUN.evFx.armor; }   // v139 event Armor: next fight only, no stacking
@@ -6777,6 +6780,7 @@ function coachBoard(){
   if(!B || !RUN) return;
   if(B.swaps > 0 && coachSeen().score) coach('swap');
   if(B.board.some((p, i) => p && p.side === 'me' && p.t === 'P' && rc(i)[0] <= 1)) coach('promo');
+  if(B.banner && B.banner.length && coachSeen().score) coach('banner');   // v205
   if(B.board.some(p => p && p.side === 'me' && p.sh > 0)) coach('armor');
   if($('#trapBtn') && B.trapsLeft > 0) coach('trap');
 }
@@ -6903,18 +6907,19 @@ function encounterHTML(planned=false){
   return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>${guardBrief(planned)}`;
 }
 function vantageHTML(short=false){if(!B?.vantage?.length)return bountyHTML(short);return short?`<p class="hazard-brief">${B.vantage.length} vantage points: step your <b>King</b> onto one for +1 Tactic. If an enemy gets there first, you lose 1 swap.</p>`:`<div class="hazard-explain"><b>${B.vantage.length} vantage points</b>Only your King can claim one: move it there for +1 Tactic (or +1 swap when your Tactics are full). If an enemy piece lands on one first, you lose 1 swap. Each works once; your other pieces can stand there without using it.</div>`;}
-function bountyHTML(short=false){if(!B?.bounty)return '';return short?`<p class="hazard-brief">Bounty: one enemy piece wears a <b>$</b> tag. Capture it for +$${B.bounty.pay}. Each time it captures one of yours, you lose $1.</p>`:`<div class="hazard-explain"><b>Bounty · $${B.bounty.pay}</b>The enemy piece with the $ tag has a price on it. Capture it for +$${B.bounty.pay}. Every time it captures one of your pieces, you lose $1 (if you have it).</div>`;}
+function bannerHTML(short=false){if(!B?.banner?.length)return '';return short?`<p class="hazard-brief">Royal banner: land a piece (not a Pawn) on it for +1 Tactic and 1 Armor. If an enemy gets there first, you lose 1 Tactic.</p>`:`<div class="hazard-explain"><b>The Royal Banner</b>One marked square. The first piece to land on it raises the banner; Pawns cannot. Yours: +1 Tactic (+1 swap when your Tactics are full) and that piece gains 1 Armor. Theirs: you lose 1 Tactic, or 1 swap if you have no Tactic.</div>`;}
+function bountyHTML(short=false){if(!B?.bounty)return bannerHTML(short);return short?`<p class="hazard-brief">Bounty: one enemy piece wears a <b>$</b> tag. Capture it for +$${B.bounty.pay}. Each time it captures one of yours, you lose $1.</p>`:`<div class="hazard-explain"><b>Bounty · $${B.bounty.pay}</b>The enemy piece with the $ tag has a price on it. Capture it for +$${B.bounty.pay}. Every time it captures one of your pieces, you lose $1 (if you have it).</div>`;}
 function lightsHTML(short=false){if(!B?.lights?.length)return vantageHTML(short);return short?`<p class="hazard-brief">${B.lights.length} green lights: reach one for +1 move. If an enemy gets there first, you lose 1 move. Each works once.</p>`:`<div class="hazard-explain"><b>${B.lights.length} green lights</b>Move a piece onto a green light and get 1 move back on the Blitz clock. If an enemy piece lands there first, you lose 1 move instead (never your last one). Each light works once; no piece is removed.</div>`;}
 function hazardHTML(short=false){if(!B?.crates?.length)return lightsHTML(short);return short?`<p class="hazard-brief">${B.crates.length} marked crates: you lose up to $2; enemy entry gives you $2. Each clears once.</p>`:`<div class="hazard-explain"><b>${B.crates.length} marked crate traps</b>Land on a marked crate and lose up to $2. If an enemy lands there, you recover $2 instead. Each crate clears once; no piece is removed. Use their position when planning exchanges.</div>`;}
 function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a cyan outlined capture square to see which scoring bonuses it triggers.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
-  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t==='K',bnty=bountyOn(B.board[to]);
+  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t==='K',bnty=bountyOn(B.board[to]),bann=(B.banner||[]).includes(to)&&p&&p.t!=='P';
   let points=sc?.total||0;if(victim&&p.charge)points=Math.round(points*1.5);
   movePreview={from,to,board:B.board,position:after};drawBoard();
   const el=$('#pinfo');if(!el)return;pieceInfo(null);el.style.setProperty('--confirm-height',Math.max(52,el.getBoundingClientRect().height)+'px');el.className='pinfo move-preview';
   const scoreText=sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
-  const detail=`${scoreText}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate?' · crate costs up to $2':''}${light?' · green light: +1 move':''}${vant?' · vantage point: +1 Tactic':''}${bnty?` · bounty: +$${B.bounty.pay}`:''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
+  const detail=`${scoreText}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate?' · crate costs up to $2':''}${light?' · green light: +1 move':''}${vant?' · vantage point: +1 Tactic':''}${bnty?` · bounty: +$${B.bounty.pay}`:''}${bann?' · banner: +1 Tactic':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
   el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate?' · −$2':''}${!victim&&RULE('tax')?' · −$1':''}</span><span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
   el.querySelector('#commitPreview').onclick=commitMovePreview;
   el.querySelector('#cancelPreview').onclick=cancelMovePreview;
@@ -6990,6 +6995,7 @@ function drawBoard(){
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
     if(p?.side === 'en' && B.guardIds?.includes(p.id)) inner += '<span class="guard-mark" role="img" aria-label="Marked defender: remove to unlock score victory" title="Marked defender">⛨</span>';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
+    if((B.banner || []).includes(i)) inner += '<span class="banner-mark" role="img" aria-label="Royal banner: your piece gains 1 Tactic and 1 Armor; enemy entry costs you 1 Tactic. Pawns cannot raise it"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#2a2208" stroke="#0d0d0d" stroke-width="2"/><path d="M14 30V10" stroke="#f3e6c0" stroke-width="2.4" stroke-linecap="round"/><path d="M15 11H28L24.5 15.5L28 20H15Z" fill="#ffd23d" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg></span>';
     if((B.vantage || []).includes(i)) inner += '<span class="vantage-mark" role="img" aria-label="Vantage point: your King gains 1 Tactic; enemy entry costs you 1 swap"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0c2a2a" stroke="#0d0d0d" stroke-width="2"/><path d="M12 26L11 15L16 19L20 12L24 19L29 15L28 26Z" fill="#19e3c9" stroke="#06201d" stroke-width="1.6" stroke-linejoin="round"/></svg></span>';
     if(bountyOn(p)) inner += '<span class="bounty-mark" role="img" aria-label="Bounty: capture for money; its captures cost you $1">$</span>';
     if((B.lights || []).includes(i)) inner += '<span class="green-light" role="img" aria-label="Green light: you gain 1 move; enemy entry costs you 1 move" title="Green light · you +1 move / enemy −1 move to you"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0f2a1c" stroke="#0d0d0d" stroke-width="2"/><circle cx="20" cy="20" r="9" fill="#3ddc84"/><path d="M15 21L20 14L25 21M20 14.500V27" fill="none" stroke="#0d2a1a" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
@@ -7061,6 +7067,7 @@ const BK_ICON = {
   crate:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 11H33V31H7Z" fill="#ffb347" stroke="#0d0d0d" stroke-width="2.5"/><path d="M9 13L31 29M31 13L9 29M7 21H33" stroke="#0d0d0d" stroke-width="2.5"/></svg>',
   vantage:'<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0c2a2a" stroke="#0d0d0d" stroke-width="2"/><path d="M12 26L11 15L16 19L20 12L24 19L29 15L28 26Z" fill="#19e3c9" stroke="#06201d" stroke-width="1.6" stroke-linejoin="round"/></svg>',
   bounty:'<span class="bk-glyph" style="color:#ffe14d;font-weight:800">$</span>',
+  banner:'<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#2a2208" stroke="#0d0d0d" stroke-width="2"/><path d="M14 30V10" stroke="#f3e6c0" stroke-width="2.4" stroke-linecap="round"/><path d="M15 11H28L24.5 15.5L28 20H15Z" fill="#ffd23d" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg>',
   guard:'<span class="bk-glyph" style="color:#ff5a72">⛨</span>',
   armor:'<span class="bk-glyph" style="color:#6fb7ff">⛊</span>',
   trap:'<span class="bk-glyph" style="color:#ffd23d">✸</span>',
@@ -7071,14 +7078,15 @@ function boardMarks(){
   if(n('lights')) out.push({k:'light', name:`Green light${n('lights') > 1 ? 's' : ''} · ${n('lights')} left`, text:'Move one of your pieces onto it and get <b>1 move back</b> on the Blitz clock. If an enemy piece gets there first, you <b>lose 1 move</b> (never your last one). Each works once.'});
   if(n('crates')) out.push({k:'crate', name:`Crate trap${n('crates') > 1 ? 's' : ''} · ${n('crates')} left`, text:'Land one of your pieces on it and you <b>lose up to $2</b>. If an enemy piece lands on it, you <b>gain $2</b>. Each works once, and no piece is removed.'});
   if(n('vantage')) out.push({k:'vantage', name:`Vantage point${n('vantage') > 1 ? 's' : ''} · ${n('vantage')} left`, text:'Only your <b>King</b> can claim one: step onto it for <b>+1 Tactic</b> (+1 swap if your Tactics are full). If an enemy piece lands there first, you <b>lose 1 swap</b>. Each works once.'});
+  if(n('banner')) out.push({k:'banner', name:'Royal banner', text:'The first piece to land here raises it; <b>Pawns cannot</b>. Yours: <b>+1 Tactic</b> (+1 swap if your Tactics are full) and that piece gains <b>1 Armor</b>. Theirs: you <b>lose 1 Tactic</b>, or 1 swap if you have none.'});
   if(B.bounty && B.board.some(p => bountyOn(p))) out.push({k:'bounty', name:`Bounty · $${B.bounty.pay}`, text:`The enemy piece with the $ tag. <b>Capture it for +$${B.bounty.pay}</b>. Every time it captures one of your pieces, you <b>lose $1</b>.`});
   if(g) out.push({k:'guard', name:`Marked defender${g > 1 ? 's' : ''} · ${g} left`, text:'Enemy pieces with a shield mark. <b>Capture them all</b>, then reach the score target to win. Checkmate still wins at once.'});
   if(n('trapSq')) out.push({k:'trap', name:`Your ${R('trap').name}`, text:'Hidden by you. The first enemy piece to land there (not the King) is either <b>destroyed</b> for 3× its value or <b>turns to your side</b> for the round.'});
   if(B.board.some(p => p && p.sh > 0)) out.push({k:'armor', name:'Armor', text:'A shield with a number on a piece. It <b>blocks that many captures</b> against the piece. Your own Armor is off while that piece is giving check.'});
   return out;
 }
-const boardMarkAt = i => { if(!B) return ''; const k = (B.lights || []).includes(i) ? 'light' : (B.vantage || []).includes(i) ? 'vantage' : (B.crates || []).includes(i) ? 'crate' : (B.trapSq || []).includes(i) ? 'trap' : ''; const m = k && boardMarks().find(x => x.k === k);
-  return m ? `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${{light:'Green light', crate:'Crate trap', vantage:'Vantage point'}[k] || m.name} on ${sqName(i)}</b><br>${m.text}</span></span>` : ''; };
+const boardMarkAt = i => { if(!B) return ''; const k = (B.lights || []).includes(i) ? 'light' : (B.vantage || []).includes(i) ? 'vantage' : (B.banner || []).includes(i) ? 'banner' : (B.crates || []).includes(i) ? 'crate' : (B.trapSq || []).includes(i) ? 'trap' : ''; const m = k && boardMarks().find(x => x.k === k);
+  return m ? `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${{light:'Green light', crate:'Crate trap', vantage:'Vantage point', banner:'Royal banner'}[k] || m.name} on ${sqName(i)}</b><br>${m.text}</span></span>` : ''; };
 function boardKey(){ const L = boardMarks(); if(!L.length) return;
   showTip('<b>Board key</b>' + L.map(m => `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${m.name}</b><br>${m.text}</span></span>`).join('')); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = setTimeout(hideTip, 12000); } }
 async function tapSquare(i){
@@ -7482,6 +7490,35 @@ function bountyStrikes(mover, lost, at){
   try{ updateHud(); }catch(e){}
   return true;
 }
+/* v205 The Royal Banner: the Ruler fights' encounter (all five). One marked square in the middle of the board.
+   Pawns cannot raise it. The Bearer's piece that lands there first: +1 Tactic (+1 swap when Tactics are full) and that piece
+   gains 1 Armor (not the King). If an enemy piece gets there first, the Bearer loses 1 Tactic, or 1 swap when there is none. */
+const rulerFight = () => !!(RUN && !RUN.gauntlet && !MATCH && RUN.circuit === 'ruler' && RUN.bosses && bossAt(RUN.ante) === 'ruler');
+function bannerSquare(board){
+  if(!rulerFight()) return [];
+  const mid = [27, 28, 26, 29, 35, 36, 34, 37, 25, 30, 33, 38, 24, 31, 32, 39].filter(x => !board[x]);
+  // a fair race: no officer or King on either side can reach it with its first move
+  const near = new Set(); try{ for(let i = 0; i < 64; i++){ const p = board[i]; if(p && p.t !== 'P') for(const t of movesFor(board, i)) near.add(t); } }catch(e){}
+  const i = mid.find(x => !near.has(x)); return i !== undefined ? [i] : mid.length ? [mid[0]] : [];
+}
+function runBanner(at){
+  if(!B || !B.board[at] || !(B.banner || []).includes(at)) return false;
+  const q = B.board[at]; if(q.t === 'P') return false;
+  B.banner = [];
+  if(q.side === 'en'){
+    const t = tacState(), tac = t.n > 0, sw = !tac && B.swaps > 0; if(tac) t.n--; else if(sw) B.swaps--;
+    pop(at, tac ? 'Banner lost · −1 Tactic' : sw ? 'Banner lost · −1 swap' : 'Banner lost', 'fxm'); sfx.ambush();
+    logPos(`The enemy raised the banner on ${sqName(at)}.${tac ? ' You lost 1 Tactic.' : sw ? ' You lost 1 swap.' : ''}`, at, at, 'fx');
+    try{ updateHud(); }catch(e){}
+    return true;
+  }
+  const t = tacState(), tac = t.n < TAC_MAX; if(tac) t.n++; else B.swaps++;
+  const armor = q.t !== 'K'; if(armor) q.sh = (q.sh || 0) + 1;
+  pop(at, `Banner taken · +1 ${tac ? 'Tactic' : 'swap'}${armor ? ' · +1 Armor' : ''}`, 'fxg'); sfx.coin();
+  logPos(`You took the banner on ${sqName(at)}: +1 ${tac ? 'Tactic' : 'swap'}${armor ? `, and your ${TYPE[q.t].name} gains 1 Armor` : ''}.`, at, at, 'fx');
+  try{ updateHud(); }catch(e){}
+  return true;
+}
 function springDockCrate(at){
   if(!B || !B.board[at] || !(B.crates || []).includes(at)) return false;
   B.crates = B.crates.filter(i => i !== at);
@@ -7560,7 +7597,7 @@ async function doMove(from, to, pt){
     if(RULE('tax')){ RUN.money = Math.max(0, RUN.money - 1); pop(to, '-$1', 'fxm'); }
     $('#hand').textContent = 'Quiet move';
   }
-  springDockCrate(to); runGreenLight(to); runVantage(to); bountyClaim(victim, to);
+  springDockCrate(to); runGreenLight(to); runVantage(to); bountyClaim(victim, to); runBanner(to);
   chalAfterMove(mover, victim);
   updateHud();
   if(enemyMated()){ save(); busy = false; return checkmateWin(); }      // v156: saved first, so a refresh comes back to the mate
@@ -8399,6 +8436,7 @@ async function enemyExec(plan, sub){
   await enSafe('crate',()=>springDockCrate(to));
   await enSafe('light',()=>runGreenLight(to));
   await enSafe('vantage',()=>runVantage(to));
+  await enSafe('banner',()=>runBanner(to));
   await enSafe('bounty',()=>bountyStrikes(mover, lost, to));
   // 2. Thorns: the attacker falls with the piece it took
   const thorns = !!(lost && hasE(lost, 'thorn'));
