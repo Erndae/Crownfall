@@ -325,3 +325,31 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .en-cont:disabled{opacity:.55}
 .en-cont:focus-visible{outline:2px solid #ffe14d;outline-offset:3px}
 @media (max-height:700px){.en-panel{gap:14px;bottom:calc(var(--sab) + 14px)}.en-panel p{font-size:clamp(19px,5.6vw,24px)}}
+/* v212: The King Rises (Final Throne Phase cutscene) */
+.ending.ckrise{background:transparent}
+.ckrise .ckr-throne{background:#07060a}
+.ckrise .ckr-bg{position:absolute;inset:0;background:center/cover no-repeat;filter:brightness(.42) saturate(.85)}
+.ckrise .ckr-throne::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(120,10,24,.18),transparent 60%),linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 55%,rgba(0,0,0,.9) 82%)}
+.ckrise .ckr-crowns img{position:absolute;width:min(30vw,150px);aspect-ratio:1;object-fit:cover;opacity:0;filter:brightness(.6);-webkit-mask:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%);mask:radial-gradient(circle at 50% 50%,#000 38%,transparent 70%);transition:opacity 1.6s ease,filter 1.6s ease;z-index:1}
+.ckrise .ckr-c.c0{left:4%;top:calc(var(--sat) + 11%)}.ckrise .ckr-c.c1{right:4%;top:calc(var(--sat) + 11%)}
+.ckrise .ckr-c.c2{left:6%;top:calc(var(--sat) + 25%)}.ckrise .ckr-c.c3{right:6%;top:calc(var(--sat) + 25%)}
+.ckrise.stir .ckr-crowns img{opacity:1;filter:brightness(1.15) saturate(1.1)}
+.ckrise.stir .ckr-crowns::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 22%,rgba(255,200,120,.16),transparent 22%),radial-gradient(circle at 82% 22%,rgba(255,200,120,.16),transparent 22%),radial-gradient(circle at 20% 36%,rgba(255,200,120,.14),transparent 20%),radial-gradient(circle at 80% 36%,rgba(255,200,120,.14),transparent 20%)}
+.ckrise .ckr-king{position:absolute;left:50%;bottom:calc(var(--sab) + 25vh);width:min(58vw,300px);aspect-ratio:3/4;transform:translate(-50%,18%) scale(.9);border-radius:16px;overflow:hidden;border:2px solid #120d0f;box-shadow:0 10px 40px rgba(0,0,0,.8);filter:brightness(.68) saturate(.8);transition:transform 2.2s cubic-bezier(.2,.7,.2,1),filter 2.2s ease;z-index:2}
+.ckrise .ckr-king img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
+.ckrise.rise .ckr-king{transform:translate(-50%,0) scale(1);filter:brightness(1)}
+.ckrise.shake .ckr-throne{animation:ckshake .6s ease}
+@keyframes ckshake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+.ckrise .ckr-dim{background:linear-gradient(180deg,transparent 52%,rgba(5,4,7,.86) 74%,rgba(5,4,7,.96))}
+.ckrise .ckr-card{background:rgba(5,4,7,.88)}
+.ckrise .en-txt{bottom:calc(var(--sab) + 7vh)}
+.ckrise .en-txt.ckline>span{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ckrise .ckwho{font:600 12px var(--body);letter-spacing:.32em;text-transform:uppercase;color:#e0263f;text-shadow:none}
+.ckrise .ckwho.mine{color:#ffd23d}
+.ckrise .en-panel p.ckcard{display:flex;flex-direction:column;gap:10px}
+.ckrise .ckt{font:400 clamp(24px,7.4vw,34px)/1.1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:#f5c542}
+.ckrise .cks{font-size:clamp(17px,4.8vw,21px);color:#efe7da}
+.ckrise .en-panel{bottom:calc(var(--sab) + 26vh)}
+.ckrise .en-skip{color:#bbb;border-color:#666}
+.ckrise.calm .ckr-king,.ckrise.calm .ckr-crowns img{transition:opacity .4s ease}
+@media (max-height:700px){.ckrise .ckr-king{width:min(48vw,230px);bottom:calc(var(--sab) + 27vh)}.ckrise .ckr-c{width:min(26vw,120px)}.ckrise .en-panel{bottom:calc(var(--sab) + 20vh)}}

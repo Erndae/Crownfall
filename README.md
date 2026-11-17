@@ -306,3 +306,11 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Order:** after "It was waiting for you." the ending crossfades to the crown painting with "You lift the Crown of Crowns." and a Continue button, then into the transformation as before. After "A new Crownrunner has entered." it crossfades to the balcony painting for "They are coming for your throne, …" and, if you haven't seen the other ending, "A crown can be worn. It can also be broken.", each with Continue; the last Continue ends it. Every line and the reveal order are unchanged.
 - The artwork's mock titles, numbers, captions and buttons were cropped off; the first painting's visible face was painted over as a black mask. Text and Continue are the game's own, placed above the iPhone's bottom safe area; the art starts below the top one and is scaled without stretching, keeping the crown in view.
 - The true ending, gameplay, balance, music and other screens are unchanged.
+
+## v212 — The King Rises
+
+- When the Crownless King is checkmated the first time, a short cutscene now plays in place of the old two-second banner: the board holds while the mated square cracks and the music dips; the throne appears with his portrait bowed; your four World Crowns glow; he rises ("Not yet."); the view returns to the board as his guard arrives; one of your companions answers by name and personality; then a "Final Throne Phase" card with Continue hands you your turn.
+- Seen before on this device: a short version (the rise, "Not yet." and the card). Skip is available from the first frame and ends in the same state.
+- Variants: your name (or "Bearer"), New Game+ ("Again, …? The throne remembers you."), and after the ending the guard line names your old army. Hints only: nothing in the scene or in Phase 2 says who he was or what the throne does.
+- During Phase 2 he has new capture, hurt and check lines, and speaks when the throne crumbles. His win and lose lines are unchanged.
+- The board change and save still happen before the scene, so a refresh during it returns to Final Throne Phase on the saved board with a two-second recap, never a second wave. Phase 2's rules, army, target, anti-stall and scoring are unchanged.

@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=211"></script>
-<script src="piece-designs.js?v=211"></script>
-<script src="character-style.js?v=211"></script>
-<script src="campaign-opponents.js?v=211"></script>
-<script src="campaign-dialogue.js?v=211"></script>
-<link rel="stylesheet" href="character-style.css?v=211">
+<script src="gameplay-polish.js?v=212"></script>
+<script src="piece-designs.js?v=212"></script>
+<script src="character-style.js?v=212"></script>
+<script src="campaign-opponents.js?v=212"></script>
+<script src="campaign-dialogue.js?v=212"></script>
+<link rel="stylesheet" href="character-style.css?v=212">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=211">
-<link rel="stylesheet" href="ruler-style.css?v=211">
-<link rel="stylesheet" href="gameplay-polish.css?v=211">
+<link rel="stylesheet" href="city-board.css?v=212">
+<link rel="stylesheet" href="ruler-style.css?v=212">
+<link rel="stylesheet" href="gameplay-polish.css?v=212">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3616,7 +3616,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 211;
+const GAME_VERSION = 212;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5020,6 +5020,11 @@ function storyLines(o){
       o.intro = a && b ? `I climbed these steps once, with ${a} and ${b} beside me. Look closely, Bearer. They never left.` : 'I climbed these steps once, as you do now. Look closely at my army, Bearer.';
       o.hurt = ['They fought for me before they ever saw you.', 'I have lost more than that, Bearer.'];
       o.lose = F.king ? `They called me ${F.king}, once. Now the question is yours, Bearer: what will they call you?` : 'I carried it as far as I could. Now the question is yours, Bearer: what will they call you?'; }
+    if(B && B.ckFinal){ const nm = bearerOr();                         // v212: Final Throne Phase only (win and lose lines unchanged)
+      o.capture = ['The throne gives back what you take.', `Still mine, ${nm}.`];
+      o.hurt = ['Again? You cannot kill what the throne keeps.', 'Each piece you take, I remember.'];
+      o.check = 'Careful. You are closer to this throne than you think.';
+      o.crumble = `The throne is tiring of me, ${nm}. Is it watching you now?`; }
   }
   // v143: the Crownrunner mystery, first clear only (a Circuit or crown already won keeps its usual lines)
   const fresh = RUN && !MATCH && !(o.ruler ? landWon(land()) : circuitDone(land(), RUN.circuit));
@@ -6059,6 +6064,7 @@ function playBlind(resumed){
   $('#expC').onclick = $('#expM').onclick = () => explainScore();
   $('#goalInfo').onclick = battleInfo;
   finalPhaseHud();   // a saved Final Phase comes back as it was
+  if(resumed && B.ckFinal && B.ckRiseShown === false) later(() => ckRiseRecap(), 500);   // v212
   chalHud();         // and so does an active challenge
   showCombo();
   if(boss && boss.ruler && land() === 'throne') endingPrefetch();   // the ending's art is ready before it is needed
@@ -9369,22 +9375,105 @@ async function crownlessRise(){
   B.wave = REINF_MAX + 1; B.startVal = enemyValue(B.board);                   // the rise is his last reinforcement
   window.__ck.phase2 = B.board.filter(q => q && q.side === 'en').map(q => q.t).sort().join('');
   logPos('The King does not fall', -1, -1, 'fx');
+  B.ckRiseShown = false;                                                      // v212: a refresh before the cutscene ends gets the short recap
   save();
-  await sleep(calm ? 300 : 700); if(bw) bw.classList.remove('matebeat');
+  musicDuck(true); try{ endingSounds().rumble(); endingSounds().stone(.2); }catch(e){}   // v212: beat 1, the board holds
+  await sleep(calm ? 300 : 1100); if(bw) bw.classList.remove('matebeat');
   const sp = document.getElementById('speech'); if(sp) sp.remove();
-  drawBoard();
-  if(bw){ bw.classList.add('ckrise');
-    const el = document.createElement('div'); el.className = 'reinf lk ckr';
-    el.innerHTML = '<b>The King does not fall.</b><span>Final Throne Phase</span>';
-    bw.appendChild(el); requestAnimationFrame(() => el.classList.add('on'));
-    try{ noise({type:'lowpass', f:260, dur:.7, vol:.14}); tone({f:55, f2:41, dur:1.2, vol:.1}); tone({f:220, f2:330, type:'triangle', dur:.5, vol:.04, at:.5}); }catch(e){}
-    arrived.forEach((i, n) => { const q = document.querySelector(`.sq[data-i="${i}"]`); if(q && !calm){ q.style.setProperty('--d', (n * 45) + 'ms'); q.classList.add('arrive'); } });
-    const kk = kingIdx(B.board, 'en'); if(kk >= 0) setTimeout(() => pop(kk, 'Not yet.', 'fxx'), calm ? 100 : 600);
-    await sleep(calm ? 1100 : 2000);
-    el.classList.remove('on'); el.classList.add('out'); setTimeout(() => el.remove(), 260); bw.classList.remove('ckrise'); }
+  await ckRiseCutscene(arrived);                                              // v212: presentation only; the board above is already final and saved
   finalPhaseHud(); updateHud(); drawBoard();
   $('#hand').textContent = 'Final Throne Phase: reach the target or checkmate him again';
   busy = false;                                                               // the rise is not a move: your turn
+}
+/* v212 THE KING RISES. Shown after crownlessRise() has already changed and saved the board. Built with the ending kit.
+   First time: the full scene (throne, the four crowns, his rise, his guard on the live board, a companion's answer, the title card).
+   Seen before on this device (crownfall-ckrise-seen): beats 1, 4 and 7 only. Skip is always available and ends in the same state.
+   Hints only: nothing here says who he was or what the throne does to the one who holds it. */
+const CKRISE_KEY = 'crownfall-ckrise-seen';
+const ckRiseSeen = () => { try{ return localStorage.getItem(CKRISE_KEY) === '1'; }catch(e){ return false; } };
+const bearerOr = () => bearerName() || 'Bearer';
+function musicDuck(on){ try{ const c = MM.cur; if(!c || !AC) return; const t = AC.currentTime, g = c.gain.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(on ? 0.22 : 1, t + (on ? 0.6 : 1.6)); }catch(e){} }
+const CK_ANSWER = {L:'We stand with you. Finish it.', F:'Good. I wasn’t done.', S:'Great. He has a second wind.', C:'Stay close. He got up once. Don’t give him a reason to again.',
+  A:'A second chance to lose. Generous of him.', K:'New pieces, same board. I count a way through.', M:'Even better. Two falls, twice the glory.', V:'I’ve seen kings get up before. They go down the same way.'};
+function ckAnswer(){
+  try{
+    if(laOn()){ const alive = (B.board || []).filter(p => p && p.side === 'me' && p.t !== 'K' && p.ri !== undefined).map(p => laOfRi(p.ri)).filter(c => c && fallenClean(c.n, 14));
+      if(alive.length){ const ch = alive.reduce((a, c) => (c.b || 0) > (a.b || 0) ? c : a, alive[0]);
+        return {who:`${fallenClean(ch.n, 14)} · ${TYPE[ch.t] ? TYPE[ch.t].name : ''}`, line:CK_ANSWER[ch.p] || CK_ANSWER.L}; } }
+    const anyone = (B.board || []).some(p => p && p.side === 'me' && p.t !== 'K');
+    return anyone ? {who:'', line:'Your army closes ranks around you.'} : {who:'', line:`${bearerOr()} stands alone. It is enough.`};
+  }catch(e){ return {who:'', line:`${bearerOr()} stands alone. It is enough.`}; }
+}
+function ckGuardLine(){
+  try{ const F = fallenRecord(); if(F){ const a = F.army[0] && F.army[0].n, b = F.army[1] && F.army[1].n;
+    if(a && b) return `${a} and ${b} still stand guard. Do you recognise them yet?`; if(a) return `${a} still stands guard. Do you recognise them yet?`; } }catch(e){}
+  return 'My guard still stands. They followed me here, as yours follow you.';
+}
+function ckRiseHTML(){
+  const crowns = BASE_LANDS.map((l, i) => { const a = crownArt(l, WORLD_TIER(l)); return a ? `<img class="ckr-c c${i}" src="${a}" alt="">` : ''; }).join('');
+  return `<div class="en-scene ckr-throne" data-s="throne"><div class="ckr-bg"></div><div class="ckr-crowns">${crowns}</div>
+      <div class="ckr-king"><img src="${RULERS.throne.art}" alt="The Crownless King"></div></div>
+    <div class="en-scene ckr-dim" data-s="dim"></div>
+    <div class="en-scene ckr-card" data-s="card"></div>
+    <div class="en-txt"></div>
+    <div class="en-panel" hidden><p></p><button type="button" class="en-cont"><span aria-hidden="true">✦</span>Continue<span aria-hidden="true">✦</span></button></div>
+    <button class="en-skip">Skip</button>`;
+}
+async function ckRiseScript(E, o){
+  const ov = E.ov, snd = endingSounds(), nm = bearerOr();
+  const H = h => fast ? Math.round(h * 0.7) : h;                       // reading time: shorter on Fast, never cut by reduced motion
+  const king = (t, h) => E.say(`<small class="ckwho">The Crownless King</small>“${t}”`, H(h), 'bottom', 'story ckline');
+  const bg = ov.querySelector('.ckr-bg'); if(bg && LAND_ART.throne) bg.style.backgroundImage = `url("${LAND_ART.throne}")`;
+  E.scene('throne'); await E.wait(o.short ? 700 : 1500);
+  if(!o.short){
+    await king('Checkmate.', 1700);
+    await king('I know that word. I have heard it on these steps before.', 3100);
+    ov.classList.add('stir'); snd.resonance(.3); await E.wait(500);                                  // beat 3: the four crowns
+    await king(`Do you feel them pulling, ${nm}? They have pulled you all the way here.`, 3400);
+    if(o.ng) await king(`Again, ${nm}? The throne remembers you.`, 2400);
+  } else ov.classList.add('stir');
+  ov.classList.add('rise'); snd.stone(0); snd.rumble();                                               // beat 4: he rises
+  if(!calm){ ov.classList.add('shake'); setTimeout(() => ov.classList.remove('shake'), 700); }
+  if(!o.short) await king('The throne does not let its king fall. Not while it still has a use for him.', 3600);
+  await king('Not yet.', o.short ? 1500 : 2000);
+  if(!o.short){
+    E.scene('dim'); await E.wait(800); o.wave();                                                     // beat 5: back to the board, his guard arrives
+    await king(ckGuardLine(), 3000);
+    const a = ckAnswer();                                                                            // beat 6: your answer
+    await E.say(a.who ? `<small class="ckwho mine">${a.who}</small>“${a.line}”` : a.line, H(2800), 'bottom', 'story ckline');
+  }
+  E.scene('card'); await E.wait(500);                                                                // beat 7
+  await E.cont('<b class="ckt">Final Throne Phase</b><span class="cks">Reach the target or checkmate him again.</span>', 'ckcard');
+}
+function ckRiseCutscene(arrived){
+  return new Promise(done => {
+    const short = ckRiseSeen();
+    const ov = document.createElement('div');
+    ov.className = 'ending ckrise go' + (calm ? ' calm' : '') + (short ? ' short' : '');
+    ov.innerHTML = ckRiseHTML(); document.body.appendChild(ov);
+    const E = endingKit(ov); let waved = false;
+    const wave = () => { if(waved) return; waved = true; drawBoard();
+      arrived.forEach((i, n) => { const q = document.querySelector(`.sq[data-i="${i}"]`); if(q && !calm){ q.style.setProperty('--d', (n * 45) + 'ms'); q.classList.add('arrive'); } }); };
+    const sk = ov.querySelector('.en-skip'); sk.onclick = e => { e.stopPropagation(); E.halt(); };   // from the first frame
+    const fin = () => {
+      if(!waved){ waved = true; drawBoard(); }
+      if(B){ B.ckRiseShown = true; save(); }                                   // same state whether finished or skipped
+      try{ localStorage.setItem(CKRISE_KEY, '1'); }catch(e){}
+      musicDuck(false);
+      ov.classList.add('out'); setTimeout(() => { ov.remove(); done(); }, calm ? 0 : 700);
+    };
+    ckRiseScript(E, {short, ng:ngLevel() > 0, wave}).catch(err => { if(err !== E.STOP) console.error(err); }).then(fin);
+  });
+}
+// v212: refreshed during the cutscene: the saved board is already Final Throne Phase; a 2-second recap instead of the scene
+async function ckRiseRecap(){
+  if(!B || !B.ckFinal || B.ckRiseShown !== false) return;
+  B.ckRiseShown = true; save();
+  const bw = $('#bw'); if(!bw) return;
+  const el = document.createElement('div'); el.className = 'reinf lk ckr';
+  el.innerHTML = '<b>The King does not fall.</b><span>Final Throne Phase · reach the target or checkmate him again</span>';
+  bw.appendChild(el); requestAnimationFrame(() => el.classList.add('on'));
+  await sleep(2000); el.classList.remove('on'); el.classList.add('out'); setTimeout(() => el.remove(), 260);
 }
 /* Final Throne Phase anti-stall: once, after 30 of your moves in the phase, the remaining score is capped at
    30% of the phase's original target. Lowers only; the board, the enemy army and the AI are untouched. */
@@ -9407,6 +9496,7 @@ async function throneCrumbles(){
     el.classList.remove('on'); el.classList.add('out'); setTimeout(() => el.remove(), 260); bw.classList.remove('ckcrumble'); }
   updateHud();
   if(B.target < before) $('#hand').innerHTML = `<span class="money">The throne crumbles</span> Target ${B.target.toLocaleString()}`;
+  if(isCrownless()) setTimeout(() => { if(B && B.ckFinal && !B.done) say('crumble', true); }, calm ? 100 : 400);   // v212
 }
 /* v156 · CHECKMATE FIRST
    The bug: a Tactic Swap or a Gambit (both "still your move") changed the board without asking whether the enemy was now
