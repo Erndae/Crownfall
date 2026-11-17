@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=208"></script>
-<script src="piece-designs.js?v=208"></script>
-<script src="character-style.js?v=208"></script>
-<script src="campaign-opponents.js?v=208"></script>
-<script src="campaign-dialogue.js?v=208"></script>
-<link rel="stylesheet" href="character-style.css?v=208">
+<script src="gameplay-polish.js?v=209"></script>
+<script src="piece-designs.js?v=209"></script>
+<script src="character-style.js?v=209"></script>
+<script src="campaign-opponents.js?v=209"></script>
+<script src="campaign-dialogue.js?v=209"></script>
+<link rel="stylesheet" href="character-style.css?v=209">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=208">
-<link rel="stylesheet" href="ruler-style.css?v=208">
-<link rel="stylesheet" href="gameplay-polish.css?v=208">
+<link rel="stylesheet" href="city-board.css?v=209">
+<link rel="stylesheet" href="ruler-style.css?v=209">
+<link rel="stylesheet" href="gameplay-polish.css?v=209">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3315,7 +3315,7 @@ function landsScreen(after){
       <div class="jone">${slot(l)}</div></section>`; };
   const m = modal(`<div class="jtop"><div><small>${runnerTitle()}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
-    ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}</em></div>` : ''}
+    ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}${bestCampaign() ? `<br>Best campaign $${bestCampaign().toLocaleString('en-US')}` : ''}</em></div>` : ''}
     <div class="jpath"><svg class="jcracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${cracks}</svg>
       ${PACKS.map((x, i) => (i ? link(i - 1) : '') + chapter(x, i)).join('')}</div>`, '#pdone', after);
   m.classList.add('journey');
@@ -3508,7 +3508,7 @@ const LOGO_HALO = 'data:image/webp;base64,UklGRjpfAABXRUJQVlA4TC5fAAAvsYE0EAmJkW
 let savedAt = 0; try{ savedAt = +(localStorage.getItem('gambit-savedAt') || 0); }catch(e){}
 const CLOUD = {doc:null, state:'off', last:0, timer:null, busy:false, again:false};
 function stamp(){ savedAt = Date.now(); try{ localStorage.setItem('gambit-savedAt', String(savedAt)); }catch(e){} cloudSoon(); }
-function save(){ if(B && B.cr && !enSnap) crSync(); if(MATCH) return matchWrite(); laEnsure();   // v127: a Crown Match never touches the Campaign save
+function save(){ if(B && B.cr && !enSnap) crSync(); if(MATCH) return matchWrite(); laEnsure(); purseSpill();   // v209   // v127: a Crown Match never touches the Campaign save
   try{ localStorage.setItem('gambit-run', enSnap && B && !B.done ? enSnap : JSON.stringify({RUN, B})); }catch(e){} stamp(); }   // a move in flight saves its clean boundary (v118)
 function loadRun(){ try{ const x = JSON.parse(localStorage.getItem('gambit-run')); if(x && x.RUN){ RUN = migRun(normLv(x.RUN)); B = x.B; migrateIntroRule(RUN, B); return true; } }catch(e){} return false; }
 function clearRun(){ try{ localStorage.removeItem('gambit-run'); }catch(e){} RUN = null; B = null; stamp(); }
@@ -3570,7 +3570,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 208;
+const GAME_VERSION = 209;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4899,7 +4899,7 @@ const throneCrowns = () => landWon('throne') ? 1 : 0;   // The Crown of Crowns (
 /* v206 The Royal Treasury: something for the money left at the end. When the Fallen Throne is won, the Bearer's whole purse is
    banked once per campaign into a lifetime total that survives new campaigns, with a rank shown on the Journey screen.
    A record only: it buys nothing and changes no fight. */
-const TREASURY_RANKS = [[1000, 'Keeper of the Mint'], [600, 'Golden Hand'], [300, 'Merchant Prince'], [150, 'Paymaster'], [50, 'Coin Counter']];
+const TREASURY_RANKS = [[10000, 'Keeper of the Mint'], [5000, 'Golden Hand'], [2500, 'Merchant Prince'], [1000, 'Paymaster'], [250, 'Coin Counter']];   // v209: raised with the Hoard
 const treasuryTotal = () => Math.max(0, Math.floor(+ACH.treasury || 0));
 const treasuryRank = (n = treasuryTotal()) => (TREASURY_RANKS.find(r => n >= r[0]) || [0, ''])[1];
 const treasuryNext = (n = treasuryTotal()) => [...TREASURY_RANKS].reverse().find(r => n < r[0]) || null;
@@ -4910,8 +4910,23 @@ function treasuryBank(amount){ if(!treasuryDue()) return 0; const a = Math.max(0
 function treasuryNotice(){ if(!ACH.treasury_note) return;
   const show = () => { if(document.getElementById('splash') || document.querySelector('.modal, .vict, .ending')) return setTimeout(show, 600);
     if(!onTitle || !ACH.treasury_note) return; delete ACH.treasury_note; saveAch();
-    showTip(`<b>Royal Treasury · $${treasuryTotal().toLocaleString('en-US')}</b><br>The $${Math.max(0, +ACH.treasury_last || 0)} you carried to the throne is banked.${treasuryRank() ? ` Rank: <b>${treasuryRank()}</b>.` : ''}<br><span class="muted">See it on the Journey screen.</span>`); };
+    showTip(`${ACH.campaign_best_new ? '<b>New best campaign!</b><br>' : ''}<b>Campaign score · $${Math.max(0, +ACH.treasury_last || 0).toLocaleString('en-US')}</b><br>Your purse and Hoard go to the Royal Treasury, now <b>$${treasuryTotal().toLocaleString('en-US')}</b>.${treasuryRank() ? ` Rank: <b>${treasuryRank()}</b>.` : ''}<br><span class="muted">See it on the Journey screen.</span>`); };
   setTimeout(show, 1500); }
+/* v209 Purse limit and the campaign high score. In a Campaign the Bearer carries at most PURSE_CAP; anything earned above it goes
+   to this campaign's Hoard. At the Fallen Throne, Hoard + purse is the campaign's score: banked into the Royal Treasury and kept as
+   the best campaign. The Gauntlet and Crown Match have no limit. */
+const PURSE_CAP = 300;
+const purseCapped = () => !!(RUN && !RUN.gauntlet && !(typeof MATCH !== 'undefined' && MATCH));
+const hoardNow = () => { const h = ACH.hoard; return h && h.ep === (ACH.campaign_epoch || 0) ? Math.max(0, Math.floor(+h.n || 0)) : 0; };
+const bestCampaign = () => Math.max(0, Math.floor(+ACH.best_campaign || 0));
+function purseSpill(){
+  if(!purseCapped() || !(RUN.money > PURSE_CAP)) return 0;
+  const x = Math.floor(RUN.money - PURSE_CAP); RUN.money = PURSE_CAP;
+  ACH.hoard = {ep:ACH.campaign_epoch || 0, n:hoardNow() + x}; saveAch();
+  if(!ACH.hoard_tip){ ACH.hoard_tip = 1; saveAch(); setTimeout(() => { try{ showTip(`<b>Purse full · $${PURSE_CAP}</b><br>Money above $${PURSE_CAP} goes to your <b>Hoard</b>. It can’t be spent, but at the end it counts toward your campaign score and the Royal Treasury.`); }catch(e){} }, 400); }
+  return x;
+}
+function campaignScore(){ const n = hoardNow() + Math.max(0, Math.floor(+(RUN && RUN.money) || 0)); const best = n > bestCampaign(); if(best) ACH.best_campaign = n; ACH.last_campaign = n; ACH.campaign_best_new = best ? 1 : 0; saveAch(); return n; }
 function runnerTitle(){ const n = worldCrowns(); return n >= 4 ? 'Bearer of the Four Crowns' : n >= 2 ? 'The Crownrunner' : n >= 1 ? 'Crownrunner' : 'Unknown challenger'; }
 const CROWN_LORE = {
   street:   {easy:'Sprayed gold over something older. Under the paint, a hairline crack.', medium:'Polished so bright you can see your face in it, and a thin fracture running through the reflection.', hard:'Vex never took it off. Up close, the stones sit along a break that was never repaired.'},
@@ -5383,7 +5398,7 @@ function title(){
     <button class="btn ghost" id="achb">${inC ? `Achievements ${Object.keys(ACH).filter(k => ACHS.some(a => a.id === k)).length}/${ACHS.length}` : 'Achievements'}</button><button class="btn ghost" id="how">How to play</button>
     <button class="btn ghost character-menu" id="customCharacter"><span data-character-token="badge">${CrownfallCharacter.svg()}</span> Customize</button></div>
     <p class="savebadge">${saveBadgeText()}</p>
-    ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span></div>` : ''}
+    ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span>${bestCampaign() ? `<span>Best campaign <b>$${bestCampaign().toLocaleString('en-US')}</b></span>` : ''}</div>` : ''}
     <div class="setg three"><button class="btn ghost" id="mus">Music: ${musicOn?'On':'Off'}</button><button class="btn ghost" id="snd">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="spd">Speed: ${fast?'Fast':'Normal'}</button></div>
     ${musicControls('mvol')}
     <div class="gver" id="gver">Crownfall ${VERSION_LABEL()}</div>
@@ -7051,7 +7066,7 @@ function drawBoard(){
     else if(sel !== null) tb.innerHTML = 'Gold = safe. <b style="color:var(--mult)">Red</b> = an enemy can take you there.';
     else tb.innerHTML = 'Tap one of your pieces to see its moves and scores.'; }
 }
-function updateHud(){
+function updateHud(){ try{ purseSpill(); }catch(e){}   // v209
   const mvEl = $('#mv'); if(mvEl){ mvEl.textContent = B.moves; const bx = mvEl.closest('.blitzmv'); if(bx) bx.classList.toggle('low', B.moves <= 3); } $('#sw').textContent = B.swaps; { const ce = $('#cash'); if(ce) ce.textContent = '$' + RUN.money; }
   { const tp = $('#tacPips'); if(tp) tp.innerHTML = pips(tacState().n); } shadowHud();
   $('#swapBtn').textContent = `Swap (${B.swaps})`;
@@ -9589,7 +9604,7 @@ function winBlind(){
   B.done = true;
   if(RUN.gauntlet) return gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mateBonus, captureFinish);   // v152: Arena Tokens (committed in gWin)
   // commit the win right away, so closing the app or going back never loses it
-  RUN.money += total;
+  RUN.money += total; purseSpill();   // v209
   let giftCard = null, fin = null;
   if(bossWin){ RUN.ante++; RUN.blind = 2; RUN.armyStages = (RUN.armyStages || 0) + 1; if(RUN.ante - 1 > BEST.ante){ BEST.ante = RUN.ante - 1; saveBest(); }
     RUN.cards = RUN.cards || []; if(RUN.cards.length < 2){ giftCard = pick(CARDS.filter(c => !c.circuit || c.circuit === RUN.circuit)); RUN.cards.push(giftCard.id); }
@@ -9603,7 +9618,7 @@ function winBlind(){
       cp.mid = null;
       if(cp.replay === l && cc === REBUILD_CIRCUIT) cp.replay = null; cp.cur = null; setCheckpoint(cp);
       if(!rebuilt) unlockAch(cc + '_conq'); const k = conqKey(l, cc), fresh = !ACH[k]; ACH[k] = ACH[k] || Date.now(); saveAch(); fin = () => circuitCleared(l, cc, fresh, rebuilt); }
-    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne'){ endingPending('standard', 'crown'); fallenRemember(); treasuryBank(RUN.money); }   // v190: remembered here, while the run still exists
+    else { const cid = landCrownId(l), fresh = !ACH[cid]; if(l === 'throne'){ endingPending('standard', 'crown'); fallenRemember(); treasuryBank(campaignScore()); }   // v190: remembered here, while the run still exists
       { const cp = cpGet(); if(cp.ruler && cp.ruler.land === l) cp.ruler = null; if(cp.rulerMid && cp.rulerMid.land === l) cp.rulerMid = null; cp.mid = null; if(cp.replay === l) cp.replay = null; cp.cur = null; setCheckpoint(cp); }   // the Ruler fell: this Land's checkpoints end
       CIRCUITS.forEach(c => { ACH[conqKey(l, c.id)] = ACH[conqKey(l, c.id)] || Date.now(); });
       ACH[cid] = ACH[cid] || Date.now(); saveAch(); fin = () => crownCeremony(l, fresh); }
@@ -10711,7 +10726,7 @@ function renderShop(html){
   if(before.length!==after.length){current.replaceChildren(...after);return;}
   after.forEach((section,i)=>{if(section.outerHTML!==before[i].outerHTML)before[i].replaceWith(section);});
 }
-function shop(){
+function shop(){ purseSpill();   // v209
   if(app.classList.contains('play')) leaveBoard();
   const shopPosition = shopScrollPosition();
   if(RUN && RUN.land && PACK !== RUN.land) setPack(RUN.land);   // tile names always follow the Land you are in
@@ -10764,7 +10779,7 @@ function shop(){
   renderShop(`<section class="screen shopscr">
     <div class="shophead">
       <div class="topbar"><button class="btn ghost backbtn" id="sback">‹ Back</button><span class="muted">${landPriceMult() > 1 ? `${PACKS.find(x => x.id === land()).name} · prices +${Math.round((landPriceMult() - 1) * 100)}%` : `Saved · ${PACKS.find(x => x.id === land()).name}`}</span></div>
-      <div class="shoptitle"><h2>${RUN.gauntlet ? 'Armory' : UI.shop}</h2><span class="shopcash"><span class="money">$${RUN.money}</span>${hearts(L)}</span></div>
+      <div class="shoptitle"><h2>${RUN.gauntlet ? 'Armory' : UI.shop}</h2><span class="shopcash"><span class="money">$${RUN.money}</span>${hearts(L)}${purseCapped() ? `<small class="hoardline">${RUN.money >= PURSE_CAP ? 'Purse full · ' : ''}Hoard $${hoardNow().toLocaleString('en-US')}</small>` : ''}</span></div>
     </div>
     <div class="inv">
       <div class="invlab"><b>${UI.tiles} · ${RUN.relics.length}/5</b>${RUN.relics.length ? '<em>Tap one to sell it</em>' : ''}</div>

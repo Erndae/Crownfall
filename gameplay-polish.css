@@ -298,3 +298,6 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .en-txt.story{font-size:clamp(19px,5.7vw,27px)}
 .en-txt>span{max-width:min(100%,28ch)}
 .en-cimg{-webkit-mask:radial-gradient(ellipse 72% 51% at 50% 50%,#000 60%,transparent 100%);mask:radial-gradient(ellipse 72% 51% at 50% 50%,#000 60%,transparent 100%)}
+/* v209: purse limit and Hoard */
+.shopcash{flex-wrap:wrap;justify-content:flex-end}
+.shopcash .hoardline{flex-basis:100%;text-align:right;font:12px var(--body);color:#d9c98a;letter-spacing:.02em;margin-top:2px}

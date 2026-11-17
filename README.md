@@ -282,3 +282,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Story:** the ending now says what is happening. The Crownless King steps aside and tells you he climbed these steps too. As you lift the crown, each change is told: your soldiers (by name) call after you, you do not turn around, the crown takes your name and then your face. After "Long live the Crownless King" it says it plainly: the throne has its king again, and it is you. The last scene adds that the new Crownrunner is coming for your throne.
 - A closing line hints that the crown can also be broken, for anyone who has not yet seen the other ending.
 - The other ending's words are unchanged; it shares the clearer crown and city pictures. About 30 seconds longer; taps still move it on.
+
+## v209 — purse limit and a campaign high score
+
+- **Purse limit $300.** In a Campaign you can carry at most $300. Anything you earn above it goes to your **Hoard**: it can't be spent, but it counts at the end. The store shows your Hoard under your money. The first time your purse fills, a note explains it.
+- **Campaign score.** When you win the Fallen Throne, your Hoard plus your purse is the campaign's score. It is banked into the Royal Treasury and kept as your **Best campaign**, shown on the title screen and the Journey screen, with "New best campaign!" when you beat it.
+- Treasury ranks are raised to match: Coin Counter $250, Paymaster $1,000, Merchant Prince $2,500, Golden Hand $5,000, Keeper of the Mint $10,000.
+- The Gauntlet and Crown Match have no limit. A campaign already over $300 moves the extra into its Hoard the next time it saves.
