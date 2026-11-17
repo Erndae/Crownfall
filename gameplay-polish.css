@@ -301,3 +301,13 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 /* v209: purse limit and Hoard */
 .shopcash{flex-wrap:wrap;justify-content:flex-end}
 .shopcash .hoardline{flex-basis:100%;text-align:right;font:12px var(--body);color:#d9c98a;letter-spacing:.02em;margin-top:2px}
+/* v210: the name prompt and New Game+ */
+.modal.namemodal .box{text-align:center}
+.nameask,.ngask{display:flex;flex-direction:column;gap:10px}
+.nameask small,.ngask small{font:11px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--brass,#e6b85c)}
+.nameask h2,.ngask h2{margin:0}
+.nameask p,.ngask p{margin:0}
+.nameask input{font:600 20px var(--body);text-align:center;padding:12px;border-radius:8px;border:2px solid #4a4650;background:#141218;color:#fff;width:100%;box-sizing:border-box}
+.nameask input:focus{outline:none;border-color:#ffd23d}
+.nameask .nameerr{min-height:16px;font-size:13px;color:#ff8b9b}
+.ngask ul{margin:0;padding-left:20px;text-align:left;display:flex;flex-direction:column;gap:4px}

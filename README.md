@@ -289,3 +289,13 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Campaign score.** When you win the Fallen Throne, your Hoard plus your purse is the campaign's score. It is banked into the Royal Treasury and kept as your **Best campaign**, shown on the title screen and the Journey screen, with "New best campaign!" when you beat it.
 - Treasury ranks are raised to match: Coin Counter $250, Paymaster $1,000, Merchant Prince $2,500, Golden Hand $5,000, Keeper of the Mint $10,000.
 - The Gauntlet and Crown Match have no limit. A campaign already over $300 moves the extra into its Hoard the next time it saves.
+
+## v210 — your name, and New Game+
+
+- **Your name.** A new campaign starts by asking "What do they call you?" (2–16 letters; continuing a campaign without a name asks once too). The name is used in the story: the first opponent of a campaign asks it, Vex, Aldric, Athena, Morwen and the Crownless King call you by it, Crown City paints it on its walls on the road out, your starting army introduces you as King, and the ending speaks it ("The crown takes Ernesto first…", "They are coming for your throne, Ernesto."). Other opponents use it once you are known. It can be changed later in Customize.
+- **New Game+.** After you win the Fallen Throne, **Continue Campaign** offers New Game+: start again in Crown City with a new army, harder every cycle:
+  - score targets +20% per cycle
+  - enemy Queens start Armored (cycle 1), Queens and Rooks (cycle 2), every officer (cycle 3+)
+  - Blitz fights 1 move tighter per cycle (never below 60% of par)
+  - store prices +10% per cycle
+- Your name, Royal Treasury, best campaign and achievements carry over. The title button shows the cycle. A plain **New Campaign** goes back to cycle 0 (your best cycle is kept). Opponents in New Game+ sometimes notice you've done this before.

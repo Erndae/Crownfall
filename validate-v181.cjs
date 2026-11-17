@@ -23,7 +23,7 @@ const L=E(`storyLines({name:'The Crownless King',ruler:true})`);
 assert.equal(L.intro,'I climbed these steps once, with Ike and Fang beside me. Look closely, Bearer. They never left.');
 assert.equal(L.lose,'They called me Ernesto b, once. Now the question is yours, Bearer: what will they call you?');
 for(const k of ['intro','lose','check','win'])assert(!/[<>]/.test(L[k]));assert(L.capture.length&&L.hurt.length);
-assert.equal(E(`storyLines({name:'Kingpin Vex',ruler:true,intro:'x'}).intro`),'x','Other rulers are untouched');
+{const keep=c.CrownfallCharacter;c.CrownfallCharacter={...keep,get:()=>({name:'Crownrunner'})};assert.equal(E(`storyLines({name:'Kingpin Vex',ruler:true,intro:'x'}).intro`),'x','Other rulers are untouched (v210: without a chosen name)');c.CrownfallCharacter=keep;}
 // names: stable per piece, by type, never reused, survive capture, promotion and save/load
 assert.equal(E('fallenNameOf(B.board[4])'),'Ernesto b');assert.equal(E('fallenNameOf(B.board[7])'),'Ike');assert.equal(E('fallenNameOf(B.board[0])'),null,'One Rook was remembered; the second stays unnamed');
 assert.equal(E('fallenNameOf(B.board[2])'),'Fang');assert.equal(E('fallenNameOf(B.board[12])'),'Dime');assert.equal(E('fallenNameOf(B.board[52])'),null,'Your own pieces are never renamed');

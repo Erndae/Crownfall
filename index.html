@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=209"></script>
-<script src="piece-designs.js?v=209"></script>
-<script src="character-style.js?v=209"></script>
-<script src="campaign-opponents.js?v=209"></script>
-<script src="campaign-dialogue.js?v=209"></script>
-<link rel="stylesheet" href="character-style.css?v=209">
+<script src="gameplay-polish.js?v=210"></script>
+<script src="piece-designs.js?v=210"></script>
+<script src="character-style.js?v=210"></script>
+<script src="campaign-opponents.js?v=210"></script>
+<script src="campaign-dialogue.js?v=210"></script>
+<link rel="stylesheet" href="character-style.css?v=210">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=209">
-<link rel="stylesheet" href="ruler-style.css?v=209">
-<link rel="stylesheet" href="gameplay-polish.css?v=209">
+<link rel="stylesheet" href="city-board.css?v=210">
+<link rel="stylesheet" href="ruler-style.css?v=210">
+<link rel="stylesheet" href="gameplay-polish.css?v=210">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2590,7 +2590,7 @@ const isC = id => RUN && RUN.circuit === id;
    capped at $3 instead of $5 outside Crown City. Targets follow the army's real upgrades, so they ease if it buys less.
    Gauntlet and Crown Match prices are unchanged; sell values are unchanged. */
 const LAND_PRICE_STEP = 0.3, LAND_PRICE_ORDER = ['street', 'medieval', 'greek', 'fantasy', 'throne'];
-function landPriceMult(){ if(!RUN || RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH)) return 1; return 1 + LAND_PRICE_STEP * Math.max(0, LAND_PRICE_ORDER.indexOf(land())); }
+function landPriceMult(){ if(!RUN || RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH)) return 1; return (1 + LAND_PRICE_STEP * Math.max(0, LAND_PRICE_ORDER.indexOf(land()))) * (1 + 0.1 * ngLevel()); }
 const savingsCap = () => (land() === 'street' ? 5 : 3) + (isC('midnight') ? 1 : 0);
 function price(x){ if(RUN && RUN.gauntlet) return x;   // (v152: Gauntlet prices are fixed)
   return Math.max(1, Math.round((isC('midnight') ? Math.max(1, x - 1) : x) * landPriceMult())); }
@@ -2845,7 +2845,7 @@ const LAND_CHAPTER = {
    how the Bearer got there: the Crowns pull like a compass, each Land further in. Hints only; nothing says what the throne does.
    {C} is the World Crown just won. Tap moves to the next line; reduced motion shows every line at once. */
 const LAND_PASSAGE = {
-  medieval:{from:'street', lines:['Crown City sleeps for the first time in years.', 'In your hands, the {C} will not sit still.', 'It leans, like a compass needle, toward the old rail line out of the city.', 'At the end of the line stand walls of black iron, and a king who has never lost.']},
+  medieval:{from:'street', lines:['Crown City sleeps for the first time in years. On every wall, a new name: {N}.', 'In your hands, the {C} will not sit still.', 'It leans, like a compass needle, toward the old rail line out of the city.', 'At the end of the line stand walls of black iron, and a king who has never lost.']},
   greek:   {from:'medieval', lines:['The gates of the Iron Kingdom stand open behind you.', 'Aldric’s soldiers do not follow. They only watch you go.', 'Two Crowns now, and both lean the same way: up the mountain road, into the clouds.', 'They say the queen at the top has already seen how this ends.']},
   fantasy: {from:'greek', lines:['Athena does not see you off.', 'Her last words follow you down the marble steps: you are not the only one playing.', 'Past the last column the road cracks. The sky does too.', 'Three Crowns pull you on, into a land where nothing moves the way it should.']},
   throne:  {from:'fantasy', lines:['The shadows let you pass.', 'Four Crowns, and you no longer choose the road. You only walk it.', 'It climbs through ash toward a ruined throne.', 'Your army is quiet. Nobody asks to turn back.']},
@@ -2864,7 +2864,7 @@ function landPassage(l, then){
   const go = () => { try{ then && then(); }catch(e){} };
   try{
     const P = LAND_PASSAGE[l], st = passageSeen(); st.seen.push(l); try{ localStorage.setItem(PASSAGE_KEY, JSON.stringify(st)); }catch(e){}
-    const name = PACKS.find(x => x.id === l).name, lines = P.lines.map(x => x.replace('{C}', landCrownName(P.from)));
+    const name = PACKS.find(x => x.id === l).name, lines = P.lines.map(x => x.replace('{C}', landCrownName(P.from)).replace('{N}', nameOr('yours')));
     const el = document.createElement('div'); el.className = 'passage' + (calm ? ' calm' : ''); el.dataset.land = l; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'The road to ' + name);
     const img = (land, cls) => LAND_ART[land] ? `<img class="${cls}" src="${LAND_ART[land]}" alt=""${LAND_FOCUS[land] ? ` style="object-position:${LAND_FOCUS[land]}"` : ''}>` : '';
     el.innerHTML = `${img(P.from, 'pa-from')}${img(l, 'pa-to')}<span class="pa-shade"></span>
@@ -3065,6 +3065,51 @@ function migrateProgress(force){
 /* ---------- campaign vs meta ----------
    Campaign progress (World Crowns, conquered circuits, old-format crown/clear keys) is stored inside ACH next to the
    achievements. campaign_epoch marks which campaign those keys belong to, so a New Game can never be undone by a merge. */
+/* v210 The Bearer's name. Asked once, before the first campaign (and before continuing one that has no name yet), saved as the
+   character's name, and spoken in the story: the first opponent asks it, the Rulers know it, the road between Lands and the
+   ending say it. Letters, numbers, spaces, ' and - only, 2-16 characters. */
+const NAME_DEFAULT = 'Crownrunner';
+const cleanName = v => String(v == null ? '' : v).replace(/[^\p{L}\p{N} '\-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 16);
+function bearerName(){ try{ const n = cleanName(CrownfallCharacter.get().name); return n.length >= 2 && n !== NAME_DEFAULT ? n : ''; }catch(e){ return ''; } }
+const nameOr = (alt = 'Crownrunner') => bearerName() || alt;
+function askName(then){
+  if(bearerName()) return then && then();
+  const m = modal(`<div class="nameask"><small>Crown City</small><h2>What do they call you?</h2><p>Everyone in the Lands will know this name. Choose well.</p>
+    <input id="bearerName" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Your name" aria-label="Your name">
+    <p class="nameerr" id="nameErr" aria-live="polite"></p>
+    <button class="btn red" id="nameGo" disabled>That’s my name</button></div>`);
+  m.classList.add('namemodal');
+  const inp = m.querySelector('#bearerName'), go = m.querySelector('#nameGo'), err = m.querySelector('#nameErr');
+  const ok = () => { const v = cleanName(inp.value); const good = v.length >= 2 && v.toLowerCase() !== NAME_DEFAULT.toLowerCase(); go.disabled = !good;
+    err.textContent = inp.value.trim() && !good ? (v.length < 2 ? 'At least 2 letters.' : 'Pick a name of your own.') : ''; return good; };
+  inp.oninput = ok;
+  const done = () => { if(!ok()) return; try{ CrownfallCharacter.save({...CrownfallCharacter.get(), name:cleanName(inp.value)}); }catch(e){} m.remove(); then && then(); };
+  go.onclick = done; inp.onkeydown = e => { if(e.key === 'Enter') done(); };
+  setTimeout(() => { try{ inp.focus(); }catch(e){} }, 120);
+}
+/* v210 New Game+. Winning the Fallen Throne finishes a campaign; "Continue Campaign" then starts it again from Crown City, one
+   cycle harder each time: score targets +20% per cycle, enemy officers start Armored (Queen from cycle 1, Rooks from 2, Bishops
+   and Knights from 3), Blitz move limits 1 tighter per cycle, store prices +10% per cycle. A plain New Campaign returns to cycle 0.
+   The cycle (ACH.ngplus) is not a campaign key, so starting the next campaign keeps it. */
+const ngLevel = () => (RUN && (RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH))) ? 0 : Math.max(0, Math.min(99, Math.floor(+ACH.ngplus || 0)));
+const ngLabel = (n = ngLevel()) => n ? `New Game+${n > 1 ? ' ' + n : ''}` : '';
+const campaignComplete = () => { try{ return landWon('throne'); }catch(e){ return false; } };
+const ngTargetMult = () => 1 + 0.2 * ngLevel();
+function ngArmor(board){
+  const n = ngLevel(); if(!n || !Array.isArray(board)) return 0; let c = 0;
+  const types = n >= 3 ? ['Q', 'R', 'B', 'N'] : n >= 2 ? ['Q', 'R'] : ['Q'];
+  for(const p of board) if(p && p.side === 'en' && types.includes(p.t)){ p.sh = (p.sh || 0) + 1; c++; }
+  return c;
+}
+function ngAsk(){
+  const next = Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1;
+  const m = modal(`<div class="ngask"><small>The Crown of Crowns is yours</small><h2>${ngLabel(next)}</h2>
+    <p>Start again in Crown City with a new army. Every cycle is harder:</p>
+    <ul><li>Score targets <b>+${20 * next}%</b></li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
+    <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
+    <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
+  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); askName(() => draftScreen()); };
+}
 const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
 function mergeAch(local, cloud){
   const le = +local.campaign_epoch || 0, ce = +cloud.campaign_epoch || 0, out = {};
@@ -3077,6 +3122,7 @@ function mergeAch(local, cloud){
 }
 const cloudIsOlderCampaign = x => (+((x && x.ACH) || {}).campaign_epoch || 0) < (+ACH.campaign_epoch || 0);
 function newCampaign(){
+  ACH.ngplus = Math.max(0, Math.floor(+ACH.ng_next || 0)); delete ACH.ng_next; ACH.ng_best = Math.max(+ACH.ng_best || 0, ACH.ngplus);   // v210: New Game+ cycle, or 0 for a plain new campaign
   for(const k of Object.keys(ACH)) if(isCampaignKey(k)) delete ACH[k];      // crowns, conquered circuits, old-format progress
   ACH.prog_v = PROG_VERSION; ACH.campaign_epoch = Date.now(); ACH.kxv = 1;   // King XP 0 → King Lv.1, 1 Command
   try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){}
@@ -3151,7 +3197,7 @@ function draftForm(list){
     h += `<i class="${(r + c) & 1 ? 'dk' : 'lt'}">${q ? pieceSVG(q.t, 'me', q.e) : ''}</i>`; }
   return h;
 }
-function startNewGame(){ draftScreen(); }   // v155: the old campaign is only replaced when the new army is confirmed
+function startNewGame(){ delete ACH.ng_next; askName(() => draftScreen()); }   // v210: a name first; a plain New Campaign is cycle 0   // v155: the old campaign is only replaced when the new army is confirmed
 function draftScreen(init){
   if(MODE !== 'campaign') return goMode('campaign', 'new');
   sceneMusic('menu'); leaveBoard(); onTitle = false; setCircuitData(''); setLandBg(null); window.scrollTo(0, 0);
@@ -3197,7 +3243,7 @@ function teamIntro(){
   const mates = d.r.map(s => ({x:parseR(s), ch:laParse(s)})).filter(o => o.ch);
   app.innerHTML = `<section class="screen meet">
     <div class="mt-head"><small>Crown City · Starting Army</small><h2>Meet your army</h2></div>
-    <div class="mt-king"><span class="mt-pc">${pieceSVG('K', 'me')}</span><span><b>You · King</b><small>Every piece here fights for you.</small></span></div>
+    <div class="mt-king"><span class="mt-pc">${pieceSVG('K', 'me')}</span><span><b>${bearerName() || 'You'} · King</b><small>Every piece here fights for you.</small></span></div>
     <div class="mt-grid ${mates.length > 10 ? 'lots' : mates.length > 6 ? 'many' : ''}">${mates.map((o, k) => `<button class="mtc" data-k="${k}" style="--d:${k * 70}ms" aria-label="${o.ch.n}, ${TYPE[o.x.t].name}, ${LA_P[o.ch.p]}">
       <span class="mt-pc">${pieceSVG(o.x.t, 'me', o.x.e)}</span><span class="mt-tx"><b>${o.ch.n}</b><small>${TYPE[o.x.t].name}</small><i>${LA_PI[o.ch.p]} ${LA_P[o.ch.p]}</i><q>${laJoinLine(o.ch)}</q></span></button>`).join('')}</div>
     <p class="muted mt-hint">Tap a character to read about them.</p>
@@ -3570,7 +3616,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 209;
+const GAME_VERSION = 210;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3675,6 +3721,7 @@ function targetParts(i){
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
   if(lim) t = Math.max(t, Math.min(blitz * bf, BLITZ_FLOOR * targetParts(0).final));   // v177: Blitz floor (the Warm-up already includes the build factor)
+  t *= ngTargetMult();   // v210: New Game+ (+20% per cycle), after every cap so it always applies
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
   return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), build:+bf.toFixed(2), ppm:campaignPPM(), power:+campaignPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
@@ -4945,9 +4992,10 @@ const LORE_TIP = {
 function brokenCrownSVG(){ return `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 32 L4 12 L11 19 L14 6 L20 15 L26 6 L29 19 L36 12 L35 32 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 5 L18 15 L22 18 L17 28 L20 35" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg>`; }
 function repLine(pp){
   if(!pp || pp.ruler) return '';
-  const n = worldCrowns();
-  if(n >= 3) return 'So it’s true. The Crownrunner has come.';
-  if(n >= 1) return pp.simple && Math.random() < 0.5 ? '' : 'You’re the Crownrunner everyone’s talking about.';
+  const n = worldCrowns(), nm = nameOr('the Crownrunner');
+  if(ngLevel() && Math.random() < 0.35) return `${nm}. Haven’t we done this before?`;   // v210
+  if(n >= 3) return `So it’s true. ${nm} has come.`;
+  if(n >= 1) return pp.simple && Math.random() < 0.5 ? '' : `You’re ${nm}. Everyone’s talking about you.`;
   return pp.simple && Math.random() < 0.4 ? 'Another Crownrunner? You’ll be gone by sunset.' : '';
 }
 // lines that change with the story so far
@@ -4975,6 +5023,17 @@ function storyLines(o){
   }
   // v143: the Crownrunner mystery, first clear only (a Circuit or crown already won keeps its usual lines)
   const fresh = RUN && !MATCH && !(o.ruler ? landWon(land()) : circuitDone(land(), RUN.circuit));
+  // v210: the first opponent of a campaign asks the Bearer's name; the Rulers already know it
+  const nm = bearerName();
+  if(nm && fresh && !o.ruler && land() === 'street' && worldCrowns() === 0 && RUN.ante === 1 && !CS_CIRC.some(c => circuitDone('street', c))){
+    o.intro = `New face. What do they call you?… ${nm}? Never heard of it. Let’s change that.`; o.lose = `${nm}. All right. I’ll remember that name.`; }
+  if(nm && o.ruler && fresh){
+    if(o.name === 'Kingpin Vex') o.intro = `So you’re ${nm}. My corners won’t stop saying it.`;
+    if(o.name === 'King Aldric the Iron-Handed') o.intro = `${nm}. The bells rang your name before you reached my gate.`;
+    if(o.name === 'Athena, Queen of Olympus' && worldCrowns() < 2) o.intro = `${nm}. I have read that name before. Sit. Let us see how this game ends.`;
+    if(o.name === 'Morwen the Shadow Queen' && worldCrowns() !== WORLD_TOTAL - 1) o.intro = `${nm}. Your shadow told me your name before you did.`;
+  }
+  if(nm && o.name === 'The Crownless King' && !fallenRecord()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;
   if(fresh){
     if(o.name === 'Night Owl Nico') o.lose = 'Market’s closed. Funny. You all look different when you start.';
     if(o.name === 'Dockmaster Dee') o.win = 'I’ve seen that look before. Tide took them too.';
@@ -5383,7 +5442,7 @@ function title(){
     <p class="titlemotto">Everybody wants a crown.</p>
     <div class="modecard mc-camp keepcash">
       <div class="mchead"><b>Campaign</b><small>85 battles · five Lands · claim the Crowns</small></div>
-      ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${camp.cont}</small></button>` : ''}
+      ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${inC && !saved && !RUN && campaignComplete() ? `Start ${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)} · harder` : `${ngLevel() ? ngLabel() + ' · ' : ''}${camp.cont}`}</small></button>` : ''}
       <button class="btn ${camp.cont ? 'ghost' : ''}" id="new">New Campaign</button>
       ${camp.ready ? `<p class="savebadge" style="color:#19e3c9;margin:0">${camp.ready}</p>` : ''}
     </div>
@@ -5888,7 +5947,7 @@ function moveLimitFor(par, bossKey, baseOnly){
     if(n != null) lim = lim == null ? n : Math.min(lim, n); }
   if(lim == null) return null;
   const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossRuleName(id)] || 0) : 0;
-  return Math.max(1, lim + blitzBonus() + extra);
+  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - ngLevel());   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
 }
 const blitzOn = () => !!(B && B.moveLimit);
 /* v132 opponent identity (presentation only): tier = normal | rival | boss | ruler | crownless, plus one of five
@@ -5951,6 +6010,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   B.lights = greenLights(B.board);   // v195: Downtown Blitz fights
   B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);   // v200: Rooftop Kings and Midnight Market fights
   B.banner = bannerSquare(B.board);   // v205: Ruler fights
+  ngArmor(B.board);   // v210: New Game+
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
   if(has('aegis')){ const bi = aegisIdx(B.board); if(bi >= 0) B.board[bi].sh = Math.max(B.board[bi].sh || 0, 2); }   // (the same piece the Fallen Throne opening check armed)
   if(!MATCH && RUN.evFx && RUN.evFx.armor){ const ei = evArmorIdx(B.board, RUN.evFx.armor); if(ei >= 0) B.board[ei].sh = Math.max(B.board[ei].sh || 0, 1); delete RUN.evFx.armor; }   // v139 event Armor: next fight only, no stacking
@@ -6362,6 +6422,8 @@ function storedCampaignExists(){
   return !!(read('gambit-run')?.RUN || read('crownfall-carry') || read(REBUILD_KEY) || read(CP_KEY) || read('gambit-ach')?.cdraft || Object.keys(read('gambit-ach') || {}).some(k => /^(crown_|conq_|clr_|kxp_)/.test(k)));
 }
 function continueCampaign(){
+  if(!bearerName()) return askName(continueCampaign);   // v210
+  if(!RUN && !draftGet() && campaignComplete()) return ngAsk();   // v210: a finished campaign continues as New Game+
   if(RUN) return B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect());
   if(!getCarry() && draftGet()) return draftResume();
   if(hasCampaign()) return circuitSelect(frontierLand());
@@ -10178,7 +10240,7 @@ function endingFrame(ov){
 // v208: the army the Bearer led to the throne (recorded at the win), for the moment they are left behind
 function endingArmyLine(){
   let names = []; try{ const r = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'); if(r && Array.isArray(r.army)) names = r.army.map(x => fallenClean(x && x.n, 14)).filter(Boolean).slice(0, 2); }catch(e){}
-  return names.length >= 2 ? `Behind you, ${names[0]} and ${names[1]} are calling your name.` : names.length ? `Behind you, ${names[0]} is calling your name.` : 'Behind you, your army is calling your name.';
+  return names.length >= 2 ? `Behind you, ${names[0]} and ${names[1]} are calling your name${bearerName() ? `: ${bearerName()}` : ''}.` : names.length ? `Behind you, ${names[0]} is calling your name.` : 'Behind you, your army is calling your name.';
 }
 async function endingStandard(E, o){
   const ov = E.ov, q = x => ov.querySelector(x), snd = endingSounds();
@@ -10230,7 +10292,7 @@ async function endingStandard(E, o){
     ov.classList.add('t2'); snd.rumble();                             // recognition: the crowned king (the only place this art is used)
     await E.say('You do not turn around.', 2400, 'bottom', 'story');
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
-    await E.say('The crown takes your name first. Then your face.', 2800, 'bottom', 'story red');
+    await E.say(bearerName() ? `The crown takes ${bearerName()} first. Then your face.` : 'The crown takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });
     ov.classList.add('t4'); snd.shatter();                            // it falls away into shadow: crownless
     await E.wait(2600);
@@ -10251,7 +10313,7 @@ async function endingStandard(E, o){
   await E.say('EVERYBODY WANTS A CROWN.', 1700, 'lower', 'caps echo');
   await E.say('SOMEWHERE IN CROWN CITY…', 2300, 'lower', 'caps small');
   await E.say('A NEW CROWNRUNNER HAS ENTERED.', 3400, 'lower', 'caps final');
-  await E.say('THEY ARE COMING FOR YOUR THRONE.', 3000, 'lower', 'caps final red');
+  await E.say(bearerName() ? `THEY ARE COMING FOR YOUR THRONE, ${bearerName().toUpperCase()}.` : 'THEY ARE COMING FOR YOUR THRONE.', 3000, 'lower', 'caps final red');
   if(!endingSave().seen.true){ await E.wait(700); await E.say('A crown can be worn. It can also be broken.', 3800, 'lower', 'story'); }   // v208: there is another way this ends
 }
 /* ---------- crown artwork: each Land's World Crown ('land|easy') and the Fallen Throne's crowns ('throne|…'; The Crown of Crowns is 'throne|hard') ---------- */

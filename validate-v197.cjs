@@ -23,6 +23,6 @@ for(const bad of ['"x"','{"ep":4243,"seen":5}','nope']){E(`localStorage.setItem(
 assert.equal(E("landPassageDue('arena')"),false);assert.equal(E("landPassageDue()"),false);
 // wiring
 assert(src.includes("if(landPassageDue(PACK)) return landPassage(PACK, () => circuitSelect(PACK, startCircuit));"));
-assert(src.includes("lines.map(x => x.replace('{C}', landCrownName(P.from)))")&&src.includes('}catch(e){ go(); }'),'A failure never blocks the road');
+assert(src.includes("lines.map(x => x.replace('{C}', landCrownName(P.from))")&&src.includes('}catch(e){ go(); }'),'A failure never blocks the road');
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=197);assert(fs.readFileSync(__dirname+'/sw.js','utf8').includes('crownfall-v'+RegExp.$1));
 console.log('PASS: four passages in Land order, no spoilers, due once per campaign for a newly opened Land only, safe storage, wired, version.');

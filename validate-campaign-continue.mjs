@@ -12,7 +12,7 @@ const html=fs.readFileSync('index.html','utf8');window.document.write(html.repla
 for(const file of ['gameplay-polish.js','piece-designs.js','character-style.js','campaign-opponents.js','campaign-dialogue.js'])window.eval(fs.readFileSync(file,'utf8')+(file==='campaign-opponents.js'?';window.campaignOpponentName=campaignOpponentName;':''));
 const bridge = `
 window.__campaignTest={
- seed(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.money=172;storeCarry();ACH[conqKey('street','downtown')]=1;saveAch();clearRun();},
+ seed(){try{CrownfallCharacter.save({...CrownfallCharacter.get(),name:'Tester'})}catch(e){};soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.money=172;storeCarry();ACH[conqKey('street','downtown')]=1;saveAch();clearRun();},
  title:()=>title(),intent:()=>modeIntent(),
  state:()=>JSON.stringify({carry:getCarry(),ach:ACH}),
 };`;
