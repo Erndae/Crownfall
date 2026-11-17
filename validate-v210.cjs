@@ -28,8 +28,8 @@ E("RUN.circuit='ruler';RUN.ante=1");assert(E("storyLines({name:'Kingpin Vex',rul
 as('');assert.equal(E("storyLines({name:'Kingpin Vex',ruler:true,intro:'x'}).intro"),'x');
 // wiring
 assert(src.includes("function startNewGame(){ delete ACH.ng_next; askName(() => draftScreen()); }"));
-assert(src.includes("if(!bearerName()) return askName(continueCampaign);")&&src.includes("if(!RUN && !draftGet() && campaignComplete()) return ngAsk();"));
+assert(src.includes("if(!bearerName()) return askName(continueCampaign);")&&src.includes("if(!RUN && campaignComplete()) return ngAsk();"));
 assert(src.includes('  t *= ngTargetMult();   // v210')&&src.includes('ngArmor(B.board);')&&src.includes('lim + blitzBonus() + extra - ngLevel()'));
-assert(src.includes("replace('{N}', nameOr('yours'))")&&src.includes('THEY ARE COMING FOR YOUR THRONE, ${bearerName().toUpperCase()}.'));
+assert(src.includes("replace('{N}', nameOr('yours'))")&&src.includes("E.cont('THEY ARE COMING FOR YOUR THRONE.'"));   // v213: the crown took the name
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=210);assert(fs.readFileSync(__dirname+'/sw.js','utf8').includes('crownfall-v'+RegExp.$1));
 console.log('PASS: names cleaned and required, story uses them, NG+ cycles (+20% targets, armor, Blitz, +10% prices), cycle kept across campaigns and reset by a plain new one, Gauntlet and Match untouched, wired, version.');

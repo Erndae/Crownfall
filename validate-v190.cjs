@@ -23,7 +23,7 @@ assert.equal(E('typeof ENDINGS.standard'),'function');assert.equal(E('typeof END
 assert(src.includes("endingSave().seen.standard ? endingChoose({fresh, done:() => title()}) : playEnding('standard', {fresh, done:() => title()})"));
 assert(src.includes("endingPending('standard', 'choice')")&&src.includes("if(p.step === 'choice')"));
 assert(src.includes('Take the crown')&&src.includes('Break the crown'));
-const et=src.slice(src.indexOf('async function endingTrue'),src.indexOf('async function endingTrue')+5200);
+const et=src.slice(src.indexOf('async function endingTrue'),src.indexOf('async function endingTrue')+6200);
 assert(et.includes("endingPending('true', 'city')")&&et.includes('localStorage.removeItem(FALLEN_KEY)'),'Breaking the crown frees the remembered army');
 assert(et.includes('SOMEONE SETS UP A BOARD, JUST TO PLAY.'));
 // 4) the twist is not spoiled before the ending: none of the soldiers' lines names it

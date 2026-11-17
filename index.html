@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=213"></script>
-<script src="piece-designs.js?v=213"></script>
-<script src="character-style.js?v=213"></script>
-<script src="campaign-opponents.js?v=213"></script>
-<script src="campaign-dialogue.js?v=213"></script>
-<link rel="stylesheet" href="character-style.css?v=213">
+<script src="gameplay-polish.js?v=214"></script>
+<script src="piece-designs.js?v=214"></script>
+<script src="character-style.js?v=214"></script>
+<script src="campaign-opponents.js?v=214"></script>
+<script src="campaign-dialogue.js?v=214"></script>
+<link rel="stylesheet" href="character-style.css?v=214">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -793,21 +793,6 @@ body[data-art="1"] #app{position:relative;z-index:1}
 .en-stage>*{position:absolute;inset:0}
 .en-king,.en-crowned{background:center/100% 100% no-repeat;opacity:0}
 .en-crowned,.en-crownfx,.en-crackfx{transform:translate(1.25%,-1.56%) scale(1.01)}
-.en-halo{inset:auto;left:37.8%;top:-1.2%;width:62%;aspect-ratio:1;opacity:0;transform:scale(.86);transition:opacity 4.5s ease,transform 4.5s ease}
-.en-halo i{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(#6d542b 0 25%,#110c07 0 50%) 0 0/14% 14%;-webkit-mask:radial-gradient(circle closest-side,#000 64%,transparent 100%);mask:radial-gradient(circle closest-side,#000 64%,transparent 100%);animation:enspin 90s linear infinite}
-.en-halo::after{content:"";position:absolute;inset:3%;border-radius:50%;border:2px solid rgba(206,164,86,.7);box-shadow:0 0 18px rgba(206,164,86,.25)}
-.en-halo b{position:absolute;width:5.5%;aspect-ratio:1;background:linear-gradient(135deg,#e2b865,#6d4e1f);transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 8px rgba(226,184,101,.4)}
-@keyframes enspin{to{transform:rotate(360deg)}}
-.t1 .en-halo{opacity:.78;transform:none}
-.en-player{transition:opacity 2.6s ease}
-.en-player svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 6px rgba(150,170,205,.38));transition:filter 4.5s ease}
-.en-player .face{fill:#1b1c22;transition:fill 4.5s ease}
-.en-player .cape{opacity:0;transform:scale(.9);transform-origin:64% 40%;transform-box:view-box;transition:opacity 4.5s ease,transform 4.5s ease}
-.t1 .en-player svg{filter:drop-shadow(0 0 10px rgba(224,38,63,.5))}
-.t1 .en-player .face{fill:#000}
-.t1 .en-player .cape{opacity:1;transform:none}
-.en-held{position:absolute;inset:auto;left:50.5%;top:1.5%;width:28%;aspect-ratio:3/2;background:center/cover no-repeat;-webkit-mask:radial-gradient(ellipse 50% 44% at 50% 44%,#000 52%,transparent 100%);mask:radial-gradient(ellipse 50% 44% at 50% 44%,#000 52%,transparent 100%);filter:brightness(1.12) drop-shadow(0 0 10px rgba(255,200,110,.5))}
-.t2 .en-player,.t2 .en-halo{opacity:0;transition:opacity 2.6s ease}
 .t2 .en-crowned{opacity:1;transition:opacity 2.6s ease}
 .t3 .en-king{opacity:1}
 .en-crownfx,.en-crackfx{opacity:0;-webkit-mask:radial-gradient(ellipse 15% 13% at 63.5% 9%,#000 66%,transparent 100%);mask:radial-gradient(ellipse 15% 13% at 63.5% 9%,#000 66%,transparent 100%)}
@@ -850,8 +835,8 @@ body[data-art="1"] #app{position:relative;z-index:1}
 .ending.calm .en-throne{transform:scale(1.35);transition:none}
 .ending.calm .en-walker{transform:translateX(-50%) translateY(calc(var(--dy,-40vh) * .78)) scale(.3);opacity:0;transition:opacity 2.4s ease}
 .ending.calm.walk .en-walker{opacity:1}
-.ending.calm .en-walker svg,.ending.calm .en-halo i{animation:none}
-.ending.calm .en-crownbox,.ending.calm .en-city,.ending.calm .en-halo,.ending.calm .en-player .cape{transform:none!important}
+.ending.calm .en-walker svg{animation:none}
+.ending.calm .en-crownbox,.ending.calm .en-city{transform:none!important}
 .ending.calm .en-city{transition:none}
 .ending.calm .en-frag{transform:none!important;transition:opacity 2.4s ease,filter 2.4s ease}
 .ending.calm .en-crack path{stroke-dasharray:none;stroke-dashoffset:0;opacity:0;transition:opacity 1.6s ease,stroke 2s ease}
@@ -2402,9 +2387,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=213">
-<link rel="stylesheet" href="ruler-style.css?v=213">
-<link rel="stylesheet" href="gameplay-polish.css?v=213">
+<link rel="stylesheet" href="city-board.css?v=214">
+<link rel="stylesheet" href="ruler-style.css?v=214">
+<link rel="stylesheet" href="gameplay-polish.css?v=214">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3616,7 +3601,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 213;
+const GAME_VERSION = 214;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6429,7 +6414,7 @@ function storedCampaignExists(){
 }
 function continueCampaign(){
   if(!bearerName()) return askName(continueCampaign);   // v210
-  if(!RUN && !draftGet() && campaignComplete()) return ngAsk();   // v210: a finished campaign continues as New Game+
+  if(!RUN && campaignComplete()) return ngAsk();   // v210: a finished campaign continues as New Game+ (v214: even though its drafted army is still saved)
   if(RUN) return B ? playBlind(true) : (RUN.inShop ? shop() : blindSelect());
   if(!getCarry() && draftGet()) return draftResume();
   if(hasCampaign()) return circuitSelect(frontierLand());
@@ -10242,9 +10227,10 @@ async function endingTrue(E, o){
     await E.wait(250);
     await E.say('This time, you let it wait.', 2800, 'top', 'story red');
     await E.black(1400);
-    // 3) the crown is broken
+    // 3) the crown is broken (v214: you hold it, and do not put it on)
     E.scene('crown'); q('.en-crownbox').classList.remove('waiting');
     await E.wait(1500);
+    await E.cont('You hold the Crown of Crowns. This time, you do not put it on.', 'story');
     q('.en-crownbox').classList.add('breaking'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);
     await E.wait(2600);
     q('.en-crownbox').classList.add('broken'); snd.shatter();
@@ -10265,6 +10251,8 @@ async function endingTrue(E, o){
     await E.say(was && was.army.length >= 2 ? `${was.army[0]} and ${was.army[1]} lay down their arms. So does every army that ever climbed here.` : 'His army lays down its arms. So does every army that ever climbed here.', 3600, 'top', 'story');
     endingPending('true', 'city');                                    // the story has been told: a refresh from here resumes at the city
     try{ localStorage.removeItem(FALLEN_KEY); }catch(e){}             // the cycle is broken: no one is kept
+    await E.wait(400);
+    await E.say(bearerName() ? `The throne never takes your face. You walk down the steps as you came: ${bearerName()}.` : 'The throne never takes your face. You walk down the steps as you came.', 3600, 'top', 'story');   // v214: you stay yourself
     await E.black(1600);
     await E.wait(1000);
   } else { try{ localStorage.removeItem(FALLEN_KEY); }catch(e){} await E.wait(1000); }
@@ -10305,12 +10293,6 @@ function playEnding(type, opts){
 function endingHTML(){
   // v213: painted rear-view walk cycle; no face is exposed.
   const walker = '<div class="en-walksprite" role="img" aria-label="Your hooded Crownrunner walks up the stone steps toward the throne"></div>';
-  const sh = [[.08,.46],[.16,.2],[.36,.04],[.64,.05],[.85,.18],[.96,.44],[.9,.72],[.1,.74],[.5,.02]].map(([x, y]) => `<b style="left:${x * 100}%;top:${y * 100}%"></b>`).join('');
-  const player = `<svg viewBox="0 0 640 768" aria-hidden="true"><defs><linearGradient id="enp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15151b"/><stop offset="1" stop-color="#050506"/></linearGradient>
-    <linearGradient id="enc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a1424"/><stop offset="1" stop-color="#2a0409"/></linearGradient></defs>
-    <path class="cape" fill="url(#enc)" d="M330 290L250 272 276 300 190 290 236 320 140 318 204 350 96 364 176 386 60 420 150 430 50 492 140 488 40 560 128 552 52 640 110 630 70 768H620L600 690 636 700 598 620 640 610 592 540 636 520 584 470 628 440 570 410 610 380 548 364 580 330 520 330 512 296Z"/>
-    <path fill="url(#enp)" d="M412 108C372 108 340 140 334 190 330 230 330 270 318 300 290 318 250 322 214 340 170 362 130 400 112 450 96 500 90 560 84 620L70 768H610L600 640C596 560 600 470 590 420 580 380 548 350 508 330 498 300 492 260 490 200 486 140 452 108 412 108Z"/>
-    <ellipse class="face" cx="412" cy="222" rx="52" ry="78"/></svg>`;
   // the crown breaks along these lines (image space, in % of the portrait): 8 pieces that tile the crown
   const P = {A:[50,0],B:[58,0],C:[66,0],D:[72,0],E:[77,0],F:[50,9],G:[56,11],H:[62,8],I:[68,12],J:[73,9],K:[77,10],L:[50,21],M:[57,21],N:[64,21],O:[71,21],Q:[77,21]};
   const pieces = ['ABHGF','BCIH','CDJI','DEKJ','FGML','GHINM','IJON','JKQO'];
@@ -10324,8 +10306,7 @@ function endingHTML(){
     <div class="en-scene" data-s="approach"><div class="en-journey"><div class="en-throne"></div><div class="en-walker">${walker}</div></div></div>
     <div class="en-scene" data-s="become"><div class="en-back"></div><div class="en-glow"></div>
       <div class="en-stagewrap"><div class="en-stage">
-        <div class="en-halo"><i></i>${sh}</div><div class="en-king"></div><div class="en-crowned"></div>
-        <div class="en-player">${player}<div class="en-crest">${(() => { try{ return CrownfallCharacter.svg(); }catch(e){ return ''; } })()}</div><div class="en-held"></div></div>
+        <div class="en-king"></div><div class="en-crowned"></div>
         <div class="en-crownfx">${frags}</div><div class="en-crackfx"><svg class="en-crack" viewBox="0 0 100 100" preserveAspectRatio="none">${crack}</svg></div>
       </div></div></div>
     <div class="en-scene" data-s="city"><div class="en-city"></div></div>
@@ -10344,15 +10325,17 @@ function endingFrame(ov){
 }
 // v208: the army the Bearer led to the throne (recorded at the win), for the moment they are left behind
 function endingArmyLine(){
-  let names = []; try{ const r = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'); if(r && Array.isArray(r.army)) names = r.army.map(x => fallenClean(x && x.n, 14)).filter(Boolean).slice(0, 2); }catch(e){}
-  return names.length >= 2 ? `Behind you, ${names[0]} and ${names[1]} are calling your name${bearerName() ? `: ${bearerName()}` : ''}.` : names.length ? `Behind you, ${names[0]} is calling your name.` : 'Behind you, your army is calling your name.';
+  let army = []; try{ const r = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'); if(r && Array.isArray(r.army)) army = r.army.map(x => ({n:fallenClean(x && x.n, 14), t:x && x.t})).filter(x => x.n && TYPE[x.t]).slice(0, 2); }catch(e){}
+  const who = x => `${x.n}, your ${TYPE[x.t].name}`, nm = bearerName() ? `: ${bearerName()}` : '';   // v214: say who they are
+  if(army.length >= 2) return army[0].t === army[1].t ? `Behind you, ${army[0].n} and ${army[1].n}, your ${TYPE[army[0].t].name}s, are calling your name${nm}.` : `Behind you, ${who(army[0])}, and ${who(army[1])}, are calling your name${nm}.`;
+  return army.length ? `Behind you, ${who(army[0])}, is calling your name${nm}.` : `Behind you, your army is calling your name${nm}.`;
 }
 async function endingStandard(E, o){
   const ov = E.ov, q = x => ov.querySelector(x), snd = endingSounds();
   const art = {crown:crownArt('throne', 'hard'), throne:LAND_ART.throne, approach:ENDING_APPROACH, walker:ENDING_WALKER, city:LAND_ART.street, king:RULERS.throne.art, crowned:ENDING_ART, lift:ENDING_LIFT, reign:ENDING_REIGN};
   const ready = {}; for(const k in art) ready[k] = E.load(art[k]);
   const bg = (el, k) => { if(el && art[k]) el.style.backgroundImage = `url("${art[k]}")`; };
-  bg(q('.en-cimg'), 'crown'); bg(q('.en-held'), 'crown'); bg(q('.en-throne'), 'approach'); bg(q('.en-back'), 'throne'); bg(q('.en-city'), 'city'); bg(q('.en-king'), 'king');
+  bg(q('.en-cimg'), 'crown'); bg(q('.en-throne'), 'approach'); bg(q('.en-back'), 'throne'); bg(q('.en-city'), 'city'); bg(q('.en-king'), 'king');
   bg(q('.en-crowned'), 'crowned'); ov.querySelectorAll('.en-frag').forEach(f => bg(f, 'crowned'));
   bg(q('[data-s=lift] .en-art'), 'lift'); bg(q('[data-s=reign] .en-art'), 'reign');   // v211
   if(o.resume !== 'city'){
@@ -10375,16 +10358,18 @@ async function endingStandard(E, o){
     await Promise.all([ready.approach, ready.walker]); endingFrame(ov); E.scene('approach'); snd.wind(10); snd.stone(.6);
     await E.wait(300); ov.classList.add('walk');
     await E.wait(1600);
-    await E.say('The Crownless King does not fall. He stands, and steps aside.', 3000, 'top', 'story');   // v208: the handover, said plainly
+    await E.say('The Crownless King falls, and this time he does not rise.', 3000, 'top', 'story');   // v214: he already rose once (v212)
     await E.wait(250);
-    await E.say('“I climbed these steps too,” he says. “So did every king before me.”', 3400, 'top', 'story');
+    await E.say('“Take it,” he whispers. “I climbed these steps too. So did every king before me.”', 3600, 'top', 'story');
+    await E.wait(250);
+    await E.say('Then he is gone. Only the crown remains.', 2600, 'top', 'story');
     await E.wait(250);
     await E.say('Every Crownrunner believed they were coming to claim the throne.', 2900, 'top', 'story');
     await E.wait(250);
-    await E.say('None understood what the throne was claiming.', 2600, 'top', 'story');
+    await E.say('None understood that the throne was claiming them.', 2600, 'top', 'story');
     snd.stone(0);
     await E.wait(250);
-    await E.say('The crown was never waiting for a king.', 2500, 'top', 'story');
+    await E.say('The throne was never waiting for a king.', 2500, 'top', 'story');
     await E.wait(250);
     await E.say('It was waiting for you.', 2800, 'top', 'story red');
     await E.black(1400);
@@ -10392,18 +10377,25 @@ async function endingStandard(E, o){
     await ready.lift; E.scene('lift'); snd.resonance(.6);             // v211: the painted crown scene, held until Continue
     await E.wait(1400);
     await E.cont('You lift the Crown of Crowns.', 'story');
-    await Promise.all([ready.king, ready.crowned]);
-    E.scene('become'); snd.rumble();                                  // gentle crossfade into the transformation
-    await E.wait(1500);
-    ov.classList.add('t1'); snd.resonance(.4);                       // halo, red cloak, void face, throne light
-    await E.say(endingArmyLine(), 3200, 'bottom', 'story');
-    ov.classList.add('t2'); snd.rumble();                             // recognition: the crowned king (the only place this art is used)
+    ov.classList.add('t1'); snd.resonance(.4);                       // v214: the painting darkens; no figure is drawn over it
+    await E.say(endingArmyLine(), 3600, 'bottom', 'story');
     await E.say('You do not turn around.', 2400, 'bottom', 'story');
+    // v214: the one moment the crown is worn (the balcony painting), then the throne takes its price
+    await ready.reign; E.scene('reign'); snd.wind(8);
+    await E.wait(1800);
+    await E.cont('For one moment, the whole kingdom is yours.', 'story');
+    await Promise.all([ready.king, ready.crowned]);
+    ov.classList.add('t2'); E.scene('become'); snd.rumble();         // the throne consumes you: his face becomes yours
+    await E.wait(1800);
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
-    await E.say(bearerName() ? `The crown takes ${bearerName()} first. Then your face.` : 'The crown takes your name first. Then your face.', 2800, 'bottom', 'story red');
+    await E.say('The throne takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });
     ov.classList.add('t4'); snd.shatter();                            // it falls away into shadow: crownless
-    await E.wait(2600);
+    await E.wait(2000);
+    await E.say('The Crown of Crowns breaks apart.', 2400, 'bottom', 'story');
+    await E.say('Its four crowns scatter back to the four Lands, and their Rulers rise to guard them again.', 3800, 'bottom', 'story');
+    await E.say('The throne can be held. The crown can never be kept.', 3200, 'bottom', 'story red');
+    await E.wait(400);
     // 4) the reveal
     await E.say('THE KING IS DEAD.', 2400, 'bottom', 'caps big');
     await E.wait(500);
@@ -10421,10 +10413,8 @@ async function endingStandard(E, o){
   await E.say('EVERYBODY WANTS A CROWN.', 1700, 'lower', 'caps echo');
   await E.say('SOMEWHERE IN CROWN CITY…', 2300, 'lower', 'caps small');
   await E.say('A NEW CROWNRUNNER HAS ENTERED.', 3400, 'lower', 'caps final');
-  // v211: the final scene, the new sovereign over the kingdom; its lines wait for Continue, and the last Continue ends the ending
-  await ready.reign; E.scene('reign'); snd.wind(8);
-  await E.wait(1800);
-  await E.cont(bearerName() ? `THEY ARE COMING FOR YOUR THRONE, ${bearerName().toUpperCase()}.` : 'THEY ARE COMING FOR YOUR THRONE.', 'caps final red');
+  // the last lines wait for Continue, and the last Continue ends the ending (v214: over the city; the balcony moment came earlier)
+  await E.cont('THEY ARE COMING FOR YOUR THRONE.', 'caps final red');   // v214: the throne took the name; they call you by your title now
   if(!endingSave().seen.true) await E.cont('A crown can be worn. It can also be broken.', 'story');   // v208: there is another way this ends
 }
 /* ---------- crown artwork: each Land's World Crown ('land|easy') and the Fallen Throne's crowns ('throne|…'; The Crown of Crowns is 'throne|hard') ---------- */
