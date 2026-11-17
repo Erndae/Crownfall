@@ -328,3 +328,13 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - The true ending now shows a painted scene (`assets/ending/crown-refused.webp`): your masked Crownrunner before the empty throne, the Crown of Crowns held low at their side, under "You hold the Crown of Crowns. This time, you do not put it on." and its Continue button. The crown then breaks as before.
 - Fitted like the other ending paintings (390×844 and 375×667 checked), cached offline and preloaded. The standard ending is unchanged.
 - Tests: `validate-v215.cjs`.
+
+## v216 — the throne's hold on the Lands
+- **The story:** the World Crowns bind each Land to the Fallen Throne. Wearing the Crown of Crowns keeps the Lands bound (now to you); breaking it frees them.
+- **Opponents:** after your first World Crown, about one ordinary opponent in four sounds released when they lose ("Thank you. For a second there, I couldn't hear it."). First clears only, never stage 1, never Rulers; the same opponent always says the same line.
+- **Rulers** hint that they served something else (Vex: "I wore that thing ten years, and it never once felt like mine."; Aldric, Athena and Morwen likewise).
+- **The road between Lands:** each passage gains one line showing a Land under the hold (people kneeling toward the same horizon at dusk, children playing chess in cellars).
+- **Your army:** two lines changed ("The ones we beat today looked relieved to lose."; "Like something up there is listening.").
+- **Endings:** standard adds "Four Lands kneel to the throne again. Now they kneel to you."; the true ending adds "In four Lands at once, the Rulers' crowns go dark. For the first time in a hundred years, nobody kneels."
+- Nothing before the ending says who the Crownless King was or that the throne takes its kings.
+- Tests: `validate-v216.cjs`; v197 passage test now expects five lines.

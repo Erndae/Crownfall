@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=215"></script>
-<script src="piece-designs.js?v=215"></script>
-<script src="character-style.js?v=215"></script>
-<script src="campaign-opponents.js?v=215"></script>
-<script src="campaign-dialogue.js?v=215"></script>
-<link rel="stylesheet" href="character-style.css?v=215">
+<script src="gameplay-polish.js?v=216"></script>
+<script src="piece-designs.js?v=216"></script>
+<script src="character-style.js?v=216"></script>
+<script src="campaign-opponents.js?v=216"></script>
+<script src="campaign-dialogue.js?v=216"></script>
+<link rel="stylesheet" href="character-style.css?v=216">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2387,9 +2387,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=215">
-<link rel="stylesheet" href="ruler-style.css?v=215">
-<link rel="stylesheet" href="gameplay-polish.css?v=215">
+<link rel="stylesheet" href="city-board.css?v=216">
+<link rel="stylesheet" href="ruler-style.css?v=216">
+<link rel="stylesheet" href="gameplay-polish.css?v=216">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2830,10 +2830,10 @@ const LAND_CHAPTER = {
    how the Bearer got there: the Crowns pull like a compass, each Land further in. Hints only; nothing says what the throne does.
    {C} is the World Crown just won. Tap moves to the next line; reduced motion shows every line at once. */
 const LAND_PASSAGE = {
-  medieval:{from:'street', lines:['Crown City sleeps for the first time in years. On every wall, a new name: {N}.', 'In your hands, the {C} will not sit still.', 'It leans, like a compass needle, toward the old rail line out of the city.', 'At the end of the line stand walls of black iron, and a king who has never lost.']},
-  greek:   {from:'medieval', lines:['The gates of the Iron Kingdom stand open behind you.', 'Aldric’s soldiers do not follow. They only watch you go.', 'Two Crowns now, and both lean the same way: up the mountain road, into the clouds.', 'They say the queen at the top has already seen how this ends.']},
-  fantasy: {from:'greek', lines:['Athena does not see you off.', 'Her last words follow you down the marble steps: you are not the only one playing.', 'Past the last column the road cracks. The sky does too.', 'Three Crowns pull you on, into a land where nothing moves the way it should.']},
-  throne:  {from:'fantasy', lines:['The shadows let you pass.', 'Four Crowns, and you no longer choose the road. You only walk it.', 'It climbs through ash toward a ruined throne.', 'Your army is quiet. Nobody asks to turn back.']},
+  medieval:{from:'street', lines:['Crown City sleeps for the first time in years. On every wall, a new name: {N}.', 'At dusk, the whole city turns to face the same horizon. Nobody can tell you why.', 'In your hands, the {C} will not sit still.', 'It leans, like a compass needle, toward the old rail line out of the city.', 'At the end of the line stand walls of black iron, and a king who has never lost.']},
+  greek:   {from:'medieval', lines:['The gates of the Iron Kingdom stand open behind you.', 'Aldric’s soldiers do not follow. They only watch you go.', 'In the iron villages, people kneel toward the mountains at dusk. Nobody remembers who taught them.', 'Two Crowns now, and both lean the same way: up the mountain road, into the clouds.', 'They say the queen at the top has already seen how this ends.']},
+  fantasy: {from:'greek', lines:['Athena does not see you off.', 'Her last words follow you down the marble steps: you are not the only one playing.', 'Under the temples, children play chess in cellars, quietly, as if it were forbidden.', 'Past the last column the road cracks. The sky does too.', 'Three Crowns pull you on, into a land where nothing moves the way it should.']},
+  throne:  {from:'fantasy', lines:['The shadows let you pass.', 'Four Crowns, and you no longer choose the road. You only walk it.', 'It climbs through ash toward a ruined throne.', 'Behind you, four Lands are still kneeling toward it.', 'Your army is quiet. Nobody asks to turn back.']},
 };
 const PASSAGE_KEY = 'crownfall-passages';
 function passageSeen(){ const ep = ACH.campaign_epoch || 0; let st = {}; try{ st = JSON.parse(localStorage.getItem(PASSAGE_KEY) || '{}'); }catch(e){} return st && st.ep === ep && Array.isArray(st.seen) ? st : {ep, seen:[]}; }
@@ -3601,7 +3601,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 215;
+const GAME_VERSION = 216;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4983,6 +4983,10 @@ function repLine(pp){
   if(n >= 1) return pp.simple && Math.random() < 0.5 ? '' : `You’re ${nm}. Everyone’s talking about you.`;
   return pp.simple && Math.random() < 0.4 ? 'Another Crownrunner? You’ll be gone by sunset.' : '';
 }
+// v216: what a defeated opponent says once the pull lets go of them for a moment
+const HOLD_LINES = ['Thank you. For a second there, I couldn’t hear it.', 'Funny. I never even wanted a crown. I just couldn’t stop fighting for one.',
+  'It’s quieter when I lose. Is that strange?', 'Don’t let it pull you the way it pulled me.', 'Every night it says the same thing: win. I never asked who for.',
+  'My grandmother fought for these crowns. So did hers. None of us ever got to keep one.'];
 // lines that change with the story so far
 function storyLines(o){
   if(o.name === 'Rush Hour Rex' && B && B.lights?.length) o.intro = 'Green lights are live. Reach one and you get a move back. My pieces get there first, and you lose one.';
@@ -5024,15 +5028,21 @@ function storyLines(o){
     if(o.name === 'Morwen the Shadow Queen' && worldCrowns() !== WORLD_TOTAL - 1) o.intro = `${nm}. Your shadow told me your name before you did.`;
   }
   if(nm && o.name === 'The Crownless King' && !fallenRecord()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;
+  // v216: the throne's hold on the Lands. After the first World Crown, about one ordinary opponent in three sounds released
+  // when they lose (the same line for the same opponent). Hints only: nobody names the throne or says what it does.
+  if(fresh && !o.ruler && o.name !== 'The Hollow Crown' && o.name !== 'The Fallen Grandmaster' && worldCrowns() >= 1 && RUN.ante >= 2){
+    const h = [...(o.name || '') + land()].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) >>> 0, 7);
+    if(h % 3 === 0) o.lose = HOLD_LINES[Math.floor(h / 3) % HOLD_LINES.length];
+  }
   if(fresh){
     if(o.name === 'Night Owl Nico') o.lose = 'Market’s closed. Funny. You all look different when you start.';
     if(o.name === 'Dockmaster Dee') o.win = 'I’ve seen that look before. Tide took them too.';
-    if(o.name === 'Kingpin Vex') o.lose = 'So you’re really going through with it. One crown down. That’s how it always starts.';
-    if(o.name === 'King Aldric the Iron-Handed') o.lose = `Another Crownrunner carries the ${landCrownName('medieval')}. May you fare better than the others.`;
+    if(o.name === 'Kingpin Vex') o.lose = 'So you’re really going through with it. One crown down. Enjoy it. I wore that thing ten years, and it never once felt like mine.';
+    if(o.name === 'King Aldric the Iron-Handed') o.lose = `Another Crownrunner carries the ${landCrownName('medieval')}. I knelt to it for thirty years and never saw who it answered to. May you fare better than the others.`;
     if(o.name === 'Heracles') o.lose = 'Even heroes fall. Strength carried the others this far too.';
     if(o.name === 'King Aeëtes') o.intro = 'The Fleece is mine. Every Crownrunner thinks the Crowns belong to them.';
-    if(o.name === 'Athena, Queen of Olympus') o.lose = 'You have earned the third Crown. Whether you should carry it is a different question.';
-    if(o.name === 'Morwen the Shadow Queen') o.lose = 'Four. They remember you already. And he knows.';
+    if(o.name === 'Athena, Queen of Olympus') o.lose = 'You have earned the third Crown. Whether you should carry it is a different question. Ask who has been carrying all of us.';
+    if(o.name === 'Morwen the Shadow Queen') o.lose = 'Four. They remember you already. And he knows. When you reach him, remember that every Land is still kneeling.';
   }
   if(o.name === 'The Hollow Crown'){ o.lose = 'He took my crown... then my name. Don’t let him take yours.'; }
   if(o.name === 'The Fallen Grandmaster'){ o.intro = 'I was the greatest player in all the lands. I carried four Crowns to this hall once. Turn back while you still can.'; o.lose = 'I wasn’t guarding him. I was guarding you... from him.'; o.win = 'Better you fall here than reach him.'; }
@@ -9632,9 +9642,9 @@ const CROWN_MYST = [
    voice that follows their personality (bold, wary or warm). Hints only: nothing here states what the throne does. */
 const CROWN_SAY = [
   {bold:'One down. Funny. It sits on you like it has done this before.', wary:'That was too easy to take. Rulers do not smile when they lose.', warm:'Looks good on you, boss. Almost like it was kept for you.'},
-  {bold:'Two crowns. Did you hear them hum? I am choosing not to worry.', wary:'That broken crown is carved on every gate we pass. Somebody wants it remembered.', warm:'He counted your crowns before he counted his soldiers. Odd thing for a king to care about.'},
+  {bold:'Two crowns. Did you hear them hum? The ones we beat today looked relieved to lose.', wary:'That broken crown is carved on every gate we pass. Somebody wants it remembered.', warm:'He counted your crowns before he counted his soldiers. Odd thing for a king to care about.'},
   {bold:'Three. Whoever else is playing, they are behind us.', wary:'Those statues had their names cut away. I keep wondering who held the chisel.', warm:'She looked at you like she had met you before. Have you two met?'},
-  {bold:'All four. So why does it feel like we are being led, not chased?', wary:'Nobody guards the road to the throne. Nobody has to. Think about that.', warm:'Whatever is up there, we climb it with you. Just promise you will still know our names.'},
+  {bold:'All four. Do you feel it too? Like something up there is listening.', wary:'Nobody guards the road to the throne. Nobody has to. Think about that.', warm:'Whatever is up there, we climb it with you. Just promise you will still know our names.'},
 ];
 const CROWN_TONE = {F:'bold', A:'bold', M:'bold', C:'wary', K:'wary', V:'wary', L:'warm', S:'warm'};
 function crownSay(n){
@@ -10242,6 +10252,9 @@ async function endingTrue(E, o){
     await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
     await E.wait(400);
     await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
+    await E.wait(400);
+    await E.say('In four Lands at once, the Rulers’ crowns go dark.', 2800, 'lower', 'story');   // v216: the Lands go free
+    await E.say('For the first time in a hundred years, nobody kneels.', 3200, 'lower', 'story');
     await E.black(1400);
     // 4) the one who came before
     E.scene('approach'); snd.wind(9);
@@ -10399,6 +10412,7 @@ async function endingStandard(E, o){
     await E.wait(2000);
     await E.say('The Crown of Crowns breaks apart.', 2400, 'bottom', 'story');
     await E.say('Its four crowns scatter back to the four Lands, and their Rulers rise to guard them again.', 3800, 'bottom', 'story');
+    await E.say('Four Lands kneel to the throne again. Now they kneel to you.', 3200, 'bottom', 'story');   // v216: the Lands stay bound
     await E.say('The throne can be held. The crown can never be kept.', 3200, 'bottom', 'story red');
     await E.wait(400);
     // 4) the reveal

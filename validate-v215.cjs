@@ -11,5 +11,5 @@ const order=['This time, you let it wait.',"E.scene('refuse')","E.cont('You hold
 let at=-1;for(const x of order){const k=tr.indexOf(x,at+1);assert(k>at,'In order: '+x);at=k;}
 assert(tr.includes("bg(q('[data-s=refuse] .en-art'), 'refuse')"));
 const std=src.slice(src.indexOf('async function endingStandard'),src.indexOf('/* ---------- crown artwork'));assert(!std.includes('refuse'),'the standard ending is unchanged');
-assert(src.includes('const GAME_VERSION = 215;')&&sw.includes("'crownfall-v215'")&&!src.includes('?v=214'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=215&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: refusal painting present, cached and prefetched, shown in the true ending before the crown breaks, standard ending unchanged, version.');

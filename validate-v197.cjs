@@ -5,7 +5,7 @@ const src=fs.readFileSync(__dirname+'/index.html','utf8');
 const P=JSON.parse(E('JSON.stringify(LAND_PASSAGE)'));
 assert.deepEqual(Object.keys(P),['medieval','greek','fantasy','throne']);
 const order=['street','medieval','greek','fantasy','throne'];
-for(const l in P){assert.equal(P[l].from,order[order.indexOf(l)-1],l+' follows the Land before it');assert.equal(P[l].lines.length,4);
+for(const l in P){assert.equal(P[l].from,order[order.indexOf(l)-1],l+' follows the Land before it');assert.equal(P[l].lines.length,5);   // v216: one line each shows the Land under the throne's hold
   for(const x of P[l].lines){assert(x.length<=110,x);assert(!/Crownless|become the|next king|you are the king|—|!/i.test(x),'No spoiler, plain voice: '+x);}}
 assert(P.medieval.lines.some(x=>x.includes('{C}')));
 // when it is due
