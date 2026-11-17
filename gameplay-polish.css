@@ -367,3 +367,8 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .ending.calm .en-walker,.ending.calm.walk .en-walker{transform:translateX(-50%);opacity:1;transition:none}
 .ending.calm .en-walksprite,.ending.calm.walk .en-scene.on .en-walksprite{animation:none}
 @media(prefers-reduced-motion:reduce){.ending .en-journey,.ending.walk .en-journey{transition:none;transform:translate(-50%,-50%)}.ending .en-walker,.ending.walk .en-walker{transition:none;transform:translateX(-50%)}.ending.walk .en-scene.on .en-walksprite{animation:none}}
+
+/* v217: the Lands are free (after the true ending) */
+.titlemotto .freemark{display:block;margin-top:3px;color:#e8c37a;font-weight:700;font-size:.86em;white-space:normal}
+.jfree{margin:2px 10px 0;padding:6px 10px;border-left:2px solid var(--lc);font-style:italic;font-size:13px;line-height:1.3;color:#e9e2d4;background:rgba(0,0,0,.22);border-radius:0 6px 6px 0}
+.jfree small{display:block;font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--lc);font-family:var(--display);margin-bottom:2px}

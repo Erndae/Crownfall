@@ -338,3 +338,11 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Endings:** standard adds "Four Lands kneel to the throne again. Now they kneel to you."; the true ending adds "In four Lands at once, the Rulers' crowns go dark. For the first time in a hundred years, nobody kneels."
 - Nothing before the ending says who the Crownless King was or that the throne takes its kings.
 - Tests: `validate-v216.cjs`; v197 passage test now expects five lines.
+
+## v217 — the Lands are free
+After the true ending has been seen on this device (wearing the crown frees no one):
+- **Title screen:** "Everybody wanted a crown." with "The Lands are free." beneath it.
+- **Journey:** each Land's card keeps what its Ruler said "the morning the crown broke" (Vex: "First morning in years I woke up as just Vex.").
+- **New Game+:** "The Lands were free. Someone has rebuilt the Fallen Throne, and the crowns have found their Rulers again." The new cycle explains itself.
+- **The road between Lands:** the line about each Land under the hold becomes a memory of the free morning ("Crown City remembers the morning nobody knelt. Some of them are hoping you can bring it back.").
+- Tests: `validate-v217.cjs`; v197 wiring check loosened for the new line swap.

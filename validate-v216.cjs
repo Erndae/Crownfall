@@ -26,5 +26,5 @@ const std=src.slice(src.indexOf('async function endingStandard'),src.indexOf('/*
 const a=std.indexOf('Its four crowns scatter back'),b=std.indexOf('Four Lands kneel to the throne again. Now they kneel to you.'),c2=std.indexOf('THE KING IS DEAD.');assert(a>0&&b>a&&c2>b,'standard: the Lands stay bound');
 const tr=src.slice(src.indexOf('async function endingTrue'),src.indexOf('const ENDING_PRE'));
 const t1=tr.indexOf('THE THRONE IS EMPTY.'),t2=tr.indexOf('the Rulers’ crowns go dark.'),t3=tr.indexOf('For the first time in a hundred years, nobody kneels.'),t4=tr.indexOf('The Crownless King lowers his head.');assert(t1>0&&t2>t1&&t3>t2&&t4>t3,'true: the Lands go free');
-assert(src.includes('const GAME_VERSION = 216;')&&sw.includes("'crownfall-v216'")&&!src.includes('?v=215'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=216&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: released-opponent lines (after the first Crown, ~1 in 4, stable, all six heard, no spoilers), Ruler, passage and army hints, bound vs free in each ending, version.');
