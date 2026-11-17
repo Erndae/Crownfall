@@ -353,3 +353,20 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .ckrise .en-skip{color:#bbb;border-color:#666}
 .ckrise.calm .ckr-king,.ckrise.calm .ckr-crowns img{transition:opacity .4s ease}
 @media (max-height:700px){.ckrise .ckr-king{width:min(48vw,230px);bottom:calc(var(--sab) + 27vh)}.ckrise .ckr-c{width:min(26vw,120px)}.ckrise .en-panel{bottom:calc(var(--sab) + 20vh)}}
+
+/* v213: painted throne approach, shared camera and grounded four-pose walk. */
+.ending .en-journey{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transform-origin:50% 38%;transition:transform 22s linear}
+.ending.walk .en-journey{transform:translate(-50%,-50%) scale(1.10)}
+.ending .en-throne,.ending.walk .en-throne{inset:0;background:center/100% 100% no-repeat;transform:none;transition:none}
+.ending .en-walker{left:50%;bottom:8%;height:46%;aspect-ratio:543/724;transform:translateX(-50%);transform-origin:50% 95%;transition:transform 22s linear;filter:drop-shadow(1px 3px 2px #0008)}
+.ending.walk .en-walker{transform:translateX(-50%) translateY(var(--walk-distance)) scale(.18)}
+.ending .en-walker::after{content:"";position:absolute;left:35%;bottom:4%;width:36%;height:2%;background:#0008;border-radius:50%;filter:blur(3px);z-index:-1}
+.en-walksprite{width:100%;height:100%;background:url('assets/ending/throne-walker.webp') 0 0/400% 100% no-repeat}
+.ending.walk .en-scene.on .en-walksprite{animation:ensteps 1.2s step-end 18,ensway 1.2s ease-in-out 18;animation-fill-mode:forwards}
+@keyframes ensteps{0%,100%{background-position:0 0}25%{background-position:33.333333% 0}50%{background-position:66.666667% 0}75%{background-position:100% 0}}
+@keyframes ensway{0%,100%{transform:rotate(-.3deg)}50%{transform:translateY(-.4%) rotate(.3deg)}}
+.ending .en-scene[data-s=approach]::after{background:linear-gradient(180deg,#000b,transparent 32%,transparent 86%,#0007)}
+.ending.calm .en-journey,.ending.calm.walk .en-journey{transform:translate(-50%,-50%);transition:none}
+.ending.calm .en-walker,.ending.calm.walk .en-walker{transform:translateX(-50%);opacity:1;transition:none}
+.ending.calm .en-walksprite,.ending.calm.walk .en-scene.on .en-walksprite{animation:none}
+@media(prefers-reduced-motion:reduce){.ending .en-journey,.ending.walk .en-journey{transition:none;transform:translate(-50%,-50%)}.ending .en-walker,.ending.walk .en-walker{transition:none;transform:translateX(-50%)}.ending.walk .en-scene.on .en-walksprite{animation:none}}
