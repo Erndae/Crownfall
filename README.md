@@ -323,3 +323,8 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 - **Why you are "Crownless".** After the army calls your name, the balcony painting shows the one moment the crown is worn ("For one moment, the whole kingdom is yours."). Then the throne takes your name and your face (you become the Crownless King), and the Crown of Crowns breaks: its four crowns scatter back to the four Lands and their Rulers rise to guard them again. "The throne can be held. The crown can never be kept." This is why every Crownrunner, and New Game+, starts again in Crown City. The last line, "THEY ARE COMING FOR YOUR THRONE.", now plays over the city.
 - **True ending:** "You hold the Crown of Crowns. This time, you do not put it on." (no painting here: both paintings show the crown worn), break it, and the throne never takes your face: you walk down the steps as yourself, by name.
 - Tests: `validate-v214.cjs`; v190, v208, v210 and v211 tests updated to the new lines.
+
+## v215 — the crown held, not worn
+- The true ending now shows a painted scene (`assets/ending/crown-refused.webp`): your masked Crownrunner before the empty throne, the Crown of Crowns held low at their side, under "You hold the Crown of Crowns. This time, you do not put it on." and its Continue button. The crown then breaks as before.
+- Fitted like the other ending paintings (390×844 and 375×667 checked), cached offline and preloaded. The standard ending is unchanged.
+- Tests: `validate-v215.cjs`.

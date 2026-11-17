@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=214"></script>
-<script src="piece-designs.js?v=214"></script>
-<script src="character-style.js?v=214"></script>
-<script src="campaign-opponents.js?v=214"></script>
-<script src="campaign-dialogue.js?v=214"></script>
-<link rel="stylesheet" href="character-style.css?v=214">
+<script src="gameplay-polish.js?v=215"></script>
+<script src="piece-designs.js?v=215"></script>
+<script src="character-style.js?v=215"></script>
+<script src="campaign-opponents.js?v=215"></script>
+<script src="campaign-dialogue.js?v=215"></script>
+<link rel="stylesheet" href="character-style.css?v=215">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2387,9 +2387,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=214">
-<link rel="stylesheet" href="ruler-style.css?v=214">
-<link rel="stylesheet" href="gameplay-polish.css?v=214">
+<link rel="stylesheet" href="city-board.css?v=215">
+<link rel="stylesheet" href="ruler-style.css?v=215">
+<link rel="stylesheet" href="gameplay-polish.css?v=215">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3601,7 +3601,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 214;
+const GAME_VERSION = 215;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -10100,6 +10100,7 @@ const ENDING_ART = 'assets/rulers/stag.webp'; // only ever shown inside playEndi
 // v211: two painted scenes of the standard ending: lifting the Crown of Crowns, and the new sovereign over the kingdom (face masked in both)
 const ENDING_APPROACH = 'assets/ending/throne-approach.webp', ENDING_WALKER = 'assets/ending/throne-walker.webp';
 const ENDING_LIFT = 'assets/ending/crown-lift.webp', ENDING_REIGN = 'assets/ending/kingdom-balcony.webp';
+const ENDING_REFUSE = 'assets/ending/crown-refused.webp';   // v215: the true ending, the crown held at your side
 /* ---------- endings ----------
    Only the standard ending exists. A future hidden ending registers in ENDINGS under its own type
    (e.g. ENDINGS.true) with its own trigger; nothing about it is exposed to the player yet. */
@@ -10199,10 +10200,10 @@ function fallenWas(){ try{ const f = JSON.parse(localStorage.getItem(FALLEN_KEY)
   return {king:fallenClean(w.king, 20), army:(Array.isArray(w.army) ? w.army : []).map(c => fallenClean(c && c.n, 14)).filter(Boolean)}; }catch(e){ return null; } }
 async function endingTrue(E, o){
   const ov = E.ov, q = x => ov.querySelector(x), snd = endingSounds(), was = fallenWas();
-  const art = {crown:crownArt('throne', 'hard'), throne:LAND_ART.throne, approach:ENDING_APPROACH, walker:ENDING_WALKER, city:LAND_ART.street};
+  const art = {crown:crownArt('throne', 'hard'), throne:LAND_ART.throne, approach:ENDING_APPROACH, walker:ENDING_WALKER, city:LAND_ART.street, refuse:ENDING_REFUSE};
   const ready = {}; for(const k in art) ready[k] = E.load(art[k]);
   const bg = (el, k) => { if(el && art[k]) el.style.backgroundImage = `url("${art[k]}")`; };
-  bg(q('.en-cimg'), 'crown'); bg(q('.en-throne'), 'approach'); bg(q('.en-city'), 'city');
+  bg(q('.en-cimg'), 'crown'); bg(q('.en-throne'), 'approach'); bg(q('.en-city'), 'city'); bg(q('[data-s=refuse] .en-art'), 'refuse');
   ov.classList.add('dawn');
   if(o.resume !== 'city'){
     // 1) the Crown of Crowns, whole again
@@ -10227,10 +10228,13 @@ async function endingTrue(E, o){
     await E.wait(250);
     await E.say('This time, you let it wait.', 2800, 'top', 'story red');
     await E.black(1400);
-    // 3) the crown is broken (v214: you hold it, and do not put it on)
+    // v215: you hold it at your side, and do not put it on (painted scene, held until Continue)
+    await ready.refuse; E.scene('refuse'); snd.resonance(.5);
+    await E.wait(1400);
+    await E.cont('You hold the Crown of Crowns. This time, you do not put it on.', 'story');
+    // 3) the crown is broken
     E.scene('crown'); q('.en-crownbox').classList.remove('waiting');
     await E.wait(1500);
-    await E.cont('You hold the Crown of Crowns. This time, you do not put it on.', 'story');
     q('.en-crownbox').classList.add('breaking'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);
     await E.wait(2600);
     q('.en-crownbox').classList.add('broken'); snd.shatter();
@@ -10267,7 +10271,7 @@ async function endingTrue(E, o){
 const ENDING_PRE = [];
 function endingPrefetch(){
   if(ENDING_PRE.length) return;
-  [ENDING_ART, ENDING_APPROACH, ENDING_WALKER, ENDING_LIFT, ENDING_REIGN, crownArt('throne', 'hard'), RULERS.throne.art, LAND_ART.throne, LAND_ART.street].forEach(u => { if(!u) return;
+  [ENDING_ART, ENDING_APPROACH, ENDING_WALKER, ENDING_LIFT, ENDING_REIGN, ENDING_REFUSE, crownArt('throne', 'hard'), RULERS.throne.art, LAND_ART.throne, LAND_ART.street].forEach(u => { if(!u) return;
     const im = new Image(); im.decoding = 'async'; im.src = u; if(im.decode) im.decode().catch(() => {}); ENDING_PRE.push(im); });
 }
 function playEnding(type, opts){
@@ -10311,6 +10315,7 @@ function endingHTML(){
       </div></div></div>
     <div class="en-scene" data-s="city"><div class="en-city"></div></div>
     <div class="en-scene en-paint" data-s="lift"><div class="en-art" role="img" aria-label="Your Crownrunner, face hidden by a black mask, lifts the Crown of Crowns"></div></div>
+    <div class="en-scene en-paint" data-s="refuse"><div class="en-art" role="img" aria-label="Your masked Crownrunner stands before the empty throne, the Crown of Crowns held low at their side"></div></div>
     <div class="en-scene en-paint" data-s="reign"><div class="en-art" role="img" aria-label="The masked sovereign, crowned, looks out over the kingdom from a balcony"></div></div>
     <div class="en-panel" hidden><p></p><button type="button" class="en-cont"><span aria-hidden="true">✦</span>Continue<span aria-hidden="true">✦</span></button></div>
     <div class="en-txt"></div><button class="en-skip" hidden>Skip</button>`;

@@ -44,5 +44,5 @@ const tord=["You hold the Crown of Crowns. This time, you do not put it on.",'TH
 at=-1;for(const x of tord){const k=tr.indexOf(x,at+1);assert(k>at,'True ending in order: '+x);at=k;}
 assert(!tr.includes("E.scene('lift')")&&!tr.includes("E.scene('become')")&&!tr.includes('CROWNLESS KING.'),'you never become him in the true ending');
 // version
-assert(src.includes('const GAME_VERSION = 214;')&&sw.includes("'crownfall-v214'")&&!src.includes('?v=213'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=214&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: Continue on a finished campaign always offers New Game+, which restarts in Crown City with no crowns, carry or checkpoint; army line names roles; drawn figure removed; story follows the second fall; version.');
