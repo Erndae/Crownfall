@@ -10,7 +10,7 @@ let at=-1;for(const line of order){const k=std.indexOf(line,at+1);assert(k>at,'I
 // each stage of the change still happens, between its lines
 for(const cls of ["add('t1')","add('t2')","add('t3')","add('t4')"])assert(std.includes(cls),cls);
 assert(std.indexOf("add('t2')")>std.indexOf('endingArmyLine()')&&std.indexOf("add('t2')")<std.indexOf('You do not turn around.'));
-assert(std.includes("if(!endingSave().seen.true){"),'The hint at the other ending is only for someone who has not seen it');
+assert(std.includes("if(!endingSave().seen.true)"),'The hint at the other ending is only for someone who has not seen it');
 // the army line uses the soldiers recorded at the win, safely
 const set=v=>E(`localStorage.setItem(FALLEN_KEY,${JSON.stringify(JSON.stringify(v))})`);
 set({v:1,ep:1,king:'E',army:[{t:'R',n:'Duke'},{t:'B',n:'Stone'},{t:'N',n:'Ash'}]});assert.equal(E('endingArmyLine()'),'Behind you, Duke and Stone are calling your name.');

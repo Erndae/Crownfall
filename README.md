@@ -299,3 +299,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
   - Blitz fights 1 move tighter per cycle (never below 60% of par)
   - store prices +10% per cycle
 - Your name, Royal Treasury, best campaign and achievements carry over. The title button shows the cycle. A plain **New Campaign** goes back to cycle 0 (your best cycle is kept). Opponents in New Game+ sometimes notice you've done this before.
+
+## v211 — painted ending scenes
+
+- Two new paintings in the ending (`assets/ending/`), with the Crownrunner's face hidden by a solid black mask in both: lifting the Crown of Crowns, and the crowned sovereign looking over the kingdom from a balcony.
+- **Order:** after "It was waiting for you." the ending crossfades to the crown painting with "You lift the Crown of Crowns." and a Continue button, then into the transformation as before. After "A new Crownrunner has entered." it crossfades to the balcony painting for "They are coming for your throne, …" and, if you haven't seen the other ending, "A crown can be worn. It can also be broken.", each with Continue; the last Continue ends it. Every line and the reveal order are unchanged.
+- The artwork's mock titles, numbers, captions and buttons were cropped off; the first painting's visible face was painted over as a black mask. Text and Continue are the game's own, placed above the iPhone's bottom safe area; the art starts below the top one and is scaled without stretching, keeping the crown in view.
+- The true ending, gameplay, balance, music and other screens are unchanged.
