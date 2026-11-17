@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=207"></script>
-<script src="piece-designs.js?v=207"></script>
-<script src="character-style.js?v=207"></script>
-<script src="campaign-opponents.js?v=207"></script>
-<script src="campaign-dialogue.js?v=207"></script>
-<link rel="stylesheet" href="character-style.css?v=207">
+<script src="gameplay-polish.js?v=208"></script>
+<script src="piece-designs.js?v=208"></script>
+<script src="character-style.js?v=208"></script>
+<script src="campaign-opponents.js?v=208"></script>
+<script src="campaign-dialogue.js?v=208"></script>
+<link rel="stylesheet" href="character-style.css?v=208">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2402,9 +2402,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=207">
-<link rel="stylesheet" href="ruler-style.css?v=207">
-<link rel="stylesheet" href="gameplay-polish.css?v=207">
+<link rel="stylesheet" href="city-board.css?v=208">
+<link rel="stylesheet" href="ruler-style.css?v=208">
+<link rel="stylesheet" href="gameplay-polish.css?v=208">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3570,7 +3570,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 207;
+const GAME_VERSION = 208;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -10146,7 +10146,7 @@ function endingHTML(){
     <div class="en-scene" data-s="become"><div class="en-back"></div><div class="en-glow"></div>
       <div class="en-stagewrap"><div class="en-stage">
         <div class="en-halo"><i></i>${sh}</div><div class="en-king"></div><div class="en-crowned"></div>
-        <div class="en-player">${player}<div class="en-held"></div></div>
+        <div class="en-player">${player}<div class="en-crest">${(() => { try{ return CrownfallCharacter.svg(); }catch(e){ return ''; } })()}</div><div class="en-held"></div></div>
         <div class="en-crownfx">${frags}</div><div class="en-crackfx"><svg class="en-crack" viewBox="0 0 100 100" preserveAspectRatio="none">${crack}</svg></div>
       </div></div></div>
     <div class="en-scene" data-s="city"><div class="en-city"></div></div>
@@ -10159,6 +10159,11 @@ function endingFrame(ov){
   const ox = Math.min(0, Math.max(W - 1400 * k, W / 2 - 1080 * k)), oy = (H - 700 * k) / 2, tx = ox + 1080 * k, ty = oy + 330 * k;
   th.style.backgroundSize = `${1400 * k}px ${700 * k}px`; th.style.backgroundPosition = `${ox}px ${oy}px`; th.style.transformOrigin = `${tx}px ${ty}px`;
   ov.style.setProperty('--tx', tx + 'px'); ov.style.setProperty('--dy', (ty - H * .99) + 'px');
+}
+// v208: the army the Bearer led to the throne (recorded at the win), for the moment they are left behind
+function endingArmyLine(){
+  let names = []; try{ const r = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'); if(r && Array.isArray(r.army)) names = r.army.map(x => fallenClean(x && x.n, 14)).filter(Boolean).slice(0, 2); }catch(e){}
+  return names.length >= 2 ? `Behind you, ${names[0]} and ${names[1]} are calling your name.` : names.length ? `Behind you, ${names[0]} is calling your name.` : 'Behind you, your army is calling your name.';
 }
 async function endingStandard(E, o){
   const ov = E.ov, q = x => ov.querySelector(x), snd = endingSounds();
@@ -10187,6 +10192,10 @@ async function endingStandard(E, o){
     await ready.throne; endingFrame(ov); E.scene('approach'); snd.wind(10); snd.stone(.6);
     await E.wait(300); ov.classList.add('walk');
     await E.wait(1600);
+    await E.say('The Crownless King does not fall. He stands, and steps aside.', 3000, 'top', 'story');   // v208: the handover, said plainly
+    await E.wait(250);
+    await E.say('“I climbed these steps too,” he says. “So did every king before me.”', 3400, 'top', 'story');
+    await E.wait(250);
     await E.say('Every Crownrunner believed they were coming to claim the throne.', 2900, 'top', 'story');
     await E.wait(250);
     await E.say('None understood what the throne was claiming.', 2600, 'top', 'story');
@@ -10199,20 +10208,23 @@ async function endingStandard(E, o){
     // 3) the transformation: the Crownrunner with the whole crown becomes what they defeated
     await Promise.all([ready.king, ready.crowned]);
     E.scene('become'); snd.rumble();
-    await E.wait(2300);
+    await E.wait(1300);
+    await E.say('You lift the Crown of Crowns.', 2400, 'bottom', 'story');           // v208: each change is told as it happens
     ov.classList.add('t1'); snd.resonance(.4);                       // halo, red cloak, void face, throne light
-    await E.wait(4400);
+    await E.say(endingArmyLine(), 3200, 'bottom', 'story');
     ov.classList.add('t2'); snd.rumble();                             // recognition: the crowned king (the only place this art is used)
-    await E.wait(3300);
+    await E.say('You do not turn around.', 2400, 'bottom', 'story');
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
-    await E.wait(2500);
+    await E.say('The crown takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });
     ov.classList.add('t4'); snd.shatter();                            // it falls away into shadow: crownless
-    await E.wait(3000);
+    await E.wait(2600);
     // 4) the reveal
     await E.say('THE KING IS DEAD.', 2400, 'bottom', 'caps big');
     await E.wait(500);
     await E.say('LONG LIVE THE CROWNLESS KING.', 3600, 'bottom', 'caps big red');
+    await E.wait(300);
+    await E.say('The throne has its king again. It has you.', 3400, 'bottom', 'story');
     endingPending('standard', 'city');                                // the story has been told: a refresh from here resumes at the city
     await E.wait(400);
     await E.black(1600);
@@ -10224,6 +10236,8 @@ async function endingStandard(E, o){
   await E.say('EVERYBODY WANTS A CROWN.', 1700, 'lower', 'caps echo');
   await E.say('SOMEWHERE IN CROWN CITY…', 2300, 'lower', 'caps small');
   await E.say('A NEW CROWNRUNNER HAS ENTERED.', 3400, 'lower', 'caps final');
+  await E.say('THEY ARE COMING FOR YOUR THRONE.', 3000, 'lower', 'caps final red');
+  if(!endingSave().seen.true){ await E.wait(700); await E.say('A crown can be worn. It can also be broken.', 3800, 'lower', 'story'); }   // v208: there is another way this ends
 }
 /* ---------- crown artwork: each Land's World Crown ('land|easy') and the Fallen Throne's crowns ('throne|…'; The Crown of Crowns is 'throne|hard') ---------- */
 const CROWN_ART = {

@@ -275,3 +275,10 @@ Not done: vibration on captures. Browsers on iPhone do not support it, so it wou
 ## v207 — a fair race for the green lights
 
 - Now that the enemy goes for board marks, green lights are placed on middle squares that no piece on either side, Pawns included, can reach with its first move. Before, the enemy's Pawns could step onto them at once. If an opening leaves too few such squares, the earlier placement fills in.
+
+## v208 — the ending, clearer and better told
+
+- **Pictures:** the Crown of Crowns fills the screen instead of a small strip; the figure and the Crownless King are about a third larger and no longer dimmed; Crown City at the end is much brighter; story text is slightly larger. The figure now carries your own King mark, so it reads as you.
+- **Story:** the ending now says what is happening. The Crownless King steps aside and tells you he climbed these steps too. As you lift the crown, each change is told: your soldiers (by name) call after you, you do not turn around, the crown takes your name and then your face. After "Long live the Crownless King" it says it plainly: the throne has its king again, and it is you. The last scene adds that the new Crownrunner is coming for your throne.
+- A closing line hints that the crown can also be broken, for anyone who has not yet seen the other ending.
+- The other ending's words are unchanged; it shares the clearer crown and city pictures. About 30 seconds longer; taps still move it on.

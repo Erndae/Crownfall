@@ -278,3 +278,23 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .jtreasury b{font:400 24px/1 var(--num,var(--display));color:#ffe14d}
 .jtreasury em{font:normal 12.5px/1.3 var(--body);color:#e9dfc6;text-align:right}
 .kv.treasury span{color:#ffe14d}
+/* v208 The ending, clearer: bigger and brighter pictures, a figure that reads as the Bearer, larger story type */
+.en-scene[data-s=crown]{overflow:hidden;padding-bottom:calc(var(--sab) + 16vh)}
+.en-crownbox{width:min(132vw,760px,88vh)}
+.en-reward h2{font-size:clamp(28px,8.4vw,42px)}
+.en-back{filter:blur(6px) brightness(.36) saturate(.8)}
+.en-stagewrap{top:calc(var(--sat) + 5vh);bottom:calc(var(--sab) + 25vh)}
+.en-stage{height:min(100%,152vw);max-width:none}
+.t3 .en-crowned{filter:none}
+.en-scene[data-s=become]::after{background:linear-gradient(180deg,transparent 64%,rgba(0,0,0,.92) 84%)}
+.en-player svg > path:not(.cape){stroke:#7f8fb4;stroke-opacity:.5;stroke-width:3}
+.en-player .face{fill:#2a2c36}
+.t1 .en-player svg > path:not(.cape){stroke:#e0263f;stroke-opacity:.6}
+.en-crest{position:absolute;inset:auto;left:57.5%;top:47%;width:14%;aspect-ratio:1;opacity:.92;transition:opacity 4.5s ease;filter:drop-shadow(0 0 8px rgba(255,220,150,.45))}
+.en-crest svg{width:100%;height:100%;display:block}
+.t1 .en-crest{opacity:.35}
+.en-city{filter:brightness(.86) saturate(.95)}
+.en-scene[data-s=city]::after{background:radial-gradient(ellipse at 50% 45%,transparent 46%,rgba(0,0,0,.42)),linear-gradient(180deg,rgba(0,0,0,.22),transparent 28%,transparent 50%,rgba(0,0,0,.86) 80%)}
+.en-txt.story{font-size:clamp(19px,5.7vw,27px)}
+.en-txt>span{max-width:min(100%,28ch)}
+.en-cimg{-webkit-mask:radial-gradient(ellipse 72% 51% at 50% 50%,#000 60%,transparent 100%);mask:radial-gradient(ellipse 72% 51% at 50% 50%,#000 60%,transparent 100%)}
