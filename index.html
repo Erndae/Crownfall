@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=217"></script>
-<script src="piece-designs.js?v=217"></script>
-<script src="character-style.js?v=217"></script>
-<script src="campaign-opponents.js?v=217"></script>
-<script src="campaign-dialogue.js?v=217"></script>
-<link rel="stylesheet" href="character-style.css?v=217">
+<script src="gameplay-polish.js?v=218"></script>
+<script src="piece-designs.js?v=218"></script>
+<script src="character-style.js?v=218"></script>
+<script src="campaign-opponents.js?v=218"></script>
+<script src="campaign-dialogue.js?v=218"></script>
+<link rel="stylesheet" href="character-style.css?v=218">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2387,9 +2387,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=217">
-<link rel="stylesheet" href="ruler-style.css?v=217">
-<link rel="stylesheet" href="gameplay-polish.css?v=217">
+<link rel="stylesheet" href="city-board.css?v=218">
+<link rel="stylesheet" href="ruler-style.css?v=218">
+<link rel="stylesheet" href="gameplay-polish.css?v=218">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2839,12 +2839,14 @@ const LAND_PASSAGE = {
    Journey card keeps what they said the morning the crown broke, New Game+ explains why the war starts again (someone
    rebuilt the throne), and each passage's strain line becomes a memory of that morning. */
 const landsFree = () => { try{ return !!endingSave().seen.true; }catch(e){ return false; } };
+// v218: a campaign begun after the true ending: the shards were gathered and four new crowns forged from them
+const crownsReforged = () => { try{ const t = +endingSave().seen.true || 0; return !!t && (+ACH.campaign_epoch || 0) > t; }catch(e){ return false; } };
 const FREED_SAID = {street:'First morning in years I woke up as just Vex.', medieval:'I lowered the drawbridge myself this morning. No one told me to.',
   greek:'For once, I cannot see how this ends. It is wonderful.', fantasy:'The shadows are only shadows now.'};
 const FREED_PASSAGE = {medieval:'Crown City remembers the morning nobody knelt. Some of them are hoping you can bring it back.',
   greek:'In the iron villages, people still talk about the year without a king. They step aside to let you pass.',
   fantasy:'Under the temples, the children play chess in the open now, and stop to watch you go by.',
-  throne:'Behind you, four Lands remember being free. They are counting on you to remember too.'};
+  throne:'Behind you, four Lands remember being free. Ahead, a throne rebuilt from the pieces you left.'};
 const PASSAGE_KEY = 'crownfall-passages';
 function passageSeen(){ const ep = ACH.campaign_epoch || 0; let st = {}; try{ st = JSON.parse(localStorage.getItem(PASSAGE_KEY) || '{}'); }catch(e){} return st && st.ep === ep && Array.isArray(st.seen) ? st : {ep, seen:[]}; }
 function landPassageDue(l){
@@ -2859,7 +2861,7 @@ function landPassage(l, then){
   const go = () => { try{ then && then(); }catch(e){} };
   try{
     const P = LAND_PASSAGE[l], st = passageSeen(); st.seen.push(l); try{ localStorage.setItem(PASSAGE_KEY, JSON.stringify(st)); }catch(e){}
-    const name = PACKS.find(x => x.id === l).name, lines = P.lines.map((x, k) => (k === 1 && landsFree() && FREED_PASSAGE[l] ? FREED_PASSAGE[l] : x).replace('{C}', landCrownName(P.from)).replace('{N}', nameOr('yours')));   // v216: line 2 is the Land under the hold
+    const name = PACKS.find(x => x.id === l).name, lines = P.lines.map((x, k) => (k === 1 && crownsReforged() && FREED_PASSAGE[l] ? FREED_PASSAGE[l] : x).replace('{C}', landCrownName(P.from)).replace('{N}', nameOr('yours')));   // v216: line 2 is the Land under the hold
     const el = document.createElement('div'); el.className = 'passage' + (calm ? ' calm' : ''); el.dataset.land = l; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'The road to ' + name);
     const img = (land, cls) => LAND_ART[land] ? `<img class="${cls}" src="${LAND_ART[land]}" alt=""${LAND_FOCUS[land] ? ` style="object-position:${LAND_FOCUS[land]}"` : ''}>` : '';
     el.innerHTML = `${img(P.from, 'pa-from')}${img(l, 'pa-to')}<span class="pa-shade"></span>
@@ -3100,7 +3102,7 @@ function ngAsk(){
   const next = Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1;
   const free = landsFree();   // v216: after the true ending, say why the war starts again
   const m = modal(`<div class="ngask"><small>${free ? 'The Lands were free' : 'The Crown of Crowns is yours'}</small><h2>${ngLabel(next)}</h2>
-    <p>${free ? 'Someone has rebuilt the Fallen Throne, and the crowns have found their Rulers again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
+    <p>${free ? 'Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
     <ul><li>Score targets <b>+${20 * next}%</b></li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
@@ -3613,7 +3615,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 217;
+const GAME_VERSION = 218;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5016,6 +5018,7 @@ function storyLines(o){
     o.check = 'Kneel, Bearer, before the throne you cannot hold.';
     o.win = 'Leave the crowns, Bearer. You were only ever carrying them for me.';
     o.lose = 'The Crown of Crowns is whole again, Bearer. The question is yours now: what will you do with it?';
+    if(crownsReforged() && !throneCrowns()) o.intro = 'You broke my crown, Bearer. They gathered the pieces. Somebody always does.';   // v218: crowns forged from the shards
     const F = fallenRecord();                                         // v181: a later campaign, after an ending
     if(F){ const a = F.army[0] && F.army[0].n, b = F.army[1] && F.army[1].n;
       o.intro = a && b ? `I climbed these steps once, with ${a} and ${b} beside me. Look closely, Bearer. They never left.` : 'I climbed these steps once, as you do now. Look closely at my army, Bearer.';
@@ -5039,7 +5042,7 @@ function storyLines(o){
     if(o.name === 'Athena, Queen of Olympus' && worldCrowns() < 2) o.intro = `${nm}. I have read that name before. Sit. Let us see how this game ends.`;
     if(o.name === 'Morwen the Shadow Queen' && worldCrowns() !== WORLD_TOTAL - 1) o.intro = `${nm}. Your shadow told me your name before you did.`;
   }
-  if(nm && o.name === 'The Crownless King' && !fallenRecord()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;
+  if(nm && o.name === 'The Crownless King' && !fallenRecord()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : crownsReforged() ? `You broke my crown, ${nm}. They gathered the pieces. Somebody always does.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;   // v218
   // v216: the throne's hold on the Lands. After the first World Crown, about one ordinary opponent in three sounds released
   // when they lose (the same line for the same opponent). Hints only: nobody names the throne or says what it does.
   if(fresh && !o.ruler && o.name !== 'The Hollow Crown' && o.name !== 'The Fallen Grandmaster' && worldCrowns() >= 1 && RUN.ante >= 2){
@@ -5451,7 +5454,7 @@ function title(){
   const inC = MODE === 'campaign';
   app.innerHTML = `<section class="screen" style="padding-block:18px">
     <h1 class="logoimg"><span class="lg-halo" style="-webkit-mask-image:url(${LOGO_HALO});mask-image:url(${LOGO_HALO})"></span><img class="brandimg" src="${LOGO}" alt="Crownfall" width="869" height="423"></h1>
-    <p class="titlemotto">${landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>
+    <p class="titlemotto">${crownsReforged() ? 'Everybody wants a crown. <b class="freemark">The crowns were forged again.</b>' : landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>
     <div class="modecard mc-camp keepcash">
       <div class="mchead"><b>Campaign</b><small>85 battles · five Lands · claim the Crowns</small></div>
       ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${inC && !saved && !RUN && campaignComplete() ? `Start ${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)} · harder` : `${ngLevel() ? ngLabel() + ' · ' : ''}${camp.cont}`}</small></button>` : ''}
@@ -10266,7 +10269,7 @@ async function endingTrue(E, o){
     await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
     await E.wait(400);
     await E.say('In four Lands at once, the Rulers’ crowns go dark.', 2800, 'lower', 'story');   // v216: the Lands go free
-    await E.say('For the first time in a hundred years, nobody kneels.', 3200, 'lower', 'story');
+    await E.say(landsFree() ? 'Again, nobody kneels. This time, they remember how to stand.' : 'For the first time in a hundred years, nobody kneels.', 3200, 'lower', 'story');   // v218: freed before
     await E.black(1400);
     // 4) the one who came before
     E.scene('approach'); snd.wind(9);
@@ -10425,6 +10428,7 @@ async function endingStandard(E, o){
     await E.say('The Crown of Crowns breaks apart.', 2400, 'bottom', 'story');
     await E.say('Its four crowns scatter back to the four Lands, and their Rulers rise to guard them again.', 3800, 'bottom', 'story');
     await E.say('Four Lands kneel to the throne again. Now they kneel to you.', 3200, 'bottom', 'story');   // v216: the Lands stay bound
+    if(landsFree()) await E.say('The Lands were free once. You have chained them again.', 3200, 'bottom', 'story red');   // v218: after the true ending
     await E.say('The throne can be held. The crown can never be kept.', 3200, 'bottom', 'story red');
     await E.wait(400);
     // 4) the reveal

@@ -346,3 +346,11 @@ After the true ending has been seen on this device (wearing the crown frees no o
 - **New Game+:** "The Lands were free. Someone has rebuilt the Fallen Throne, and the crowns have found their Rulers again." The new cycle explains itself.
 - **The road between Lands:** the line about each Land under the hold becomes a memory of the free morning ("Crown City remembers the morning nobody knelt. Some of them are hoping you can bring it back.").
 - Tests: `validate-v217.cjs`; v197 wiring check loosened for the new line swap.
+
+## v218 — after the crown was broken
+- **Where the new crowns come from.** New Game+ after the true ending: "Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again." (It used to say the crowns "found their Rulers again", which made no sense once they were destroyed.)
+- **Title** during that campaign: "Everybody wants a crown." / "The crowns were forged again." ("The Lands are free." still shows between the true ending and the next campaign.)
+- **The Crownless King** in that campaign: "You broke my crown, {name}. They gathered the pieces. Somebody always does."
+- **Last road:** "Ahead, a throne rebuilt from the pieces you left." Passage memories now show only in the campaign after the true ending.
+- **Endings the second time:** taking the crown adds "The Lands were free once. You have chained them again."; breaking it again says "Again, nobody kneels. This time, they remember how to stand."
+- Tests: `validate-v218.cjs`; v217 updated.

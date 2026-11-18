@@ -9,12 +9,12 @@ const S=JSON.parse(E('JSON.stringify(FREED_SAID)')),FP=JSON.parse(E('JSON.string
 assert.deepEqual(Object.keys(S).sort(),['fantasy','greek','medieval','street']);assert.deepEqual(Object.keys(FP).sort(),['fantasy','greek','medieval','throne']);
 assert(S.street.includes('just Vex'));for(const x of [...Object.values(S),...Object.values(FP)])assert(!/crownless king|was once a/i.test(x));
 // wiring: title, Journey, passage, NG+
-assert(src.includes(`<p class="titlemotto">\${landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>`));
+assert(src.includes(`landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>`));
 assert(src.includes('${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : \'\'}'));
-assert(src.includes("(k === 1 && landsFree() && FREED_PASSAGE[l] ? FREED_PASSAGE[l] : x)"));
-assert(src.includes("Someone has rebuilt the Fallen Throne, and the crowns have found their Rulers again.")&&src.includes("free ? 'The Lands were free' : 'The Crown of Crowns is yours'"));
+assert(src.includes("(k === 1 && crownsReforged() && FREED_PASSAGE[l] ? FREED_PASSAGE[l] : x)"));   // v218: in the campaign after the true ending
+assert(src.includes("Someone gathered the shards of the Crown of Crowns.")&&src.includes("free ? 'The Lands were free' : 'The Crown of Crowns is yours'"));
 assert(css.includes('.titlemotto .freemark{')&&css.includes('.jfree{'));
 // unchanged before the true ending
 const P=JSON.parse(E('JSON.stringify(LAND_PASSAGE)'));assert(P.greek.lines[1].includes('soldiers do not follow')||P.greek.lines[2].includes('kneel toward the mountains'));
-assert(src.includes('const GAME_VERSION = 217;')&&sw.includes("'crownfall-v217'")&&!src.includes('?v=216'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=217&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: freedom only after the true ending, title mark, Rulers remember the morning on Journey, passage memories, NG+ explains the rebuilt throne, safe with bad data, version.');
