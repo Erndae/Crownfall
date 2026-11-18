@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=219"></script>
-<script src="piece-designs.js?v=219"></script>
-<script src="character-style.js?v=219"></script>
-<script src="campaign-opponents.js?v=219"></script>
-<script src="campaign-dialogue.js?v=219"></script>
-<link rel="stylesheet" href="character-style.css?v=219">
+<script src="gameplay-polish.js?v=220"></script>
+<script src="piece-designs.js?v=220"></script>
+<script src="character-style.js?v=220"></script>
+<script src="campaign-opponents.js?v=220"></script>
+<script src="campaign-dialogue.js?v=220"></script>
+<link rel="stylesheet" href="character-style.css?v=220">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -757,6 +757,9 @@ body[data-art="1"] #app{position:relative;z-index:1}
 .endhold{position:fixed;inset:0;z-index:199;background:transparent}
 .en-scene{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;pointer-events:none}
 .en-scene.on{opacity:1}
+.en-scene[data-s=film]{background:#100d0b center / contain no-repeat}
+.en-scene[data-s=film] video{width:100%;height:100%;object-fit:contain}
+.en-scene[data-s=film]::after{background:linear-gradient(to bottom,rgba(0,0,0,.52),transparent 32%,transparent 65%,rgba(0,0,0,.68))}
 .en-scene::after{content:"";position:absolute;inset:0;pointer-events:none}
 /* 1) the Crown of Crowns */
 .en-scene[data-s=crown]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.4vh;padding:calc(var(--sat) + 4vh) 16px calc(var(--sab) + 22vh)}
@@ -2387,9 +2390,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=219">
-<link rel="stylesheet" href="ruler-style.css?v=219">
-<link rel="stylesheet" href="gameplay-polish.css?v=219">
+<link rel="stylesheet" href="city-board.css?v=220">
+<link rel="stylesheet" href="ruler-style.css?v=220">
+<link rel="stylesheet" href="gameplay-polish.css?v=220">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3615,7 +3618,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 219;
+const GAME_VERSION = 220;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -10206,6 +10209,23 @@ function endingKit(ov){
     E.wake.add(stop); if(E.stop) stop();
   });
   E.scene = name => ov.querySelectorAll('.en-scene').forEach(x => x.classList.toggle('on', x.dataset.s === name));
+  // Only attach media when its story beat is reached. The painting remains available if playback fails.
+  E.film = name => {
+    const scene = ov.querySelector('[data-s="film"]');
+    const base = 'assets/ending/' + name;
+    scene.style.backgroundImage = 'url("' + base + '.webp")';
+    scene.replaceChildren();
+    E.scene('film');
+    if(calm || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('aria-hidden', 'true');
+    video.addEventListener('error', () => video.remove(), {once:true});
+    scene.append(video);
+    video.src = base + '.mp4';
+    video.play().catch(() => video.remove());
+  };
   E.black = async ms => { E.scene(null); await E.wait(ms); };
   E.load = url => Promise.race([new Promise(r => { if(!url) return r(); const im = new Image(); im.onload = im.onerror = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(r); im.src = url; }), new Promise(r => setTimeout(r, 5000))]);
   return E;
@@ -10268,6 +10288,7 @@ async function endingTrue(E, o){
     await E.wait(2600);
     q('.en-crownbox').classList.add('broken'); snd.shatter();
     await E.wait(2400);
+    E.film('broken');
     await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
     await E.say('The Hunger dies with it.', 2600, 'lower', 'story');   // v219
     await E.wait(400);
@@ -10277,7 +10298,7 @@ async function endingTrue(E, o){
     await E.say(landsFree() ? 'Again, nobody kneels. This time, they remember how to stand.' : 'For the first time in a hundred years, nobody kneels.', 3200, 'lower', 'story');   // v218: freed before
     await E.black(1400);
     // 4) the one who came before
-    E.scene('approach'); snd.wind(9);
+    E.film('surrender'); snd.wind(9);
     await E.wait(1500);
     await E.say('The Crownless King lowers his head.', 2600, 'top', 'story');
     await E.wait(250);
@@ -10346,6 +10367,7 @@ function endingHTML(){
         <div class="en-king"></div><div class="en-crowned"></div>
         <div class="en-crownfx">${frags}</div><div class="en-crackfx"><svg class="en-crack" viewBox="0 0 100 100" preserveAspectRatio="none">${crack}</svg></div>
       </div></div></div>
+    <div class="en-scene" data-s="film"></div>
     <div class="en-scene" data-s="city"><div class="en-city"></div></div>
     <div class="en-scene en-paint" data-s="lift"><div class="en-art" role="img" aria-label="Your Crownrunner, face hidden by a black mask, lifts the Crown of Crowns"></div></div>
     <div class="en-scene en-paint" data-s="refuse"><div class="en-art" role="img" aria-label="Your masked Crownrunner stands before the empty throne, the Crown of Crowns held low at their side"></div></div>
@@ -10416,6 +10438,7 @@ async function endingStandard(E, o){
     await E.wait(1400);
     await E.cont('You lift the Crown of Crowns.', 'story');
     ov.classList.add('t1'); snd.resonance(.4);                       // v214: the painting darkens; no figure is drawn over it
+    E.film('turn');
     await E.say(endingArmyLine(), 3600, 'bottom', 'story');
     await E.say('You do not turn around.', 2400, 'bottom', 'story');
     // v214: the one moment the crown is worn (the balcony painting), then the throne takes its price
@@ -10423,7 +10446,7 @@ async function endingStandard(E, o){
     await E.wait(1800);
     await E.cont('For one moment, the whole kingdom is yours.', 'story');
     await Promise.all([ready.king, ready.crowned]);
-    ov.classList.add('t2'); E.scene('become'); snd.rumble();         // the throne consumes you: his face becomes yours
+    ov.classList.add('t2'); E.film('transformation'); snd.rumble();         // the throne consumes you: his face becomes yours
     await E.wait(1200);
     await E.say('The Hunger finishes what the crowns began.', 2800, 'bottom', 'story red');   // v219
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
@@ -10431,6 +10454,7 @@ async function endingStandard(E, o){
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });
     ov.classList.add('t4'); snd.shatter();                            // it falls away into shadow: crownless
     await E.wait(2000);
+    E.scene('become');
     await E.say('The Crown of Crowns breaks apart.', 2400, 'bottom', 'story');
     await E.say('Its four crowns scatter back to the four Lands, and their Rulers rise to guard them again.', 3800, 'bottom', 'story');
     await E.say('Four Lands kneel to the throne again. Now they kneel to you.', 3200, 'bottom', 'story');   // v216: the Lands stay bound
@@ -10453,6 +10477,7 @@ async function endingStandard(E, o){
   await E.wait(1900);
   await E.say('EVERYBODY WANTS A CROWN.', 1700, 'lower', 'caps echo');
   await E.say('SOMEWHERE IN CROWN CITY…', 2300, 'lower', 'caps small');
+  E.film('arrival');
   await E.say('A NEW CROWNRUNNER HAS ENTERED.', 3400, 'lower', 'caps final');
   // the last lines wait for Continue, and the last Continue ends the ending (v214: over the city; the balcony moment came earlier)
   await E.cont('THEY ARE COMING FOR YOUR THRONE.', 'caps final red');   // v214: the throne took the name; they call you by your title now
