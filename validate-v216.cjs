@@ -17,7 +17,7 @@ const r=JSON.parse(E(`(()=>{const used={};let n=0,h=0,early=0,ruler=0,stable=tru
 assert.equal(r.early,0,'never before the first World Crown, never in stage 1');assert.equal(r.ruler,0,'Rulers keep their own lines');assert(r.stable,'same opponent, same line');
 assert.equal(r.used,6,'every line is heard somewhere');assert(r.h>r.n*0.15&&r.h<r.n*0.4,'about one in four: '+r.h+'/'+r.n);
 // Rulers, passages, army
-for(const x of ['it never once felt like mine.','never saw who it answered to.','Ask who has been carrying all of us.','remember that every Land is still kneeling.'])assert(src.includes(x),x);
+for(const x of ['Then the Hunger got in, and I forgot what I wanted.','never saw who it answered to.','Ask who has been carrying all of us.','remember that every Land is still kneeling.'])assert(src.includes(x),x);
 const P=JSON.parse(E('JSON.stringify(LAND_PASSAGE)'));const strain={medieval:'same horizon',greek:'kneel toward the mountains',fantasy:'play chess in cellars',throne:'four Lands are still kneeling'};
 for(const l in strain){assert.equal(P[l].lines.length,5);assert(P[l].lines.some(x=>x.includes(strain[l])),l);for(const x of P[l].lines)assert(!/crownless|was once a|became the/i.test(x));}
 assert(src.includes("relieved to lose.")&&src.includes('Like something up there is listening.'));

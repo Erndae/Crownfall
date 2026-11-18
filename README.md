@@ -354,3 +354,13 @@ After the true ending has been seen on this device (wearing the crown frees no o
 - **Last road:** "Ahead, a throne rebuilt from the pieces you left." Passage memories now show only in the campaign after the true ending.
 - **Endings the second time:** taking the crown adds "The Lands were free once. You have chained them again."; breaking it again says "Again, nobody kneels. This time, they remember how to stand."
 - Tests: `validate-v218.cjs`; v217 updated.
+
+## v219 — the Hunger
+The crowns carry a dark power, the Hunger. It makes its wearer stronger and bends them toward the throne; that is how the Crownless King holds the Lands through their Rulers.
+- **The whisper grows with each World Crown** (on the crown-claimed screen): it is named at the first ("Old Crownrunners called it the Hunger."), then "Win.", "More.", "Make them kneel.", "Come home." Each crown's card on Journey, and the defended-crown screen, shows its whisper.
+- **Rulers:** Vex "ran these streets for myself once. Then the Hunger got in, and I forgot what I wanted."; Morwen: "The Hunger hollows you out from the inside."
+- **The Hollow Crown** is what the Hunger leaves: "I wore a crown once. The Hunger ate the rest of me. Now I take them." / "The Hunger took my will... then he took my name."
+- One released-opponent line: "The Hunger goes quiet when I lose."
+- **Endings:** wearing it: "The Hunger finishes what the crowns began."; breaking it: "The Hunger dies with it."
+- Nothing before the ending says who the Crownless King was. Checked on 320×568 and 375×667.
+- Tests: `validate-v219.cjs`; v216 and v218 updated.

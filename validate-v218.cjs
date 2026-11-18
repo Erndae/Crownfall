@@ -16,7 +16,7 @@ const a=std.indexOf('Now they kneel to you.'),b=std.indexOf("if(landsFree()) awa
 const tr=src.slice(src.indexOf('async function endingTrue'),src.indexOf('const ENDING_PRE'));
 assert(tr.includes("landsFree() ? 'Again, nobody kneels. This time, they remember how to stand.' : 'For the first time in a hundred years, nobody kneels.'"));
 assert(src.indexOf("s.seen[type] = s.seen[type] || Date.now()")<src.indexOf('async function endingTrue')||true);
-assert(src.includes('const GAME_VERSION = 218;')&&sw.includes("'crownfall-v218'")&&!src.includes('?v=217'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=218&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 // New Game+ and the title tell where the new crowns came from
 assert(src.includes("Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again."));
 assert(!src.includes('the crowns have found their Rulers again'));

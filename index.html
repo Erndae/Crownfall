@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=218"></script>
-<script src="piece-designs.js?v=218"></script>
-<script src="character-style.js?v=218"></script>
-<script src="campaign-opponents.js?v=218"></script>
-<script src="campaign-dialogue.js?v=218"></script>
-<link rel="stylesheet" href="character-style.css?v=218">
+<script src="gameplay-polish.js?v=219"></script>
+<script src="piece-designs.js?v=219"></script>
+<script src="character-style.js?v=219"></script>
+<script src="campaign-opponents.js?v=219"></script>
+<script src="campaign-dialogue.js?v=219"></script>
+<link rel="stylesheet" href="character-style.css?v=219">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2387,9 +2387,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=218">
-<link rel="stylesheet" href="ruler-style.css?v=218">
-<link rel="stylesheet" href="gameplay-polish.css?v=218">
+<link rel="stylesheet" href="city-board.css?v=219">
+<link rel="stylesheet" href="ruler-style.css?v=219">
+<link rel="stylesheet" href="gameplay-polish.css?v=219">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3369,7 +3369,7 @@ function landsScreen(after){
     const art = crownArt(l, WORLD_TIER(l));
     modal(`<div class="trophy${l === 'throne' ? ' throne' : ''}" style="animation:none">${art ? `<img src="${art}" alt="" style="animation:none">` : crownSVG(l, 'hard', true)}</div>
       <h2 class="tr-name" style="animation:none">${landCrownName(l)}</h2><p class="muted" style="text-align:center;margin:-4px 0 0">${PACKS.find(x => x.id === l).name} · ${l === 'throne' ? 'The final crown' : 'World Crown'}</p>
-      <p class="crownlore">${CROWN_LORE[l][WORLD_TIER(l)]}</p>
+      <p class="crownlore">${CROWN_LORE[l][WORLD_TIER(l)]}</p>${crownWhisperHTML(l)}
       <button class="btn" id="cclose">Close</button>`, '#cclose'); });
   m.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
     if(!landOpen(b.dataset.p)){ sfx.bad(); return; }
@@ -3615,7 +3615,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 218;
+const GAME_VERSION = 219;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4902,7 +4902,7 @@ const PERSONA = {
   'Morwen the Shadow Queen': {style:'tricky', intro:'In the shadows, I move twice while you blink once.', capture:['The shadows take you.','Darkness claims another.'], hurt:['A flicker of light. It will fade.','You wound a shadow? Amusing.'], check:'Your king stands alone in the dark.', lose:'The light... it burns... take the crown.', win:'All crowns fall into shadow.'},
 
   'The Ash Herald': {style:'aggressive', intro:'I announce your ending. Kneel in the ash.', capture:['To ash.','The herald speaks your doom.'], hurt:['Embers still burn.','You scatter ash. Nothing more.'], check:'Hear the final proclamation.', lose:'My voice... fades to smoke.', win:'It is proclaimed. You have fallen.'},
-  'The Hollow Crown': {style:'hunter', intro:'I wore a crown once. Now I take them.', capture:['Empty, like me.','Another crown for the hollow.'], hurt:['I feel nothing.','You cannot hurt what is already empty.'], check:'Your crown will be mine.', lose:'Finally... rest.', win:'Hollow. Like your hopes.'},
+  'The Hollow Crown': {style:'hunter', intro:'I wore a crown once. The Hunger ate the rest of me. Now I take them.', capture:['Empty, like me.','Another crown for the hollow.'], hurt:['I feel nothing.','You cannot hurt what is already empty.'], check:'Your crown will be mine.', lose:'Finally... rest.', win:'Hollow. Like your hopes.'},
   'The Ruined Knight': {style:'defensive', intro:'My oath is broken. My blade is not.', capture:['Ruin follows me.','Fallen, like my order.'], hurt:['Old wounds.','Still standing.'], check:'Your king will know ruin.', lose:'My oath... is fulfilled.', win:'Ruin. Always ruin.'},
   'The Tithe Lord': {style:'greedy', intro:'Every step on this road costs you. I will collect.', capture:['Tribute accepted.','Your debt grows.'], hurt:['That will be added to your bill.','Theft from the throne!'], check:'Your king is the final payment.', lose:'The debt... is forgiven.', win:'Paid in full.'},
   'The Crownless King': {style:'hunter', intro:'Every crown you carry was once mine. I have come to take them back.', capture:['Mine. All of it is mine.','The throne remembers.'], hurt:['You wound a king without a crown?','I have lost more than that.'], check:'Kneel before the throne you cannot hold.', lose:'Take it... the Crown of Crowns. May it weigh on you as it did on me.', win:'The throne will never be yours.'},
@@ -4974,6 +4974,9 @@ function purseSpill(){
 }
 function campaignScore(){ const n = hoardNow() + Math.max(0, Math.floor(+(RUN && RUN.money) || 0)); const best = n > bestCampaign(); if(best) ACH.best_campaign = n; ACH.last_campaign = n; ACH.campaign_best_new = best ? 1 : 0; saveAch(); return n; }
 function runnerTitle(){ const n = worldCrowns(); return n >= 4 ? 'Bearer of the Four Crowns' : n >= 2 ? 'The Crownrunner' : n >= 1 ? 'Crownrunner' : 'Unknown challenger'; }
+// v219: what each crown whispers (the Lands are taken in order, so the whisper grows as you go)
+const CROWN_WHISPER = {street:'Win.', medieval:'More.', greek:'Make them kneel.', fantasy:'Come home.', throne:'You are home.'};
+const crownWhisperHTML = l => CROWN_WHISPER[l] ? `<p class="crownwhisper">The Hunger whispers: “${CROWN_WHISPER[l]}”</p>` : '';
 const CROWN_LORE = {
   street:   {easy:'Sprayed gold over something older. Under the paint, a hairline crack.', medium:'Polished so bright you can see your face in it, and a thin fracture running through the reflection.', hard:'Vex never took it off. Up close, the stones sit along a break that was never repaired.'},
   medieval: {easy:'Forged, the smiths say, from the first iron of the kingdom. The seam in the metal is older than the kingdom.', medium:'Worn at every coronation for three hundred years. Each heir was told never to ask about the crack.', hard:'The Iron Kingdom’s proudest treasure. Its edge is jagged, as if it were broken off something larger.'},
@@ -4999,7 +5002,7 @@ function repLine(pp){
 }
 // v216: what a defeated opponent says once the pull lets go of them for a moment
 const HOLD_LINES = ['Thank you. For a second there, I couldn’t hear it.', 'Funny. I never even wanted a crown. I just couldn’t stop fighting for one.',
-  'It’s quieter when I lose. Is that strange?', 'Don’t let it pull you the way it pulled me.', 'Every night it says the same thing: win. I never asked who for.',
+  'The Hunger goes quiet when I lose. Is that strange?', 'Don’t let it pull you the way it pulled me.', 'Every night it says the same thing: win. I never asked who for.',
   'My grandmother fought for these crowns. So did hers. None of us ever got to keep one.'];
 // lines that change with the story so far
 function storyLines(o){
@@ -5052,14 +5055,14 @@ function storyLines(o){
   if(fresh){
     if(o.name === 'Night Owl Nico') o.lose = 'Market’s closed. Funny. You all look different when you start.';
     if(o.name === 'Dockmaster Dee') o.win = 'I’ve seen that look before. Tide took them too.';
-    if(o.name === 'Kingpin Vex') o.lose = 'So you’re really going through with it. One crown down. Enjoy it. I wore that thing ten years, and it never once felt like mine.';
+    if(o.name === 'Kingpin Vex') o.lose = 'So you’re really going through with it. One crown down. I ran these streets for myself once. Then the Hunger got in, and I forgot what I wanted.';
     if(o.name === 'King Aldric the Iron-Handed') o.lose = `Another Crownrunner carries the ${landCrownName('medieval')}. I knelt to it for thirty years and never saw who it answered to. May you fare better than the others.`;
     if(o.name === 'Heracles') o.lose = 'Even heroes fall. Strength carried the others this far too.';
     if(o.name === 'King Aeëtes') o.intro = 'The Fleece is mine. Every Crownrunner thinks the Crowns belong to them.';
     if(o.name === 'Athena, Queen of Olympus') o.lose = 'You have earned the third Crown. Whether you should carry it is a different question. Ask who has been carrying all of us.';
-    if(o.name === 'Morwen the Shadow Queen') o.lose = 'Four. They remember you already. And he knows. When you reach him, remember that every Land is still kneeling.';
+    if(o.name === 'Morwen the Shadow Queen') o.lose = 'Four. And he knows. The Hunger hollows you out from the inside. When you reach him, remember that every Land is still kneeling.';
   }
-  if(o.name === 'The Hollow Crown'){ o.lose = 'He took my crown... then my name. Don’t let him take yours.'; }
+  if(o.name === 'The Hollow Crown'){ o.lose = 'The Hunger took my will... then he took my name. Don’t let him take yours.'; }   // v219: what the Hunger leaves
   if(o.name === 'The Fallen Grandmaster'){ o.intro = 'I was the greatest player in all the lands. I carried four Crowns to this hall once. Turn back while you still can.'; o.lose = 'I wasn’t guarding him. I was guarding you... from him.'; o.win = 'Better you fall here than reach him.'; }
   return o;
 }
@@ -9648,10 +9651,11 @@ async function rulerDefeatIntro(l, rulerName){
 const rulerShort = l => RULERS[l].short || RULERS[l].name.split(/,| the /)[0];
 // 3) land conquered: a chapter ending (World Crown → name → LAND CONQUERED → X / 4)
 const CROWN_MYST = [
-  ['For a moment, the Crown feels familiar.', 'You have never worn it before.'],
-  ['The two Crowns answer each other with a faint pulse.', 'Then they fall silent.'],
-  ['The three Crowns resonate.', 'For an instant you hear something like a distant crowd.', 'Then nothing.'],
-  ['All four Crowns answer at once.', 'Somewhere far away, something answers back.'],
+  // v219: the Hunger, the dark power in every crown, whispers louder with each one you carry
+  ['Something inside the Crown wakes. Old Crownrunners called it the Hunger.', 'It whispers one word: “Win.”'],
+  ['The two Crowns pulse together, and the whisper grows.', '“More.”'],
+  ['The three Crowns resonate. The whisper is a voice now.', '“Make them kneel.”'],
+  ['All four Crowns answer at once.', 'The Hunger is loud now: “Come home.”'],
 ];
 /* v190: after each World Crown, the longest-serving soldier says what the army is starting to notice. One line, in a
    voice that follows their personality (bold, wary or warm). Hints only: nothing here states what the throne does. */
@@ -10265,6 +10269,7 @@ async function endingTrue(E, o){
     q('.en-crownbox').classList.add('broken'); snd.shatter();
     await E.wait(2400);
     await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
+    await E.say('The Hunger dies with it.', 2600, 'lower', 'story');   // v219
     await E.wait(400);
     await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
     await E.wait(400);
@@ -10419,7 +10424,8 @@ async function endingStandard(E, o){
     await E.cont('For one moment, the whole kingdom is yours.', 'story');
     await Promise.all([ready.king, ready.crowned]);
     ov.classList.add('t2'); E.scene('become'); snd.rumble();         // the throne consumes you: his face becomes yours
-    await E.wait(1800);
+    await E.wait(1200);
+    await E.say('The Hunger finishes what the crowns began.', 2800, 'bottom', 'story red');   // v219
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
     await E.say('The throne takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });
@@ -10475,7 +10481,7 @@ function crownCeremony(l, fresh){
     <p class="tr-kicker">World Crown defended</p>
     <h2 class="tr-name">${landCrownName(l)}</h2>
     <p class="tr-count">${worldCrowns()} / ${WORLD_TOTAL} World Crowns</p>
-    <p class="crownlore">${CROWN_LORE[l][WORLD_TIER(l)]}</p>
+    <p class="crownlore">${CROWN_LORE[l][WORLD_TIER(l)]}</p>${crownWhisperHTML(l)}
     <button class="btn" id="go">Choose your next land</button><button class="btn ghost" id="vault">See my crowns</button>`, '#go', () => circuitSelect(frontierLand())).querySelector('#vault').onclick = e => { e.target.closest('.modal').remove(); landsScreen(() => circuitSelect(frontierLand())); };
 }
 // 4 / 4: the four World Crowns, then the Fallen Throne opens
