@@ -48,5 +48,5 @@ assert(src.includes("lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ?
 E("ACH.edicts=['iron','fuse'];RUN={land:'greek',circuit:'harbor',ante:2,money:100,relics:[],roster:['K']}");assert.equal(E('campaignScore()'),Math.round((E('hoardNow()')+100)*1.3),'+15% each');
 assert(E('edictsHTML()').includes('Iron Rulers')&&E('edictsHTML()').includes('+30% campaign score'));E('ACH.edicts=[]');assert.equal(E('edictsHTML()'),'');
 assert(src.includes("edictPick(() => askName(() => draftScreen()));")&&src.includes('${hungerRecordHTML()}${edictsHTML()}')&&css.includes('.ed-card{'));
-assert(src.includes('const GAME_VERSION = 226;')&&sw.includes("'crownfall-v226'")&&!src.includes('?v=225'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=226&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: Crownless King fields your last army (types, names, padding, fallbacks), seven Edicts stack through New Game+ and clear on a new campaign, pick 1 of 3, every effect, campaign score bonus, display, version.');

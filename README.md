@@ -415,3 +415,11 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
   - The New Game+ offer and Journey list the Edicts in force.
 - **The Crownless King fights with your previous army.** In a later campaign (after an ending other than the true one), his pieces are the army you brought to the throne last time, in your formation mirrored to his side, each named after the soldier it was. A smaller army is filled out with Pawns to 16; extra pieces stand behind a screen of pawns. If the opening fairness check rejects it (only extreme armies, like eight Queens), he uses his own army, still with your soldiers' names.
 - Tests: `validate-v226.cjs`; v224, v225 and the balance audit updated.
+
+## v227 — first-time tips, and a ceiling on New Game+ targets
+- **Board marks:** the first fight with a Green Light, Supply crate, Vantage point or Bounty highlights the Board key: tap a marked square to see what it does, or open the key for the full list. (The Royal Banner keeps its own tip.)
+- **The Hunger keeps count:** after your first bargain, a tip says the Rulers notice and the ending remembers, and where to see your record.
+- **Edicts:** after choosing your first Edict, a tip says they stay for every cycle and add +15% each.
+- Each shows once, to every player (existing players included, since these systems are new).
+- **New Game+ targets are capped.** They rose +20% every cycle with no limit while Blitz fights also lost a move each cycle, so by cycle 3 a Blitz target was 1.6× what a strong army scores in its moves (2× by cycle 5). Now: +20% per cycle up to **+60%** (cycle 3); Blitz rises half as fast, up to **+30%**. Measured against army capacity across 170 fight positions: normal fights top out at 1.6×, Blitz at 1.3×, at any cycle. Past cycle 3, New Game+ gets harder through Edicts. The New Game+ offer shows both numbers.
+- Tests: `validate-v227.cjs`; v210 updated.

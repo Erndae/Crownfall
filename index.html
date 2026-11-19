@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=226"></script>
-<script src="piece-designs.js?v=226"></script>
-<script src="character-style.js?v=226"></script>
-<script src="campaign-opponents.js?v=226"></script>
-<script src="campaign-dialogue.js?v=226"></script>
-<link rel="stylesheet" href="character-style.css?v=226">
+<script src="gameplay-polish.js?v=227"></script>
+<script src="piece-designs.js?v=227"></script>
+<script src="character-style.js?v=227"></script>
+<script src="campaign-opponents.js?v=227"></script>
+<script src="campaign-dialogue.js?v=227"></script>
+<link rel="stylesheet" href="character-style.css?v=227">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=226">
-<link rel="stylesheet" href="ruler-style.css?v=226">
-<link rel="stylesheet" href="gameplay-polish.css?v=226">
+<link rel="stylesheet" href="city-board.css?v=227">
+<link rel="stylesheet" href="ruler-style.css?v=227">
+<link rel="stylesheet" href="gameplay-polish.css?v=227">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3131,7 +3131,7 @@ function edictPick(then){
     <p>A new rule for this cycle. It stays for every cycle after, and each Edict adds <b>+15%</b> to your campaign score.</p>
     ${offer.map(id => `<button class="ed-card" data-ed="${id}"><b>${EDICTS[id].name}</b><span>${EDICTS[id].desc}</span></button>`).join('')}
     ${held.length ? `<p class="muted ed-held">Already in force: ${held.map(id => EDICTS[id].name).join(', ')}</p>` : ''}</div>`);
-  m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.edict_next = b.dataset.ed; saveAch(); then(); });
+  m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.edict_next = b.dataset.ed; saveAch(); then(); coach('edicts'); });   // v227: the tip follows once
 }
 function edictsApply(){   // at the start of every campaign fight
   if(!B || !edictList().length || MATCH || (RUN && RUN.gauntlet)) return;
@@ -3145,7 +3145,10 @@ const edictsHTML = () => { const l = edictList(); if(!l.length) return '';
   return `<div class="jedicts"><small>Edicts in force · +${15 * l.length}% campaign score</small>${l.map(id => `<span><b>${EDICTS[id].name}</b>${EDICTS[id].desc}</span>`).join('')}</div>`; };
 const ngLabel = (n = ngLevel()) => n ? `New Game+${n > 1 ? ' ' + n : ''}` : '';
 const campaignComplete = () => { try{ return landWon('throne'); }catch(e){ return false; } };
-const ngTargetMult = () => 1 + 0.2 * ngLevel();
+// v227: the target rise is capped. +20% per cycle up to +60% (cycle 3); Blitz fights, which also lose moves, rise half as
+// fast (+10% per cycle, at most +30%). Past cycle 3, New Game+ gets harder through Edicts instead of bigger numbers.
+const ngTargetPct = (n = ngLevel(), blitz = false) => blitz ? Math.min(30, 10 * n) : Math.min(60, 20 * n);
+const ngTargetMult = (blitz = false) => 1 + ngTargetPct(ngLevel(), blitz) / 100;
 function ngArmor(board){
   const n = ngLevel(); if(!n || !Array.isArray(board)) return 0; let c = 0;
   const types = n >= 3 ? ['Q', 'R', 'B', 'N'] : n >= 2 ? ['Q', 'R'] : ['Q'];
@@ -3157,7 +3160,7 @@ function ngAsk(){
   const free = landsFree();   // v216: after the true ending, say why the war starts again
   const m = modal(`<div class="ngask"><small>${free ? 'The Lands were free' : 'The Crown of Crowns is yours'}</small><h2>${ngLabel(next)}</h2>
     <p>${free ? 'Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
-    <ul><li>Score targets <b>+${20 * next}%</b></li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
+    <ul><li>Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)</li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
     ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. You choose one more.</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
@@ -3673,7 +3676,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 226;
+const GAME_VERSION = 227;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3778,7 +3781,7 @@ function targetParts(i){
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
   if(lim) t = Math.max(t, Math.min(blitz * bf, BLITZ_FLOOR * targetParts(0).final));   // v177: Blitz floor (the Warm-up already includes the build factor)
-  t *= ngTargetMult();   // v210: New Game+ (+20% per cycle), after every cap so it always applies
+  t *= ngTargetMult(!!lim);   // v210: New Game+ (v227: capped, half in Blitz), after every cap so it always applies
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
   return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), build:+bf.toFixed(2), ppm:campaignPPM(), power:+campaignPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
@@ -5826,6 +5829,9 @@ const COACH = {
   banner:     {pri:3,  target:'.banner-mark',       text:() => ['The Royal Banner', `Land a piece on the marked square, not a Pawn, for +1 Tactic and 1 Armor. If the Ruler’s side gets there first, you lose 1 Tactic.`]},
   armor:      {pri:2,  target:null,                 text:() => ['Armored', `The number on this piece is its armor. It can survive that many extra captures before it falls.`]},
   trap:       {pri:2,  target:'#trapBtn',           text:() => ['Traps', `Tap <b>Trap</b>, then an empty square or one of your pieces to hide a trap there. The first enemy to land on it gets caught.`]},
+  marks:      {pri:3,  target:'#keyBtn',            text:() => ['Board marks', `Some squares and pieces carry a mark that helps or hurts you. <b>Tap a marked square</b> to see what it does, or open the <b>Board key</b> for the full list.`]},   // v227
+  hunger:     {pri:3,  target:null,                 text:() => ['The Hunger keeps count', `Every bargain you take or refuse is counted. The Rulers notice, and the ending remembers. Your record is on the <b>Journey</b> screen.`]},   // v227
+  edicts:     {pri:3,  target:null,                 text:() => ['Edicts', `Your Edicts stay for every New Game+ cycle after this one, and each adds <b>+15%</b> to your campaign score. They are listed on the <b>Journey</b> screen.`]},   // v227
   circuit:    {pri:2,  target:null,                 text:() => ['Choosing a route', `Each land has <b>circuits</b> of 4 Stages. Every Stage is one battle against one opponent, and Stage 4 is the <b>circuit boss</b>. Conquer all four, in order, to open the <b>Ruler’s Road</b> and fight for that land’s crown.`]},
 };
 const ONBOARD_KEYS = ['intro','score','brilliance','damage','swap','card','crown','journey'];
@@ -6145,7 +6151,7 @@ function hungerAsk(go){
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
     if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed'); }
     else { hungerNote('refused'); if(edictOn('hungry')) RUN.money = Math.max(0, RUN.money - 2); }   // v226: Hungry Crowns
-    save(); go(); };
+    save(); go(); coach('hunger'); };   // v227: once, after the first bargain
   m.querySelector('#hgYes').onclick = () => pick(true); m.querySelector('#hgNo').onclick = () => pick(false);
 }
 function hungerApply(){   // at the start of the Stage Battle the bargain was made for
@@ -6247,6 +6253,7 @@ function playBlind(resumed){
   if(isRuler && !resumed && !rulerIntroSeen.has(introKey)){ rulerIntroSeen.add(introKey); rulerIntro(land()); }
   if(resumed && B.enchPick) later(() => { if(B && B.enchPick) openEnchPick(); }, 600);   // v137: an enhancement choice was open
   if(!coachSeen().score) later(() => { if(B && app.classList.contains('play')) coach('score'); }, 1100);
+  if(!resumed && !coachSeen().marks && boardMarks().some(m => ['light', 'crate', 'vantage', 'bounty'].includes(m.k))) later(() => { if(B && !B.done && app.classList.contains('play')) coach('marks'); }, 1600);   // v227: the first fight with board marks
   else {
     if(!resumed && curPersona()) later(() => { if(!(B && B.introSaid)) say('intro', true); }, boss && !boss.ruler ? 1750 : 1300);   // v132: after the name card (v154: the card already carries the line)
     if(resumed && B.promoPending) later(() => { if(B && B.promoPending && !busy) resumePromo(); }, 500);   // a promotion choice was open
