@@ -35,5 +35,6 @@ assert(src.includes("$('#play').onclick = () => hungerAsk(startBlind);")&&src.in
 assert(src.includes("if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed');"));
 const std=src.slice(src.indexOf('async function endingStandard'),src.indexOf('/* ---------- crown artwork'));assert(std.indexOf('It remembered every one.')>std.indexOf('The Hunger finishes what the crowns began.'));
 const tr=src.slice(src.indexOf('async function endingTrue'),src.indexOf('const ENDING_PRE'));assert(tr.indexOf('It never owned you.')>tr.indexOf('The Hunger dies with it.'));
-assert(src.includes('const GAME_VERSION = 223;')&&sw.includes("'crownfall-v223'")&&!src.includes('?v=222'));
+const version = Number(src.match(/const GAME_VERSION = (\d+);/)[1]);
+assert(version >= 223 && sw.includes(`'crownfall-v${version}'`) && !src.includes('?v=222'));
 console.log('PASS: offered before Stage Battles once you carry a crown (not Gauntlet, once per battle), four bargains scaling with crowns, effects applied, payout, campaign tally, endings remember, version.');

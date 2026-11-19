@@ -262,7 +262,33 @@ function spec(name){
     return s;}
   return null;
 }
-const cache={};
-function campaignOpponentFace(name){ if(!(name in cache)){const s=spec(name); cache[name]=s?{svg:draw(s),accent:s.accent,bg:s.bg,boss:s.boss}:null;} return cache[name]; }
+// Names follow the painted cells from left to right, then top to bottom.
+const sheets = {
+  'iron-kingdom': [
+    "Warden Osric", "Fordkeeper Elwen", "Tollguard Cedric", "Rampart Ysella",
+    "Bailey Roderic", "Banneret Hester", "Meadowguard Ansel", "Stablemaster Fenwick",
+    "Bridgewarden Maud", "Guildsman Tavian", "Woolmerchant Bess", "Treasurer Halden",
+    "Sir Swiftblade", "Prince Garran the Red", "Bran Horse-Lord", "Master Corvin"
+  ],
+  'olympian-court': [
+    "Damon of Marathon", "Laurelkeeper Ione", "Colonnade Theron", "Stairwarden Nereus",
+    "Lionguard Myrrine", "Pillarwarden Evander", "Beachguard Xanthe", "Shipwright Leandros",
+    "Gatekeeper Phaedra", "Ferryman Orestes", "Agorakeeper Melia", "Grovewarden Lysandra",
+    "Atalanta the Swift", "Heracles", "Hector of Troy", "King Aeëtes"
+  ],
+  'road-opponents': [
+    "The Stone Golem", "The Unicorn Warden", "The Two-Headed Ogre", "The Dragon Hoarder",
+    "The Archmage", "The Hourglass Wraith", "The Obsidian Wall", "The Stablebane",
+    "The Twin Shadows", "The Tithe Collector", "The Fallen Grandmaster"
+  ]
+};
+const paintings = new Map();
+for (const [sheet, names] of Object.entries(sheets)) {
+  names.forEach((name, i) => paintings.set(name, {
+    sheet, x: (i % 4) * 100 / 3, y: Math.floor(i / 4) * 100 / 3
+  }));
+}
+const cache=Object.create(null);
+function campaignOpponentFace(name){ if(!(name in cache)){const s=spec(name); cache[name]=s?{svg:draw(s),accent:s.accent,bg:s.bg,boss:s.boss,painting:paintings.get(name)}:null;} return cache[name]; }
 globalThis.campaignOpponentFace=campaignOpponentFace; globalThis.CAMPAIGN_FACES=FACES; globalThis.CAMPAIGN_BOSS_FACES=BOSSES; globalThis.CAMPAIGN_OTHER_FACES=OTHERS;
 })();
