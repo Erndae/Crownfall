@@ -88,19 +88,62 @@ body[data-pack="street"] .pblind .otag{font-size:10px!important;line-height:11.4
 .offer .tileprev .relic .rn{display:none!important}
 
 
-/* v186 arrival banner: it used to be a 62% scrim, so its text collided with the stage screen behind it. The screen behind
-   is now fully covered (and blurred where supported), the text block has room to breathe, and the Circuit's skyline
-   sits under the text instead of behind it. Every Land. */
-.carrive{background:rgba(7,9,12,.95)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 22px;box-sizing:border-box}
-.carrive .ca-txt{order:1;gap:8px!important;transform:none!important;max-width:340px}
-.carrive.in .ca-txt{transform:none!important}
-.carrive .ca-art{order:2;position:static!important;transform:none!important;width:100vw;height:16vh!important;flex:none;opacity:.9}
-.carrive small{font-size:13px!important;opacity:1!important;color:#cfc8ba!important}
-.carrive b{margin-block:2px}
-.carrive span{font-size:12px!important}
-.carrive .catr{margin-top:14px!important;gap:6px!important;font-size:14.5px!important;line-height:1.4!important;color:#eee6d6!important}
-.carrive .catr b{font-size:12.5px!important}
-.carrive .camyst{margin-top:12px!important;font-size:14px!important;color:#d8d0c2!important}
+/* Circuit arrivals. The painting, heraldic standard and brass edge share one frame. */
+.carrive{
+  position:fixed;inset:0;z-index:38;display:flex;flex-direction:column;align-items:center;
+  box-sizing:border-box;overflow:auto;overscroll-behavior:contain;isolation:isolate;
+  padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  background:#101013;opacity:0;transition:opacity .22s ease;
+}
+.carrive::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,#0b0b10aa,#0a0a0de8),var(--ca-land) center / cover;
+  filter:blur(5px);
+}
+.carrive.in{opacity:1}.carrive.out{opacity:0}
+.ca-card{
+  position:relative;flex:none;margin:auto 0;width:min(100%,29rem);box-sizing:border-box;
+  padding:4px;background:#25201c;border:1px solid #92744d;
+  box-shadow:0 12px 36px #0009,inset 0 0 0 2px #171514;
+}
+.ca-scene{
+  position:relative;isolation:isolate;display:flex;align-items:flex-end;overflow:hidden;
+  min-height:clamp(12rem,37svh,21rem);background:#413839 var(--ca-land) center / cover;
+  border:1px solid #7f694d;border-bottom:0;box-sizing:border-box;
+}
+.ca-scene::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(0deg,#161416 0%,rgba(20,17,20,.92) 7%,rgba(20,17,20,.60) 26%,transparent 63%);
+}
+.ca-portrait{
+  position:absolute;z-index:-2;height:100%;width:68%;right:0;bottom:0;object-fit:contain;object-position:bottom right;
+  filter:drop-shadow(-4px 2px 5px #161217aa);
+}
+.ca-standard{
+  position:absolute;left:1rem;top:0;display:grid;place-items:center;width:2.45rem;height:3.5rem;
+  padding-bottom:.42rem;box-sizing:border-box;clip-path:polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);
+  background:#b18a54;color:#fff0cc;font:1.55rem/1 Georgia,serif;isolation:isolate;
+}
+.ca-standard::before{content:"";position:absolute;inset:0 2px 3px;clip-path:inherit;z-index:-1;background:linear-gradient(110deg,#151213,color-mix(in srgb,var(--ca-accent) 33%,#201419) 55%,#181416)}
+.ca-heading{width:100%;box-sizing:border-box;padding:3rem 1.2rem .75rem;text-align:left;color:#fff5de}
+.ca-land,.ca-progress,.ca-rule strong{font-size:.8rem;font-weight:750;letter-spacing:.14em;text-transform:uppercase;line-height:1.4}
+.ca-land{color:#f0d8ad;text-shadow:0 1px 4px #000}
+.ca-heading h2{margin:.3rem 0 0;color:#fff7e7;font-family:var(--tag),Georgia,serif;font-size:clamp(2rem,8.5vw,2.9rem);font-weight:400;line-height:1.04;text-align:left;text-transform:uppercase;text-shadow:0 2px 3px #000;overflow-wrap:anywhere}
+.ca-inscription{
+  padding:0 1.2rem 1.2rem;background:linear-gradient(180deg,#161416,#201c1c);
+  border:1px solid #7f694d;border-top:0;text-align:left;
+}
+.ca-progress{display:flex;gap:.75rem;align-items:center;color:#dac5a1;padding:.15rem 0 .85rem;border-bottom:1px solid #65513c}
+.ca-progress span{display:flex;gap:6px}
+.ca-progress i{width:6px;height:6px;border:1px solid #927e67;box-sizing:border-box;transform:rotate(45deg)}
+.ca-progress .lit{background:var(--ca-accent);border-color:var(--ca-accent)}
+.ca-rule{margin:1rem 0 0;border-left:3px solid var(--ca-accent);padding-left:.75rem}
+.ca-rule strong{color:color-mix(in srgb,var(--ca-accent) 48%,#fff1dc)}
+.ca-rule p{font-size:1rem;line-height:1.4;margin:.22rem 0 0;color:#fff3df}
+.ca-clue{margin:.95rem 0 0;font:italic 1rem/1.4 Georgia,serif;color:#d6c8b4}
+@media(max-height:550px){.ca-scene{min-height:9rem}.ca-heading{padding-top:3.5rem}}
+@media(prefers-reduced-motion:reduce){.carrive{transition:none}}
+
 /* the new-recruit introduction used the same 62% scrim over a live screen */
 .recintro{background:rgba(7,9,12,.9)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 

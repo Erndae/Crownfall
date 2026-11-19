@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=221"></script>
-<script src="piece-designs.js?v=221"></script>
-<script src="character-style.js?v=221"></script>
-<script src="campaign-opponents.js?v=221"></script>
-<script src="campaign-dialogue.js?v=221"></script>
-<link rel="stylesheet" href="character-style.css?v=221">
+<script src="gameplay-polish.js?v=222"></script>
+<script src="piece-designs.js?v=222"></script>
+<script src="character-style.js?v=222"></script>
+<script src="campaign-opponents.js?v=222"></script>
+<script src="campaign-dialogue.js?v=222"></script>
+<link rel="stylesheet" href="character-style.css?v=222">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1739,20 +1739,9 @@ body[data-cscene] .circname{display:inline-block;padding:1px 8px 1px 6px;border-
 .ccmodal .cc-art{background:linear-gradient(0deg,transparent,color-mix(in srgb,var(--c2) 26%,transparent) 60%,transparent)}
 .ccmodal .clearbadge{position:relative;z-index:1}
 .ccmodal .cctitle .cic{font-style:normal;color:var(--c2);margin-right:6px}
-/* Circuit arrival card */
-.carrive{position:fixed;inset:0;z-index:38;display:grid;place-items:center;background:rgba(5,4,8,.62);opacity:0;transition:opacity .22s ease}
-.carrive.in{opacity:1}.carrive.out{opacity:0}
-.carrive .ca-art{position:absolute;left:0;right:0;top:50%;height:28vh;transform:translateY(-62%);background:linear-gradient(0deg,transparent,color-mix(in srgb,var(--c2) 22%,transparent) 55%,transparent)}
-.carrive .ca-art svg{width:100%;height:100%;display:block}.carrive .ink{fill:var(--cs-ink)}.carrive .ln{fill:none;stroke:var(--cs-ink);stroke-width:1.8}.carrive .lt{fill:var(--c2)}.carrive .water{fill:var(--c2);opacity:.2}.carrive .beam{fill:var(--c2);opacity:.15}
-.carrive .ca-txt{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;transform:translateY(34px) scale(.96);transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
-.carrive.in .ca-txt{transform:translateY(30px)}
-.carrive small{font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#e9e4d9;opacity:.85}
-.carrive b{font-family:var(--tag);font-weight:400;font-size:clamp(26px,8vw,36px);color:#fff;text-transform:uppercase;text-shadow:0 2px 0 #000,0 0 16px color-mix(in srgb,var(--c2) 60%,transparent);line-height:1.05}
-.carrive b i{font-style:normal;color:var(--c2);margin-right:8px}
-.carrive span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--c2)}
 /* Journey: the current Land's circuit dots use each Circuit's accent */
 .jpips i[style]{border-color:var(--pc)}.jpips i.on[style]{background:var(--pc)}
-@media (prefers-reduced-motion: reduce){ #cscene .cs-pat,#cscene .drift,#cscene .sway{animation:none!important} .carrive,.carrive .ca-txt{transition:opacity .15s} }
+@media (prefers-reduced-motion: reduce){ #cscene .cs-pat,#cscene .drift,#cscene .sway{animation:none!important} }
 
 /* v133: in battle the silhouettes live in the boardArea gaps (top band above the board, bottom band below it) */
 .cs-stage{position:absolute;inset:0;z-index:-1;pointer-events:none}
@@ -1767,8 +1756,6 @@ body:has(#app.play) #cscene .cs-bot,body:has(#app.play) #cscene .cs-top{display:
 
 /* v134: Circuit gameplay identity labels */
 .cptrait{display:inline-block;margin:4px 0 0 6px;padding:1px 8px;border-radius:999px;border:1.5px solid var(--c2,#ffe14d);color:var(--c2,#ffe14d);background:rgba(0,0,0,.35);font-family:var(--display);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;vertical-align:middle;cursor:pointer}
-.carrive .catr{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:300px;margin-top:8px;font-style:normal;font-size:13px;line-height:1.35;color:#e9e4d9;text-transform:none;letter-spacing:0}
-.carrive .catr b{font-family:var(--display);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--c2);text-shadow:none}
 
 /* v137 enhancement choice */
 .emodal .box{max-width:400px;gap:9px}
@@ -1865,7 +1852,6 @@ body:has(#app.play) #cscene .cs-bot,body:has(#app.play) #cscene .cs-top{display:
 .evghost svg+svg{right:16px;top:-52px;opacity:.1;animation:ghostdrift 3.2s ease-in-out infinite}
 .evghost.throne svg{color:#c9b28a}
 @keyframes ghostdrift{0%,100%{transform:translate(0,0);opacity:.06}50%{transform:translate(-5px,2px);opacity:.2}}
-.carrive .camyst{display:block;max-width:300px;margin-top:8px;font-style:italic;font-size:13px;line-height:1.35;color:#d8d0c2;text-transform:none;letter-spacing:0;text-shadow:0 1px 0 #000}
 .vict.land .vmyst{display:flex;flex-direction:column;align-items:center;gap:3px;margin:4px 0 0;min-height:0;max-width:320px;text-align:center;font-style:italic;font-size:14px;line-height:1.35;color:#e9e4d9;opacity:0;transition:opacity .5s ease}
 .vict.land .vmyst:empty{display:none}
 .vict.land.bm .vmyst{opacity:1}
@@ -2390,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=221">
-<link rel="stylesheet" href="ruler-style.css?v=221">
-<link rel="stylesheet" href="gameplay-polish.css?v=221">
+<link rel="stylesheet" href="city-board.css?v=222">
+<link rel="stylesheet" href="ruler-style.css?v=222">
+<link rel="stylesheet" href="gameplay-polish.css?v=222">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3649,7 +3635,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 221;
+const GAME_VERSION = 222;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5456,11 +5442,31 @@ function circuitArrival(){
   const l = land(), d = csDef(l, RUN.circuit); if(!d) return; const myst = csMyst(l, RUN.circuit);
   const arrivalView = battleView, arrivalRun = RUN;
   const go = () => { if(arrivalView !== battleView || RUN !== arrivalRun || onTitle) return; if(document.querySelector('.landintro, .lachap')) return setTimeout(go, 250);
-    const el = document.createElement('div'); el.className = 'carrive'; el.style.setProperty('--c2', d.c2); el.style.setProperty('--cs-ink', CS_INK[l]);
-    el.innerHTML = `<div class="ca-art">${csSVG(l, RUN.circuit, 'bot')}</div><div class="ca-txt"><small>${PACKS.find(x => x.id === l).name}</small><b><i>${d.ic}&#xFE0E;</i>${CIR().name}</b><span>Circuit ${CS_CIRC.indexOf(RUN.circuit) + 1} of 4</span>${cpDef(l, RUN.circuit) ? `<em class="catr"><b>${cpDef(l, RUN.circuit).tr}</b>${cpDef(l, RUN.circuit).line}</em>` : ''}${myst ? `<em class="camyst">${myst}</em>` : ''}</div>`;
+    const circuit = RUN.circuit, number = CS_CIRC.indexOf(circuit) + 1;
+    const trait = cpDef(l, circuit), name = CIR().name;
+    const portrait = l === 'medieval' && circuit === 'rooftop';
+    const el = document.createElement('div');
+    el.className = 'carrive';
+    el.setAttribute('role', 'region');
+    el.setAttribute('aria-label', name + ' circuit introduction');
+    el.style.setProperty('--ca-accent', d.c2);
+    el.style.setProperty('--ca-land', `url("${LAND_ART[l]}")`);
+    el.innerHTML = `<article class="ca-card">
+      <header class="ca-scene" style="background-position:${LAND_FOCUS[l] || 'center'}">
+        ${portrait ? '<img class="ca-portrait" src="assets/rulers/lion.webp" alt="">' : ''}
+        <div class="ca-heading"><div class="ca-land">${PACKS.find(x => x.id === l).name}</div>
+          <h2>${name}</h2></div>
+        <div class="ca-standard" aria-hidden="true">${d.ic}&#xFE0E;</div>
+      </header>
+      <div class="ca-inscription">
+        <div class="ca-progress">Circuit ${number} of 4 <span aria-hidden="true">${CS_CIRC.map((_, i) => `<i class="${i < number ? 'lit' : ''}"></i>`).join('')}</span></div>
+        ${trait ? `<div class="ca-rule"><strong>${trait.tr}</strong><p>${trait.line}</p></div>` : ''}
+        ${myst ? `<p class="ca-clue">${myst}</p>` : ''}
+      </div>
+    </article>`;
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
     const done = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 300); };
-    el.addEventListener('pointerdown', done); setTimeout(done, msgT(myst ? 7000 : MSG_INTRO_MS)); };   // v154   // (v134: long enough to read one line; v143: a clue line adds time)
+    el.addEventListener('click', done); setTimeout(done, msgT(myst ? 7000 : MSG_INTRO_MS)); };   // v154   // (v134: long enough to read one line; v143: a clue line adds time)
   setTimeout(go, 120);
 }
 /* v189: after an update, say so once. The last build seen is remembered on the device; a first visit says nothing. */
