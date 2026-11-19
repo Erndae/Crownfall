@@ -396,3 +396,9 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Rulers notice.** If you have mostly fed the Hunger this campaign, or mostly refused it, Aldric, Athena, Morwen, the Hollow Crown and the Crownless King add a line when you first face them (Morwen: "Every bargain you took left a shadow on you." / "You refused it again and again. The shadows noticed."). Nothing on a tie or before your first bargain; Vex is fought before any bargain, so he has none. The line is spoken in the opening speech bubble.
 - **Your record:** Journey shows "The Hunger · Fed N · Refused N" with a note on where you stand, and each new bargain shows "So far: fed N · refused N".
 - Tests: `validate-v224.cjs`.
+
+## v225 — supply crates and a Bounty worth hunting
+- **Supply crates (Harbor, stages 2–4; were crate traps).** Any piece except a pawn breaks one open: the first gives +1 Tactic (a swap if Tactics are full), the second cash that grows with each Land ($3 in Crown City and up), the third +1 swap. An enemy piece (not a pawn) that reaches one first loots it and gains 1 Armor, and the enemy now races for them. They're placed like the Royal Banner, on squares no officer or King on either side can reach with its first move (420 crates checked across 180 fights, all fair).
+- **Bounty (Midnight Market).** The $ tag goes on a Rook, Bishop or Knight (the Queen or a Pawn only when none is left). Capturing it scores **double** and still pays $3–4. Each piece it takes from you costs **1 swap** instead of $1.
+- Every explanation (fight brief, Board key, square labels, move preview, piece info, Dockmaster Dee's line) matches.
+- Tests: `validate-v225.cjs`; v160, v199, v200, v204, v222 and v224 updated.

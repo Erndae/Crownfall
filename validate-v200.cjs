@@ -20,24 +20,24 @@ fight('rooftop',2,"B.vantage=[42];B.swaps=0;B.board[42]={t:'B',side:'en',id:5}")
 E('B.vantage=undefined');assert.equal(E('runVantage(42)'),false,'Older saved fights have none');
 // ---- Bounty: who
 const army="B.board[1]={t:'N',side:'en',id:11};B.board[3]={t:'Q',side:'en',id:12};B.board[4]={t:'K',side:'en',id:13};B.board[9]={t:'P',side:'en',id:14};B.board[60]={t:'K',side:'me',id:15};";
-fight('midnight',2,army);assert.deepEqual(JSON.parse(E('JSON.stringify(bountyPick(B.board))')),{id:12,pay:3},'The most valuable enemy piece, never the King');
+fight('midnight',2,army);assert.deepEqual(JSON.parse(E('JSON.stringify(bountyPick(B.board))')),{id:11,pay:3},'v225: a Knight, Bishop or Rook before the Queen, never the King');
 fight('midnight',4,army);assert.equal(E('bountyPick(B.board).pay'),4);
 fight('midnight',1,army);assert.equal(E('bountyPick(B.board)'),null);fight('rooftop',3,army);assert.equal(E('bountyPick(B.board)'),null);
 fight('midnight',3,"B.board[4]={t:'K',side:'en',id:13};B.board[9]={t:'P',side:'en',id:14};");assert.equal(E('bountyPick(B.board).id'),14,'A Pawn only when there is nothing else');
 fight('midnight',3,"B.board[4]={t:'K',side:'en',id:13};");assert.equal(E('bountyPick(B.board)'),null);
 // ---- Bounty: what
 fight('midnight',2,army+"B.bounty=bountyPick(B.board);");
-assert.equal(E('bountyOn(B.board[3])'),true);assert.equal(E('bountyOn(B.board[1])'),false);
-assert.equal(E("bountyStrikes(B.board[3],{t:'P',side:'me'},20)"),true);assert.equal(E('RUN.money'),4,'Its capture costs $1');
-assert.equal(E("bountyStrikes(B.board[1],{t:'P',side:'me'},20)"),false);assert.equal(E("bountyStrikes(B.board[3],null,20)"),false,'A quiet move costs nothing');
-E('RUN.money=0');assert.equal(E("bountyStrikes(B.board[3],{t:'P',side:'me'},20)"),true);assert.equal(E('RUN.money'),0,'Never below zero');
-assert.equal(E('bountyClaim(B.board[1],20)'),false);assert.equal(E('bountyClaim(B.board[3],20)'),true);assert.equal(E('RUN.money'),3);assert.equal(E('B.bounty'),null);assert.equal(E('bountyClaim(B.board[3],20)'),false,'Paid once');
+assert.equal(E('bountyOn(B.board[1])'),true);assert.equal(E('bountyOn(B.board[3])'),false);E('B.swaps=1');
+assert.equal(E("bountyStrikes(B.board[1],{t:'P',side:'me'},20)"),true);assert.equal(E('B.swaps'),0,'v225: its capture costs a swap');E('B.swaps=0');
+assert.equal(E("bountyStrikes(B.board[3],{t:'P',side:'me'},20)"),false);assert.equal(E("bountyStrikes(B.board[1],null,20)"),false,'A quiet move costs nothing');
+assert.equal(E("bountyStrikes(B.board[1],{t:'P',side:'me'},20)"),true);assert.equal(E('B.swaps'),0,'Never below zero');
+E('RUN.money=0');assert.equal(E('bountyClaim(B.board[3],20)'),false);assert.equal(E('bountyClaim(B.board[1],20)'),true);assert.equal(E('RUN.money'),3);assert.equal(E('B.bounty'),null);assert.equal(E('bountyClaim(B.board[1],20)'),false,'Paid once');
 // ---- Board key and wiring
 fight('rooftop',2,"B.vantage=[42,45]");assert.deepEqual(JSON.parse(E('JSON.stringify(boardMarks().map(m=>m.k))')),['vantage']);assert(E('boardMarkAt(42)').includes('Vantage point on '));
 fight('midnight',2,army+"B.bounty=bountyPick(B.board);");assert.deepEqual(JSON.parse(E('JSON.stringify(boardMarks().map(m=>m.k))')),['bounty']);
-E('B.board[3]=null');assert.equal(E('boardMarks().length'),0,'No key entry once the bounty piece is gone');
+E('B.board[1]=null');assert.equal(E('boardMarks().length'),0,'No key entry once the bounty piece is gone');
 assert(src.includes('B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);'));
 assert(src.includes('runVantage(to); bountyClaim(victim, to);')&&src.includes("enSafe('vantage',()=>runVantage(to))")&&src.includes("enSafe('bounty',()=>bountyStrikes(mover, lost, to))"));
 assert(src.includes("out.push('Vantage points')")&&src.includes("out.push('Bounty')")&&src.includes('class="vantage-mark"')&&src.includes('class="bounty-mark"'));
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=200);assert(fs.readFileSync(__dirname+'/sw.js','utf8').includes('crownfall-v'+RegExp.$1));
-console.log('PASS: vantage points (any piece but pawns, mid-board, +1 Tactic or swap, -1 swap if lost), bounty (+$3/$4, -$1 per capture), stages 2-4 of their circuit only, key, wiring, version.');
+console.log('PASS: vantage points (any piece but pawns, mid-board, +1 Tactic or swap, -1 swap if lost), bounty (officer first, +$3/$4, -1 swap per capture), stages 2-4 of their circuit only, key, wiring, version.');

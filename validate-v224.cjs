@@ -22,5 +22,5 @@ tally(4,1);assert(E('hungerRecordHTML()').includes('Fed 4 · Refused 1')&&E('hun
 tally(1,3);assert(E('hungerRecordHTML()').includes('It has not owned you yet.'));tally(2,2);assert(E('hungerRecordHTML()').includes('It is still deciding about you.'));
 assert(src.includes('${hungerRecordHTML()}\n    <div class="jpath">'));assert(src.includes('<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>'));
 assert(css.includes('.jhunger{')&&css.includes('.hunger .hg-so{'));
-assert(src.includes('const GAME_VERSION = 224;')&&sw.includes("'crownfall-v224'")&&!src.includes('?v=223'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=224&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: five opponents react to fed/refused (none on a tie or before a bargain, no spoilers), shown in first-time intros, Journey record and running count, version.');

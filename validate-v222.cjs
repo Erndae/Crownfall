@@ -10,7 +10,7 @@ fight(3,"B.vantage=[26];B.board[26]={t:'P',side:'me',id:9}");assert.equal(E('run
 fight(3,"B.vantage=[26];B.board[26]={t:'P',side:'en',id:9}");assert.equal(E('runVantage(26)'),false,'enemy pawn passes over');assert.equal(E('B.swaps'),1);
 fight(3,"B.vantage=[26];B.board[26]={t:'B',side:'en',id:9}");assert.equal(E('runVantage(26)'),true);assert.equal(E('B.swaps'),0,'enemy piece first: -1 swap');
 // the enemy only chases them with pieces that can take them
-assert(src.includes("const takes = i => has('lights', i) || ((has('vantage', i) || has('banner', i)) && mover.t !== 'P');"));
+assert(src.includes("const takes = i => has('lights', i) || ((has('vantage', i) || has('banner', i) || has('crates', i)) && mover.t !== 'P');"));
 assert(src.includes("vant=(B.vantage||[]).includes(to)&&p&&p.t!=='P',"),'the move preview says so for any non-pawn');
 // every explanation says the new rule; none says King only
 for(const x of ['move any piece <b>except a pawn</b> onto one for +1 Tactic','Any of your pieces except a pawn can claim one','Any piece <b>except a pawn</b> can claim one','aria-label="Vantage point: any of your pieces except a pawn gains 1 Tactic'])assert(src.includes(x),x);

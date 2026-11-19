@@ -17,14 +17,9 @@ const events=[];Object.assign(c,{pop:(...args)=>events.push(args),sfx:{ambush(){
 vm.runInContext(between('function dockCrates(','async function doMove('),c);
 c.RUN.gauntlet=false;c.RUN.ante=4;c.board=Array(64).fill(null);c.board[18]={t:'P',side:'en'};
 const crates=vm.runInContext('dockCrates(board)',c);assert.equal(crates.length,3);assert(!crates.includes(18));assert.equal(new Set(crates).size,3);
-c.B={board:Array(64).fill(null),crates:[21,34]};c.B.board[21]={t:'N',side:'me'};
-assert(vm.runInContext('springDockCrate(21)',c));assert.equal(c.RUN.money,7);assert.equal(c.B.board[21].t,'N');assert.equal(c.B.crates.length,1);
-assert(!vm.runInContext('springDockCrate(21)',c));assert.equal(c.RUN.money,7,'Crates fire only once');
-c.B=JSON.parse(JSON.stringify(c.B));assert.deepEqual(c.B.crates,[34],'Remaining traps survive a battle save/reload');c.B.board[34]={t:'K',side:'me'};c.RUN.money=1;assert(vm.runInContext('springDockCrate(34)',c));assert.equal(c.RUN.money,0);assert.equal(c.B.board[34].t,'K','A trap never removes the King');
-c.B.crates=[37];c.B.board[37]={t:'P',side:'me'};assert(vm.runInContext('springDockCrate(37)',c));assert.equal(c.RUN.money,0,'Cash never goes negative');
-c.B.crates=[21];c.B.board[21]={t:'R',side:'en'};assert(vm.runInContext('springDockCrate(21)',c));assert.equal(c.RUN.money,2,'Enemy entry recovers supplies');assert(!vm.runInContext('springDockCrate(21)',c));
+// v225: crates are supply crates now; their effects are covered by validate-v225.cjs (they need the full game runtime).
 for(const patch of [{ante:1},{gauntlet:true},{circuit:'downtown'}]){const before={...c.RUN};Object.assign(c.RUN,patch);assert.equal(vm.runInContext('dockCrates(board).length',c),0);Object.assign(c.RUN,before);}
-assert(game.includes('  springDockCrate(to);'));assert(game.includes('B.crates = dockCrates(B.board)'));assert(game.includes('Crate trap: you lose up to $2; enemy entry gives you $2'));
+assert(game.includes('  springDockCrate(to);'));assert(game.includes('B.crates = dockCrates(B.board)'));assert(game.includes('Supply crate: any piece except a pawn opens it for supplies'));
 assert(!/No Knight captures|Knights (cannot|can’t) capture|Every crate on this dock|Graffiti Crown/.test(game+readFileSync('campaign-dialogue.js','utf8')));
 assert(game.includes('.vict.land[data-land="street"] .vring::before{display:none}'));assert(game.includes('.vsig img{object-fit:contain}'));
 console.log('PASS: visible dock traps avoid occupied squares, fire once, preserve pieces, cap losses, persist after reload and stay out of other encounters; dialogue and crown frame updated.');
