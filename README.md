@@ -371,3 +371,10 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - Art: `assets/intro/` (five backgrounds, five transparent figures, 780×1548, all cached offline). Built from Ernesto's mockups with the baked-in title and button removed; the Crown City background has the figure painted out so only the walking figure moves.
 - Reduced motion: a still picture for 3.5 seconds, no footsteps.
 - Tests: `validate-v221.cjs`; v211, v214 and v219 updated for v220's ending films.
+
+## v222 — Vantage points for the whole army
+- **Any piece except a pawn** can claim a Vantage point (Rooftop, stages 2–4): Knight, Bishop, Rook, Queen or King. Still +1 Tactic (+1 swap when Tactics are full), still one use each, and an enemy piece that gets there first still costs you 1 swap.
+- **Pawns pass over them, on both sides**, so neither army can grab one with an opening pawn push. The enemy only chases them with pieces that can take them.
+- **They sit in the middle of the board now:** c5 and f5 (or the nearest open squares), plus one on the fourth rank at stage 4, so taking one means pushing forward.
+- Every explanation (fight brief, Board key, square label, move preview, log) says the new rule.
+- Tests: `validate-v222.cjs`; v200 updated.

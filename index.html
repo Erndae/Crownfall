@@ -7059,7 +7059,7 @@ function encounterHTML(planned=false){
   const f=CrownfallPolish.formation(plan?.signature||B?.ai?.sig,plan?.style||B?.ai?.style);
   return `<p class="encounter-brief"><b>${f.title}</b> · ${f.tip}</p>${guardBrief(planned)}`;
 }
-function vantageHTML(short=false){if(!B?.vantage?.length)return bountyHTML(short);return short?`<p class="hazard-brief">${B.vantage.length} vantage points: step your <b>King</b> onto one for +1 Tactic. If an enemy gets there first, you lose 1 swap.</p>`:`<div class="hazard-explain"><b>${B.vantage.length} vantage points</b>Only your King can claim one: move it there for +1 Tactic (or +1 swap when your Tactics are full). If an enemy piece lands on one first, you lose 1 swap. Each works once; your other pieces can stand there without using it.</div>`;}
+function vantageHTML(short=false){if(!B?.vantage?.length)return bountyHTML(short);return short?`<p class="hazard-brief">${B.vantage.length} vantage points: move any piece <b>except a pawn</b> onto one for +1 Tactic. If an enemy piece gets there first, you lose 1 swap.</p>`:`<div class="hazard-explain"><b>${B.vantage.length} vantage points</b>Any of your pieces except a pawn can claim one: move it there for +1 Tactic (or +1 swap when your Tactics are full). If an enemy piece (not a pawn) lands on one first, you lose 1 swap. Each works once. They sit in the middle of the board, so you have to push forward to take them.</div>`;}
 function bannerHTML(short=false){if(!B?.banner?.length)return '';return short?`<p class="hazard-brief">Royal banner: land a piece (not a Pawn) on it for +1 Tactic and 1 Armor. If an enemy gets there first, you lose 1 Tactic.</p>`:`<div class="hazard-explain"><b>The Royal Banner</b>One marked square. The first piece to land on it raises the banner; Pawns cannot. Yours: +1 Tactic (+1 swap when your Tactics are full) and that piece gains 1 Armor. Theirs: you lose 1 Tactic, or 1 swap if you have no Tactic.</div>`;}
 function bountyHTML(short=false){if(!B?.bounty)return bannerHTML(short);return short?`<p class="hazard-brief">Bounty: one enemy piece wears a <b>$</b> tag. Capture it for +$${B.bounty.pay}. Each time it captures one of yours, you lose $1.</p>`:`<div class="hazard-explain"><b>Bounty · $${B.bounty.pay}</b>The enemy piece with the $ tag has a price on it. Capture it for +$${B.bounty.pay}. Every time it captures one of your pieces, you lose $1 (if you have it).</div>`;}
 function lightsHTML(short=false){if(!B?.lights?.length)return vantageHTML(short);return short?`<p class="hazard-brief">${B.lights.length} green lights: reach one for +1 move. If an enemy gets there first, you lose 1 move. Each works once.</p>`:`<div class="hazard-explain"><b>${B.lights.length} green lights</b>Move a piece onto a green light and get 1 move back on the Blitz clock. If an enemy piece lands there first, you lose 1 move instead (never your last one). Each light works once; no piece is removed.</div>`;}
@@ -7067,7 +7067,7 @@ function hazardHTML(short=false){if(!B?.crates?.length)return lightsHTML(short);
 function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a cyan outlined capture square to see which scoring bonuses it triggers.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
-  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t==='K',bnty=bountyOn(B.board[to]),bann=(B.banner||[]).includes(to)&&p&&p.t!=='P';
+  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t!=='P',bnty=bountyOn(B.board[to]),bann=(B.banner||[]).includes(to)&&p&&p.t!=='P';
   let points=sc?.total||0;if(victim&&p.charge)points=Math.round(points*1.5);
   movePreview={from,to,board:B.board,position:after};drawBoard();
   const el=$('#pinfo');if(!el)return;pieceInfo(null);el.style.setProperty('--confirm-height',Math.max(52,el.getBoundingClientRect().height)+'px');el.className='pinfo move-preview';
@@ -7149,7 +7149,7 @@ function drawBoard(){
     if(p?.side === 'en' && B.guardIds?.includes(p.id)) inner += '<span class="guard-mark" role="img" aria-label="Marked defender: remove to unlock score victory" title="Marked defender">⛨</span>';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.banner || []).includes(i)) inner += '<span class="banner-mark" role="img" aria-label="Royal banner: your piece gains 1 Tactic and 1 Armor; enemy entry costs you 1 Tactic. Pawns cannot raise it"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#2a2208" stroke="#0d0d0d" stroke-width="2"/><path d="M14 30V10" stroke="#f3e6c0" stroke-width="2.4" stroke-linecap="round"/><path d="M15 11H28L24.5 15.5L28 20H15Z" fill="#ffd23d" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg></span>';
-    if((B.vantage || []).includes(i)) inner += '<span class="vantage-mark" role="img" aria-label="Vantage point: your King gains 1 Tactic; enemy entry costs you 1 swap"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0c2a2a" stroke="#0d0d0d" stroke-width="2"/><path d="M12 26L11 15L16 19L20 12L24 19L29 15L28 26Z" fill="#19e3c9" stroke="#06201d" stroke-width="1.6" stroke-linejoin="round"/></svg></span>';
+    if((B.vantage || []).includes(i)) inner += '<span class="vantage-mark" role="img" aria-label="Vantage point: any of your pieces except a pawn gains 1 Tactic; an enemy piece there first costs you 1 swap"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0c2a2a" stroke="#0d0d0d" stroke-width="2"/><path d="M12 26L11 15L16 19L20 12L24 19L29 15L28 26Z" fill="#19e3c9" stroke="#06201d" stroke-width="1.6" stroke-linejoin="round"/></svg></span>';
     if(bountyOn(p)) inner += '<span class="bounty-mark" role="img" aria-label="Bounty: capture for money; its captures cost you $1">$</span>';
     if((B.lights || []).includes(i)) inner += '<span class="green-light" role="img" aria-label="Green light: you gain 1 move; enemy entry costs you 1 move" title="Green light · you +1 move / enemy −1 move to you"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0f2a1c" stroke="#0d0d0d" stroke-width="2"/><circle cx="20" cy="20" r="9" fill="#3ddc84"/><path d="M15 21L20 14L25 21M20 14.500V27" fill="none" stroke="#0d2a1a" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
     if((B.crates || []).includes(i)) inner += '<span class="dock-crate" role="img" aria-label="Crate trap: you lose up to $2; enemy entry gives you $2" title="Crate trap · you −$2 / enemy +$2 to you"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 10L28 7L35 12V32L12 35L6 29Z" fill="#9e713e" stroke="#30271e" stroke-width="2"/><path d="M6 10L12 15L35 12M12 15V35M15 18L31 30M31 16L15 31" fill="none" stroke="#dfb777" stroke-width="2"/><path d="M24 17L30 28H18Z" fill="#221d1b"/><path d="M24 21V24M24 25V26" stroke="#f4c361" stroke-width="1.5"/></svg></span>';
@@ -7230,7 +7230,7 @@ function boardMarks(){
   const out = [], n = k => (B[k] || []).length, g = guardsLeft();
   if(n('lights')) out.push({k:'light', name:`Green light${n('lights') > 1 ? 's' : ''} · ${n('lights')} left`, text:'Move one of your pieces onto it and get <b>1 move back</b> on the Blitz clock. If an enemy piece gets there first, you <b>lose 1 move</b> (never your last one). Each works once.'});
   if(n('crates')) out.push({k:'crate', name:`Crate trap${n('crates') > 1 ? 's' : ''} · ${n('crates')} left`, text:'Land one of your pieces on it and you <b>lose up to $2</b>. If an enemy piece lands on it, you <b>gain $2</b>. Each works once, and no piece is removed.'});
-  if(n('vantage')) out.push({k:'vantage', name:`Vantage point${n('vantage') > 1 ? 's' : ''} · ${n('vantage')} left`, text:'Only your <b>King</b> can claim one: step onto it for <b>+1 Tactic</b> (+1 swap if your Tactics are full). If an enemy piece lands there first, you <b>lose 1 swap</b>. Each works once.'});
+  if(n('vantage')) out.push({k:'vantage', name:`Vantage point${n('vantage') > 1 ? 's' : ''} · ${n('vantage')} left`, text:'Any piece <b>except a pawn</b> can claim one: move onto it for <b>+1 Tactic</b> (+1 swap if your Tactics are full). If an enemy piece (not a pawn) lands there first, you <b>lose 1 swap</b>. Each works once.'});
   if(n('banner')) out.push({k:'banner', name:'Royal banner', text:'The first piece to land here raises it; <b>Pawns cannot</b>. Yours: <b>+1 Tactic</b> (+1 swap if your Tactics are full) and that piece gains <b>1 Armor</b>. Theirs: you <b>lose 1 Tactic</b>, or 1 swap if you have none.'});
   if(B.bounty && B.board.some(p => bountyOn(p))) out.push({k:'bounty', name:`Bounty · $${B.bounty.pay}`, text:`The enemy piece with the $ tag. <b>Capture it for +$${B.bounty.pay}</b>. Every time it captures one of your pieces, you <b>lose $1</b>.`});
   if(g) out.push({k:'guard', name:`Marked defender${g > 1 ? 's' : ''} · ${g} left`, text:'Enemy pieces with a shield mark. <b>Capture them all</b>, then reach the score target to win. Checkmate still wins at once.'});
@@ -7593,20 +7593,21 @@ function runGreenLight(at){
   logPos(`Green light on ${sqName(at)}: 1 move back on the clock.`, at, at, 'fx');
   return true;
 }
-/* v200 Vantage points: the Rooftop encounter (stages 2-4, every Land). Marked squares on the Bearer's third and fourth ranks that
-   only the Bearer's KING can claim: +1 Tactic (or +1 Swap when Tactics are full). If an enemy piece lands on one first, the Bearer
-   loses 1 Swap. One use each. Other pieces of the Bearer may stand there without using it. */
+/* v200 Vantage points: the Rooftop encounter (stages 2-4, every Land). +1 Tactic (or +1 Swap when Tactics are full); if an
+   enemy piece lands on one first, the Bearer loses 1 Swap. One use each.
+   v222: any piece except a pawn claims them, for either side (pawns pass over them), and they sit in the middle of the board
+   (two on the fifth rank, plus one on the fourth at stage 4) so taking one means pushing into contested ground. */
 function vantagePoints(board){
   if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'rooftop' || RUN.ante < 2) return [];
   const out = [];
-  for(const i of [42,45,41,46,43,44]){ if(out.length >= 2) break; if(!board[i] && out.every(j => Math.abs((j & 7) - (i & 7)) >= 2)) out.push(i); }
-  if(RUN.ante === 4){ const k = [35,36,34,37].find(i => !board[i]); if(k !== undefined) out.push(k); }
+  for(const i of [26,29,25,30,27,28]){ if(out.length >= 2) break; if(!board[i] && out.every(j => Math.abs((j & 7) - (i & 7)) >= 2)) out.push(i); }   // c5 f5 b5 g5 d5 e5
+  if(RUN.ante === 4){ const k = [35,36,34,37].find(i => !board[i]); if(k !== undefined) out.push(k); }   // stage 4 adds one nearer home: d4 e4 c4 f4
   return out;
 }
 function runVantage(at){
   if(!B || !B.board[at] || !(B.vantage || []).includes(at)) return false;
   const q = B.board[at];
-  if(q.side === 'me' && q.t !== 'K') return false;
+  if(q.t === 'P') return false;   // v222: pawns pass over vantage points (either side)
   B.vantage = B.vantage.filter(i => i !== at);
   if(q.side === 'en'){
     const lost = B.swaps > 0 ? 1 : 0; B.swaps -= lost;
@@ -7617,7 +7618,7 @@ function runVantage(at){
   }
   const t = tacState(), tac = t.n < TAC_MAX; if(tac) t.n++; else B.swaps++;
   pop(at, tac ? 'Vantage · +1 Tactic' : 'Vantage · +1 swap', 'fxg'); sfx.coin();
-  logPos(`Your King holds the vantage point on ${sqName(at)}: ${tac ? '+1 Tactic' : '+1 swap'}.`, at, at, 'fx');
+  logPos(`Your ${TYPE[q.t].name} holds the vantage point on ${sqName(at)}: ${tac ? '+1 Tactic' : '+1 swap'}.`, at, at, 'fx');
   try{ updateHud(); }catch(e){}
   return true;
 }
@@ -8278,7 +8279,7 @@ async function enemyPhaseRun(to){
 function enemyMarkValue(nb, to, mover, attacked){
   if(!B || !mover) return 0;
   const officer = mover.t !== 'P' && mover.t !== 'K', has = (k, i) => (B[k] || []).includes(i);
-  const takes = i => has('lights', i) || has('vantage', i) || (has('banner', i) && mover.t !== 'P');
+  const takes = i => has('lights', i) || ((has('vantage', i) || has('banner', i)) && mover.t !== 'P');   // v222: pawns never take vantage points
   let v = 0;
   if(takes(to)) v += attacked ? 6 : 24;
   else if(officer && attackSquares(nb, to).some(i => !nb[i] && takes(i))) v += 5;
