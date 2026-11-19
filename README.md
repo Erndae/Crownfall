@@ -391,3 +391,8 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 
 ## Automatic tests
 `.github/workflows/tests.yml` runs every `validate-*` test and the balance audit on each push to main and on every pull request.
+
+## v224 — they can tell how you answer the Hunger
+- **Rulers notice.** If you have mostly fed the Hunger this campaign, or mostly refused it, Aldric, Athena, Morwen, the Hollow Crown and the Crownless King add a line when you first face them (Morwen: "Every bargain you took left a shadow on you." / "You refused it again and again. The shadows noticed."). Nothing on a tie or before your first bargain; Vex is fought before any bargain, so he has none. The line is spoken in the opening speech bubble.
+- **Your record:** Journey shows "The Hunger · Fed N · Refused N" with a note on where you stand, and each new bargain shows "So far: fed N · refused N".
+- Tests: `validate-v224.cjs`.

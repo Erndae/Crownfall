@@ -3381,6 +3381,7 @@ function landsScreen(after){
   const m = modal(`<div class="jtop"><div><small>${runnerTitle()}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
     ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}${bestCampaign() ? `<br>Best campaign $${bestCampaign().toLocaleString('en-US')}` : ''}</em></div>` : ''}
+    ${hungerRecordHTML()}
     <div class="jpath"><svg class="jcracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${cracks}</svg>
       ${PACKS.map((x, i) => (i ? link(i - 1) : '') + chapter(x, i)).join('')}</div>`, '#pdone', after);
   m.classList.add('journey');
@@ -5083,6 +5084,7 @@ function storyLines(o){
     if(o.name === 'Morwen the Shadow Queen') o.lose = 'Four. And he knows. The Hunger hollows you out from the inside. When you reach him, remember that every Land is still kneeling.';
   }
   if(o.name === 'The Hollow Crown'){ o.lose = 'The Hunger took my will... then he took my name. Don’t let him take yours.'; }   // v219: what the Hunger leaves
+  { const r = fresh && hungerReact(o.name); if(r) o.intro = (o.intro ? o.intro + ' ' : '') + r; }   // v224: they can tell how you have answered the Hunger
   if(o.name === 'The Fallen Grandmaster'){ o.intro = 'I was the greatest player in all the lands. I carried four Crowns to this hall once. Turn back while you still can.'; o.lose = 'I wasn’t guarding him. I was guarding you... from him.'; o.win = 'Better you fall here than reach him.'; }
   return o;
 }
@@ -6049,6 +6051,18 @@ function oppEntrance(boss, tier){
    choice is counted for the campaign, and the endings remember. Offered once per Stage Battle (a retry after a lost life
    is not offered again). */
 const HUNGER_OFFERS = ['power', 'greed', 'fury', 'reach'];
+/* v224: Rulers (and the Hollow Crown) notice whether you have mostly fed the Hunger or mostly refused it this campaign.
+   Nothing is said on a tie or before the first bargain. Vex is fought before any bargain is offered, so he has no line. */
+const HUNGER_REACT = {
+  'King Aldric the Iron-Handed':{fed:'You smell of the Hunger, Crownrunner. I know that smell.', refused:'You have been refusing it. Few manage that for long.'},
+  'Athena, Queen of Olympus':{fed:'I see what you have been feeding. So does it.', refused:'You keep saying no to it. That, I did not foresee.'},
+  'Morwen the Shadow Queen':{fed:'Every bargain you took left a shadow on you.', refused:'You refused it again and again. The shadows noticed.'},
+  'The Hollow Crown':{fed:'Keep feeding it. Soon you will be hollow too.', refused:'You still say no. I stopped saying no.'},
+  'The Crownless King':{fed:'You have fed it well. It is almost ready for you.', refused:'You keep refusing it. It does not like being refused.'}};
+function hungerLean(){ const h = hungerTally(); return h.fed > h.refused ? 'fed' : h.refused > h.fed ? 'refused' : null; }
+function hungerReact(name){ const R = HUNGER_REACT[name], k = hungerLean(); return R && k ? R[k] : ''; }
+const hungerRecordHTML = () => { const h = hungerTally(); if(!(h.fed + h.refused)) return '';   // v224: Journey shows how you have answered it
+  const k = hungerLean(); return `<div class="jhunger"><span><small>The Hunger</small><b>Fed ${h.fed} · Refused ${h.refused}</b></span><em>${k === 'fed' ? 'It is getting a taste for you.' : k === 'refused' ? 'It has not owned you yet.' : 'It is still deciding about you.'}</em></div>`; };
 function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
 function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
@@ -6067,7 +6081,7 @@ function hungerAsk(go){
   if(!hungerDue()) return go();
   const o = hungerOffer(); RUN.pactKey = hungerKey(); save();
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
-    <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>
+    <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
     <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>
     <div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
