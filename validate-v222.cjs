@@ -16,5 +16,5 @@ assert(src.includes("vant=(B.vantage||[]).includes(to)&&p&&p.t!=='P',"),'the mov
 for(const x of ['move any piece <b>except a pawn</b> onto one for +1 Tactic','Any of your pieces except a pawn can claim one','Any piece <b>except a pawn</b> can claim one','aria-label="Vantage point: any of your pieces except a pawn gains 1 Tactic'])assert(src.includes(x),x);
 assert(!/Only your <b>King<\/b> can claim|Only your King can claim|your King gains 1 Tactic/.test(src));
 assert(src.includes('Your ${TYPE[q.t].name} holds the vantage point on'));
-assert(src.includes('const GAME_VERSION = 222;')&&sw.includes("'crownfall-v222'")&&!src.includes('?v=221'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=222&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: vantage points c5/f5 (+d4 at stage 4), any piece but pawns claims for either side, enemy chases only with non-pawns, preview and every explanation updated, version.');

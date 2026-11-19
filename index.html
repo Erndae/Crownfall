@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=222"></script>
-<script src="piece-designs.js?v=222"></script>
-<script src="character-style.js?v=222"></script>
-<script src="campaign-opponents.js?v=222"></script>
-<script src="campaign-dialogue.js?v=222"></script>
-<link rel="stylesheet" href="character-style.css?v=222">
+<script src="gameplay-polish.js?v=223"></script>
+<script src="piece-designs.js?v=223"></script>
+<script src="character-style.js?v=223"></script>
+<script src="campaign-opponents.js?v=223"></script>
+<script src="campaign-dialogue.js?v=223"></script>
+<link rel="stylesheet" href="character-style.css?v=223">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=222">
-<link rel="stylesheet" href="ruler-style.css?v=222">
-<link rel="stylesheet" href="gameplay-polish.css?v=222">
+<link rel="stylesheet" href="city-board.css?v=223">
+<link rel="stylesheet" href="ruler-style.css?v=223">
+<link rel="stylesheet" href="gameplay-polish.css?v=223">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3635,7 +3635,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 222;
+const GAME_VERSION = 223;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5165,6 +5165,7 @@ function scoreCapture(from, to, pt){
     if(gq === 'emblem'){ const add = Math.round(chips * 0.25); chips += add; steps.push({src:'gear', name:G_EQUIP.emblem.name, c:add}); }
     else if(gq === 'crest'){ const k = gCrestBonus(me); if(k){ mult += k; steps.push({src:'gear', name:G_EQUIP.crest.name, m:k}); } } }
   if(victim && a === 'K' && isC('rooftop')){ mult *= 2; steps.push({src:'circuit', x:2}); }
+  if(victim && B.pact && B.pact.k === 'fury'){ mult += B.pact.n; steps.push({src:'ench', name:'The Hunger', m:B.pact.n}); }   // v223
   if(victim && chalBonusNow()){ chips += CHALLENGES.blitzer.material; steps.push({src:'card', name:CHALLENGES.blitzer.name || 'Blitzer', c:CHALLENGES.blitzer.material}); }   // the capture that completes the challenge
   if(victim && a === 'N' && B.knightBuff){ mult += B.knightBuff; steps.push({src:'card', name:C('stampede').name, m:B.knightBuff}); }
   if(victim && a === 'K' && B.kingX){ mult *= B.kingX; steps.push({src:'card', name:C('decree').name, x:B.kingX}); }
@@ -5966,7 +5967,7 @@ function blindSelect(){
   bindRelicTips(app); bindArmy(app);
   $('#stageShop').onclick = () => shop();
   $('#trainbtn').onclick = () => trainingModal(blindSelect);
-  $('#play').onclick = () => startBlind();
+  $('#play').onclick = () => hungerAsk(startBlind);   // v223: the Hunger may offer a bargain first
   { const bc = app.querySelectorAll('.blinds .bcard')[app.querySelectorAll('.blinds .bcard').length - 1]; if(bc){ bc.classList.add('tapme'); bc.onclick = () => bossDetails(boss); } }
   const sk = $('#skip'); if(sk) sk.onclick = e => {
     if(!sk.dataset.sure){ sk.dataset.sure = 1; sk.textContent = `Tap again to skip straight to the ${champName()}`; sk.classList.add('red'); return; }
@@ -6038,6 +6039,47 @@ function oppEntrance(boss, tier){
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
 }
+/* v223 The Hunger's bargain. Once you carry a World Crown, the Hunger makes an offer before each Stage Battle (the third
+   fight of a stage): a boon and a price, both growing with the World Crowns you carry (1-4). Take it or refuse it; the
+   choice is counted for the campaign, and the endings remember. Offered once per Stage Battle (a retry after a lost life
+   is not offered again). */
+const HUNGER_OFFERS = ['power', 'greed', 'fury', 'reach'];
+function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
+function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); }
+const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
+function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && baseCrowns() >= 1 && RUN.pactKey !== hungerKey()); }
+function hungerOffer(){
+  const n = Math.min(4, baseCrowns()), key = hungerKey(); let h = 7; for(const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  let k = HUNGER_OFFERS[h % HUNGER_OFFERS.length]; if(k === 'reach' && (RUN.money || 0) < 2 * n) k = 'power';
+  const s = x => x > 1 ? 's' : '';
+  const O = {power:{boon:`Start with ${n} extra Tactic${s(n)}`, cost:`Score target +${8 * n}%`},
+    greed:{boon:`Winning pays +$${3 * n}`, cost:'Start with 1 fewer swap'},
+    fury:{boon:`Every capture gets +${n} Brilliance`, cost:n > 1 ? `${n} enemy pieces start Armored` : 'Your opponent\'s strongest piece starts Armored'},
+    reach:{boon:`Start with ${n >= 3 ? 2 : 1} extra swap${n >= 3 ? 's' : ''}`, cost:`Pay $${2 * n} now`}}[k];
+  return {k, n, boon:O.boon, cost:O.cost, cash:3 * n, pay:2 * n, swaps:n >= 3 ? 2 : 1};
+}
+function hungerAsk(go){
+  if(!hungerDue()) return go();
+  const o = hungerOffer(); RUN.pactKey = hungerKey(); save();
+  const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
+    <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>
+    <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>
+    <div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
+  let done = false; const pick = yes => { if(done) return; done = true; m.remove();
+    if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed'); }
+    else hungerNote('refused');
+    save(); go(); };
+  m.querySelector('#hgYes').onclick = () => pick(true); m.querySelector('#hgNo').onclick = () => pick(false);
+}
+function hungerApply(){   // at the start of the Stage Battle the bargain was made for
+  const o = RUN.pactPending; delete RUN.pactPending; if(!o || !B) return;
+  B.pact = {k:o.k, n:o.n, cash:o.k === 'greed' ? o.cash : 0, boon:o.boon, cost:o.cost};
+  if(o.k === 'power'){ const t = tacState(); for(let i = 0; i < o.n; i++){ if(t.n < TAC_MAX) t.n++; else B.swaps++; } B.target = Math.max(10, Math.round(B.target * (1 + 0.08 * o.n) / 10) * 10); }
+  if(o.k === 'greed') B.swaps = Math.max(0, B.swaps - 1);
+  if(o.k === 'reach') B.swaps += o.swaps;
+  if(o.k === 'fury') B.board.map((q, i) => ({q, i})).filter(x => x.q && x.q.side === 'en' && x.q.t !== 'K').sort((a, b) => TYPE[b.q.t].val - TYPE[a.q.t].val).slice(0, o.n).forEach(x => { x.q.sh = (x.q.sh || 0) + 1; });
+  logPos(`The Hunger's bargain: ${o.boon}. ${o.cost}.`, -1, -1, 'fx');
+}
 function startBlind(){ try{ laClear(); }catch(e){}
   migrateIntroRule(RUN, B);
   if(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1) RUN.introStarted = true;
@@ -6069,6 +6111,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);   // v200: Rooftop Kings and Midnight Market fights
   B.banner = bannerSquare(B.board);   // v205: Ruler fights
   ngArmor(B.board);   // v210: New Game+
+  hungerApply();   // v223: the Hunger's bargain, if one was taken for this battle
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
   if(has('aegis')){ const bi = aegisIdx(B.board); if(bi >= 0) B.board[bi].sh = Math.max(B.board[bi].sh || 0, 2); }   // (the same piece the Fallen Throne opening check armed)
   if(!MATCH && RUN.evFx && RUN.evFx.armor){ const ei = evArmorIdx(B.board, RUN.evFx.armor); if(ei >= 0) B.board[ei].sh = Math.max(B.board[ei].sh || 0, 1); delete RUN.evFx.armor; }   // v139 event Armor: next fight only, no stacking
@@ -9787,7 +9830,8 @@ function winBlind(){
   const laRes = (() => { try{ return laWin(RUN.blind === 2, RUN.blind === 2 && bossId() === 'ruler'); }catch(e){ return null; } })();   // v147: before the rewards window
   const chal = chalWinReward();
   evWin();   // v139/v140: a wager bound to this fight settles (first try + its Challenge)
-  const total = reward + movesBonus + interest + piggy + mateBonus + chal.cash;
+  const pactCash = B.pact && B.pact.k === 'greed' ? B.pact.cash || 0 : 0;   // v223
+  const total = reward + movesBonus + interest + piggy + mateBonus + chal.cash + pactCash;
   const bossWin = RUN.blind === 2, finalWin = bossWin && RUN.ante === nStages() && !RUN.won;
   const bp = bossWin && !RUN.gauntlet ? personaOf(bossId()) : null;
   // presentation facts, captured before the commit below moves the run on
@@ -9803,6 +9847,7 @@ function winBlind(){
       <div class="kv"><span>Savings bonus ($1 per $5 saved, max $${savingsCap()})</span><b class="money">$${interest}</b></div>
       ${piggy ? `<div class="kv"><span>Piggy Bank</span><b class="money">$${piggy}</b></div>` : ''}
       ${mateBonus ? `<div class="kv"><span>Checkmate bonus</span><b class="money">$${mateBonus}</b></div>` : ''}
+      ${pactCash ? `<div class="kv"><span>The Hunger's bargain</span><b class="money">$${pactCash}</b></div>` : ''}
       ${chal.cash ? `<div class="kv"><span>Challenge · ${chal.name}${chal.swap ? ' · +1 Swap next round' : ''}</span><b class="money">$${chal.cash}</b></div>` : ''}
       <div class="kv" style="border-top:1px solid var(--line);padding-top:6px"><span>Total</span><b class="money" style="font-size:20px">$${total}</b></div>
     </div>${bossWin && (RUN.cards || []).length >= 2 ? '<p class="handfull">Hand full · no card reward this time</p>' : ''}
@@ -10329,6 +10374,7 @@ async function endingTrue(E, o){
     E.film('broken');
     await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
     await E.say('The Hunger dies with it.', 2600, 'lower', 'story');   // v219
+    { const H = hungerTally(); if(H.refused) await E.say(`You refused it ${H.refused} time${H.refused > 1 ? 's' : ''}. It never owned you.`, 2800, 'lower', 'story'); }   // v223
     await E.wait(400);
     await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
     await E.wait(400);
@@ -10487,6 +10533,7 @@ async function endingStandard(E, o){
     ov.classList.add('t2'); E.film('transformation'); snd.rumble();         // the throne consumes you: his face becomes yours
     await E.wait(1200);
     await E.say('The Hunger finishes what the crowns began.', 2800, 'bottom', 'story red');   // v219
+    { const H = hungerTally(); if(H.fed) await E.say(`You fed it ${H.fed} time${H.fed > 1 ? 's' : ''}. It remembered every one.`, 2800, 'bottom', 'story red'); }   // v223
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
     await E.say('The throne takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });

@@ -378,3 +378,16 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **They sit in the middle of the board now:** c5 and f5 (or the nearest open squares), plus one on the fourth rank at stage 4, so taking one means pushing forward.
 - Every explanation (fight brief, Board key, square label, move preview, log) says the new rule.
 - Tests: `validate-v222.cjs`; v200 updated.
+
+## v223 — the Hunger's bargain
+- Once you carry a World Crown, pressing Play on a **Stage Battle** (the third fight of a stage) brings an offer: **"The Hunger whispers"**, a boon and a price for that battle. Both grow with the World Crowns you carry (1–4):
+  - **Power:** start with +1–4 Tactics (extra become swaps) · score target +8% per crown
+  - **Greed:** winning pays +$3 per crown · start with 1 fewer swap
+  - **Fury:** every capture gets +1 Brilliance per crown · that many of the enemy's strongest pieces start Armored
+  - **Reach:** +1 swap (+2 from three crowns) · pay $2 per crown now (not offered if you can't pay)
+- **Take it** or **Refuse**. One offer per Stage Battle; a retry after a lost life is not offered again. Never in the Gauntlet or Crown Matches.
+- Each choice is counted for the campaign, and the endings remember: wear the crown and "You fed it N times. It remembered every one."; break it and "You refused it N times. It never owned you."
+- Tests: `validate-v223.cjs`; v222 version check made forward-compatible.
+
+## Automatic tests
+`.github/workflows/tests.yml` runs every `validate-*` test and the balance audit on each push to main and on every pull request.
