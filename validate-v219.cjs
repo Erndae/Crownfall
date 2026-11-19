@@ -15,8 +15,8 @@ for(const x of ['Then the Hunger got in, and I forgot what I wanted.','The Hunge
 assert(JSON.parse(E('JSON.stringify(HOLD_LINES)')).includes('The Hunger goes quiet when I lose. Is that strange?'));
 // endings: wearing it finishes the Hunger's work; breaking it kills the Hunger
 const std=src.slice(src.indexOf('async function endingStandard'),src.indexOf('/* ---------- crown artwork'));
-const a=std.indexOf("E.scene('become')"),b=std.indexOf('The Hunger finishes what the crowns began.'),k=std.indexOf('The throne takes your name first.');assert(a>0&&b>a&&k>b);
+const a=std.indexOf("E.film('transformation')"),b=std.indexOf('The Hunger finishes what the crowns began.'),k=std.indexOf('The throne takes your name first.');assert(a>0&&b>a&&k>b);
 const tr=src.slice(src.indexOf('async function endingTrue'),src.indexOf('const ENDING_PRE'));
 const t1=tr.indexOf('THE CROWN IS BROKEN.'),t2=tr.indexOf('The Hunger dies with it.'),t3=tr.indexOf('THE THRONE IS EMPTY.');assert(t1>0&&t2>t1&&t3>t2);
-assert(src.includes('const GAME_VERSION = 219;')&&sw.includes("'crownfall-v219'")&&!src.includes('?v=218'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=219&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: the Hunger named at the first crown, whispers grow (Win, More, Make them kneel, Come home), crown cards, Rulers, Hollow Crown, released opponents, both endings, no spoilers, version.');

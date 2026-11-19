@@ -364,3 +364,10 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Endings:** wearing it: "The Hunger finishes what the crowns began."; breaking it: "The Hunger dies with it."
 - Nothing before the ending says who the Crownless King was. Checked on 320×568 and 375×667.
 - Tests: `validate-v219.cjs`; v216 and v218 updated.
+
+## v221 — the walk into each Land
+- The first time a Land is entered in a campaign, the hooded Crownrunner walks toward it before the Land's chapter card: the Land drifts slowly closer while the figure steps and sways (two steps every 1.1s), with soft footsteps in time (wet cobbles in Crown City, stone and ash elsewhere). About 6 seconds; **Skip intro** or a tap ends it.
+- The satchel carries one crown charm per World Crown won before that Land (none in Crown City, four at the Fallen Throne). The Shattered Realm, which had no picture, was composed from the same layers with three charms.
+- Art: `assets/intro/` (five backgrounds, five transparent figures, 780×1548, all cached offline). Built from Ernesto's mockups with the baked-in title and button removed; the Crown City background has the figure painted out so only the walking figure moves.
+- Reduced motion: a still picture for 3.5 seconds, no footsteps.
+- Tests: `validate-v221.cjs`; v211, v214 and v219 updated for v220's ending films.
