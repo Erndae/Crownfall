@@ -29,5 +29,5 @@ assert(src.includes("${show ? a.name : 'Hidden achievement'}")&&src.includes('<h
 for(const gone of ['CROWN_COMMAND','cmdState','cmdTap','cmdMoveCommit','crownChoiceFlow','CMD_INFO','CROWN_POWERS','wisdomMove','kingLevelUp'])assert.equal(E(`typeof ${gone}`),'undefined',gone);
 for(const live of ['endTurn','enemyPromoPick','promoPick','gambitCheck','gambitDo','crownTactics','crownTacticsText','initiativeOffer'])assert.equal(E(`typeof ${live}`),'function',live);
 assert(!/cmdMode|cmdPick|id="cmdBtn"/.test(src));
-assert(src.includes('const GAME_VERSION = 228;')&&sw.includes("'crownfall-v228'")&&!src.includes('?v=227'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=228&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: nine story achievements (four hidden), each trigger, kept across campaigns, none from Crown Matches; Crown Command code removed with the live helpers intact; version.');

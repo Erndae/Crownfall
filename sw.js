@@ -1,10 +1,32 @@
 // Crownfall offline cache. Bump VERSION when you upload a new index.html.
 // Music in soundtrack/ is cached on demand.
-const VERSION = 'crownfall-v228';
+const VERSION = 'crownfall-v229';
+// v229: the first visit downloads only what the first session needs (the page once, scripts, icons, land and crown art,
+// portraits, Crown City's walk-in). Later art (the other Lands' walk-ins, the ending paintings) is cached the first time
+// it is shown, and topped up quietly a little after launch on a good connection, so the game still works offline.
 const FILES = [
-  './assets/opponents/iron-kingdom.webp', './assets/opponents/olympian-court.webp', './assets/opponents/road-opponents.webp',
-  './assets/intro/bg-street.webp','./assets/intro/bg-medieval.webp','./assets/intro/bg-greek.webp','./assets/intro/bg-fantasy.webp','./assets/intro/bg-throne.webp','./assets/intro/fig-city.webp','./assets/intro/fig-c1.webp','./assets/intro/fig-c2.webp','./assets/intro/fig-c3.webp','./assets/intro/fig-c4.webp','./assets/ending/arrival.webp','./assets/ending/broken.webp','./assets/ending/turn.webp','./assets/ending/surrender.webp','./assets/ending/transformation.webp','./assets/ending/crown-refused.webp','./assets/ending/throne-approach.webp','./assets/ending/throne-walker.webp','./assets/ending/crown-lift.webp','./assets/ending/kingdom-balcony.webp','./assets/splash/crown-city-night.webp','./assets/splash/royal-courtyard.webp','./assets/splash/road-to-the-crown.webp','./gameplay-polish.js?v=228','./gameplay-polish.css?v=228','./assets/rulers/raven.webp','./assets/rulers/stag.webp','./assets/rulers/owl.webp','./assets/rulers/lion.webp','./assets/rulers/fox.webp','./piece-designs.js?v=228','./character-style.js?v=228','./character-style.css?v=228','./campaign-opponents.js?v=228','./campaign-dialogue.js?v=228','./city-board.css?v=228','./ruler-style.css?v=228','./downtown-journey.webp', './', './index.html', './manifest.webmanifest', './cf-icon-192.png', './cf-icon-512.png', './cf-touch-180.png', './cf-favicon-32.png', './crownfall-logo.webp', './crown-city.webp', './iron-kingdom.webp', './olympian-court.webp', './shattered-realm.webp', './fallen-throne.webp', './spray-paint-crown.webp', './iron-circlet.webp', './olive-wreath.webp', './moonstone-tiara.webp'];
+  './assets/opponents/iron-kingdom.webp', './assets/opponents/olympian-court.webp', './assets/opponents/road-opponents.webp', './assets/intro/bg-street.webp',
+  './assets/intro/fig-city.webp', './assets/splash/crown-city-night.webp', './assets/splash/royal-courtyard.webp', './assets/splash/road-to-the-crown.webp',
+  './gameplay-polish.js?v=229', './gameplay-polish.css?v=229', './assets/rulers/raven.webp', './assets/rulers/stag.webp',
+  './assets/rulers/owl.webp', './assets/rulers/lion.webp', './assets/rulers/fox.webp', './piece-designs.js?v=229',
+  './character-style.js?v=229', './character-style.css?v=229', './campaign-opponents.js?v=229', './campaign-dialogue.js?v=229',
+  './city-board.css?v=229', './ruler-style.css?v=229', './downtown-journey.webp', './index.html',
+  './manifest.webmanifest', './cf-icon-192.png', './cf-icon-512.png', './cf-touch-180.png',
+  './cf-favicon-32.png', './crownfall-logo.webp', './crown-city.webp', './iron-kingdom.webp',
+  './olympian-court.webp', './shattered-realm.webp', './fallen-throne.webp', './spray-paint-crown.webp',
+  './iron-circlet.webp', './olive-wreath.webp', './moonstone-tiara.webp'
+];
+const LATER = [
+  './assets/intro/bg-medieval.webp', './assets/intro/bg-greek.webp', './assets/intro/bg-fantasy.webp', './assets/intro/bg-throne.webp',
+  './assets/intro/fig-c1.webp', './assets/intro/fig-c2.webp', './assets/intro/fig-c3.webp', './assets/intro/fig-c4.webp',
+  './assets/ending/arrival.webp', './assets/ending/broken.webp', './assets/ending/turn.webp', './assets/ending/surrender.webp',
+  './assets/ending/transformation.webp', './assets/ending/crown-refused.webp', './assets/ending/throne-approach.webp', './assets/ending/throne-walker.webp',
+  './assets/ending/crown-lift.webp', './assets/ending/kingdom-balcony.webp'
+];
 // Cache each file on its own so one missing file can never stop the whole cache from installing.
+const cacheAll = list => caches.open(VERSION).then(c => Promise.allSettled(list.map(f => c.match(f).then(hit => hit || c.add(f)))));
+// the page asks for the rest once the first session is under way (see swTopUp in index.html)
+self.addEventListener('message', e => { if(e.data && e.data.type === 'topup') e.waitUntil(cacheAll(LATER)); });
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => Promise.allSettled(FILES.map(f => c.add(f)))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => /^crownfall-v\d+$/.test(k) && k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

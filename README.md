@@ -434,3 +434,8 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
   - Bounty Hunter: capture the bounty piece within your first 10 moves
 - **Crown Command code removed** (retired in v196): about 21 KB of abilities, menus, board highlights and choice screens. The turn, promotion and Gambit helpers that lived beside it stay. A fight saved with old Command data simply drops it when it loads.
 - Tests: `validate-v228.cjs`; v196 and v227 updated.
+
+## v229 — a faster first launch, and marks in the Gauntlet
+- **First download about 40% smaller (≈11.8 MB → 7.1 MB).** The offline cache listed the 1.3 MB game page three times (`./`, `./index.html` twice); it now saves it once. The ending paintings and the walk-ins for Lands II–V (2.1 MB) are no longer part of the first download: they're cached when first shown, and topped up quietly about a minute into the first session (skipped on data saver or 2G), so the whole game still works offline. Checked in a browser: 39 files on install, 57 after the top-up, and an offline reload shows the ending art.
+- **Arena marks.** From wave 3, every Gauntlet wave brings its circuit's board mark, with the same rules as the campaign: the **Royal Banner** (Downtown), **Vantage points** (Rooftop), **Supply crates** (Harbor) or a **Bounty** (Midnight Market). The wave card names it, and the Board key explains it. Waves 1–2 stay plain; Crown Matches never have marks.
+- Tests: `validate-v229.cjs`; v160 and v228 updated.

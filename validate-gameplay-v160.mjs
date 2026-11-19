@@ -14,7 +14,7 @@ c.board=board;
 assert(vm.runInContext("CFAI.legalGame(board,'me',{thief:true}).some(([f,t])=>f===42&&t===25)",c),'Legacy rule flag cannot stop a legal Knight capture');
 console.log('PASS: legacy boss, ruler and Gauntlet restrictions retired; engine allows Knight captures.');
 const events=[];Object.assign(c,{pop:(...args)=>events.push(args),sfx:{ambush(){},coin(){}},logPos(){},showTip(){},sqName:i=>String(i)});
-vm.runInContext(between('function dockCrates(','async function doMove('),c);
+vm.runInContext('var gMarks=()=>false;'+between('function dockCrates(','async function doMove('),c);   // v229: Gauntlet marks are covered by validate-v229.cjs
 c.RUN.gauntlet=false;c.RUN.ante=4;c.board=Array(64).fill(null);c.board[18]={t:'P',side:'en'};
 const crates=vm.runInContext('dockCrates(board)',c);assert.equal(crates.length,3);assert(!crates.includes(18));assert.equal(new Set(crates).size,3);
 // v225: crates are supply crates now; their effects are covered by validate-v225.cjs (they need the full game runtime).

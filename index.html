@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=228"></script>
-<script src="piece-designs.js?v=228"></script>
-<script src="character-style.js?v=228"></script>
-<script src="campaign-opponents.js?v=228"></script>
-<script src="campaign-dialogue.js?v=228"></script>
-<link rel="stylesheet" href="character-style.css?v=228">
+<script src="gameplay-polish.js?v=229"></script>
+<script src="piece-designs.js?v=229"></script>
+<script src="character-style.js?v=229"></script>
+<script src="campaign-opponents.js?v=229"></script>
+<script src="campaign-dialogue.js?v=229"></script>
+<link rel="stylesheet" href="character-style.css?v=229">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=228">
-<link rel="stylesheet" href="ruler-style.css?v=228">
-<link rel="stylesheet" href="gameplay-polish.css?v=228">
+<link rel="stylesheet" href="city-board.css?v=229">
+<link rel="stylesheet" href="ruler-style.css?v=229">
+<link rel="stylesheet" href="gameplay-polish.css?v=229">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3689,7 +3689,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 228;
+const GAME_VERSION = 229;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5843,7 +5843,7 @@ const COACH = {
   swap:       {pri:3,  target:'#swapBtn',           text:() => ['Swap', `Trade places with two of your touching pieces. It's free: no move used and the enemy doesn't reply. You get 1 per round.`]},
   shop:       {pri:2,  target:null,                 text:() => [UI.shop, `Spend your cash here. <b>${UI.tiles}</b> bend the rules for your whole army (hold up to 5). You can also recruit pieces, train a piece type and buy extra lives.`]},
   promo:      {pri:2,  target:null,                 text:() => ['Promotion', `Get a Pawn to the far side and promote it to a <b>Queen</b>, Rook, Bishop or Knight. It stays in your army after the round.`]},
-  banner:     {pri:3,  target:'.banner-mark',       text:() => ['The Royal Banner', `Land a piece on the marked square, not a Pawn, for +1 Tactic and 1 Armor. If the Ruler’s side gets there first, you lose 1 Tactic.`]},
+  banner:     {pri:3,  target:'.banner-mark',       text:() => ['The Royal Banner', `Land a piece on the marked square, not a Pawn, for +1 Tactic and 1 Armor. If the enemy gets there first, you lose 1 Tactic.`]},
   armor:      {pri:2,  target:null,                 text:() => ['Armored', `The number on this piece is its armor. It can survive that many extra captures before it falls.`]},
   trap:       {pri:2,  target:'#trapBtn',           text:() => ['Traps', `Tap <b>Trap</b>, then an empty square or one of your pieces to hide a trap there. The first enemy to land on it gets caught.`]},
   marks:      {pri:3,  target:'#keyBtn',            text:() => ['Board marks', `Some squares and pieces carry a mark that helps or hurts you. <b>Tap a marked square</b> to see what it does, or open the <b>Board key</b> for the full list.`]},   // v227
@@ -6554,6 +6554,10 @@ function gTarget(){
   const id = bossId(); if(id && ruleOf(id).includes('crown')) t *= 1.4;
   return Math.max(10, Math.round(t / 10) * 10);
 }
+/* v229 Arena marks: from wave 3, every Gauntlet wave brings its circuit's board mark: Royal Banner (Downtown), Vantage points
+   (Rooftop), Supply crates (Harbor) or a Bounty (Midnight Market). Same rules as in the campaign. */
+const G_MARK = {downtown:'Royal Banner', rooftop:'Vantage points', harbor:'Supply crates', midnight:'Bounty'};
+const gMarks = () => { try{ return !!(RUN && RUN.gauntlet && !MATCH && gWave() >= 3); }catch(e){ return false; } };
 const gStaleDraw = () => { try{ return !!(RUN && RUN.gauntlet && !MATCH); }catch(e){ return false; } };
 function gArenaOn(){ try{ return MODE === 'gauntlet' && !!(RUN && RUN.gauntlet) && !MATCH; }catch(e){ return false; } }
 // the arena look: one of three tiers by wave (Fighting Pit 1-10 · Grand Arena 11-25 · Eternal Arena 26+); boss waves add a short emphasis
@@ -6584,7 +6588,7 @@ function gEntrance(){
   const host = document.querySelector('.boardArea'); if(!host) return;
   const w = gWave(), boss = gBossWave(w), T = gTier(w);
   const el = document.createElement('div'); el.className = `oppin gwv${boss ? ' gboss' : ''}`; el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<small class="oland">${T.name}</small><b>Wave ${w}</b><span class="otags">${boss ? '<i class="otag gbt">Boss wave</i>' : ''}<small class="mchip gfoe">${gFoeTag()}</small></span>`;
+  el.innerHTML = `<small class="oland">${T.name}</small><b>Wave ${w}</b><span class="otags">${boss ? '<i class="otag gbt">Boss wave</i>' : ''}<small class="mchip gfoe">${gFoeTag()}</small>${gMarks() && G_MARK[RUN.circuit] ? `<small class="mchip gmark">${G_MARK[RUN.circuit]}</small>` : ''}</span>`;   // v229
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   if(boss && !calm){ document.body.classList.add('gflare'); setTimeout(() => document.body.classList.remove('gflare'), 1300); }
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
@@ -7705,7 +7709,7 @@ async function resumePromo(){
    An enemy piece (not a pawn) that gets there first loots it and gains 1 Armor. Placed like the Banner: middle squares that
    no officer or King on either side can reach with its first move, at least two files apart. */
 function dockCrates(board){
-  if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'harbor' || RUN.ante<2) return [];
+  if(MATCH || !RUN || RUN.circuit !== 'harbor' || (RUN.gauntlet ? !gMarks() : RUN.ante < 2)) return [];   // v229: Gauntlet waves too
   const n = RUN.ante === 4 ? 3 : 2, out = [], near = new Set();
   try{ for(let i = 0; i < 64; i++){ const p = board[i]; if(p && p.t !== 'P') for(const t of movesFor(board, i)) near.add(t); } }catch(e){}
   const take = (list, fair) => { for(const i of list){ if(out.length >= n) break;
@@ -7748,7 +7752,7 @@ function runGreenLight(at){
    v222: any piece except a pawn claims them, for either side (pawns pass over them), and they sit in the middle of the board
    (two on the fifth rank, plus one on the fourth at stage 4) so taking one means pushing into contested ground. */
 function vantagePoints(board){
-  if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'rooftop' || RUN.ante < 2) return [];
+  if(MATCH || !RUN || RUN.circuit !== 'rooftop' || (RUN.gauntlet ? !gMarks() : RUN.ante < 2)) return [];   // v229: Gauntlet waves too
   const out = [];
   for(const i of [26,29,25,30,27,28]){ if(out.length >= 2) break; if(!board[i] && out.every(j => Math.abs((j & 7) - (i & 7)) >= 2)) out.push(i); }   // c5 f5 b5 g5 d5 e5
   if(RUN.ante === 4){ const k = [35,36,34,37].find(i => !board[i]); if(k !== undefined) out.push(k); }   // stage 4 adds one nearer home: d4 e4 c4 f4
@@ -7775,7 +7779,7 @@ function runVantage(at){
 /* v200 Bounty: the Midnight Market encounter (stages 2-4, every Land). An enemy officer carries a price (v225: a Rook, Bishop or Knight; capture scores double; its captures cost a swap).
    Capture it: +$3 (+$4 at the Circuit Boss). Every time it captures one of the Bearer's pieces, the Bearer loses $1. */
 function bountyPick(board){
-  if(MATCH || !RUN || RUN.gauntlet || RUN.circuit !== 'midnight' || RUN.ante < 2) return null;
+  if(MATCH || !RUN || RUN.circuit !== 'midnight' || (RUN.gauntlet ? !gMarks() : RUN.ante < 2)) return null;   // v229: Gauntlet waves too
   const c = board.map((p, i) => ({p, i})).filter(x => x.p && x.p.side === 'en' && x.p.t !== 'K' && x.p.id != null);
   if(!c.length) return null;
   // v225: a Rook, Bishop or Knight carries it (you would hunt the Queen anyway); the Queen, then a Pawn, only when none is left
@@ -7806,7 +7810,7 @@ function bountyStrikes(mover, lost, at){
    gains 1 Armor (not the King). If an enemy piece gets there first, the Bearer loses 1 Tactic, or 1 swap when there is none. */
 const rulerFight = () => !!(RUN && !RUN.gauntlet && !MATCH && RUN.circuit === 'ruler' && RUN.bosses && bossAt(RUN.ante) === 'ruler');
 function bannerSquare(board){
-  if(!rulerFight()) return [];
+  if(!rulerFight() && !(gMarks() && RUN.circuit === 'downtown')) return [];   // v229: Downtown Gauntlet waves too
   const mid = [27, 28, 26, 29, 35, 36, 34, 37, 25, 30, 33, 38, 24, 31, 32, 39].filter(x => !board[x]);
   // a fair race: no officer or King on either side can reach it with its first move
   const near = new Set(); try{ for(let i = 0; i < 64; i++){ const p = board[i]; if(p && p.t !== 'P') for(const t of movesFor(board, i)) near.add(t); } }catch(e){}
@@ -11114,6 +11118,11 @@ document.addEventListener('visibilitychange', () => { if(document.visibilityStat
 })();
 </script>
 
-<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {})); }</script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // v229 swTopUp: about a minute into the first session, on a connection that isn't data-saving or very slow, ask the offline
+  // cache to fetch the art the first download skipped (later Lands' walk-ins, the ending), so the whole game still works offline
+  window.addEventListener('load', () => setTimeout(() => { try{ const c = navigator.connection;
+    if(c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ''))) return;
+    navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({type:'topup'})).catch(() => {}); }catch(e){} }, 60000)); }</script>
 </body>
 </html>
