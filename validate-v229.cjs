@@ -27,5 +27,5 @@ r=JSON.parse(E("(()=>{MATCH=null;RUN={land:'greek',circuit:'downtown',ante:3,bli
 assert.equal(E('G_MARK.harbor'),'Supply crates');assert(src.includes('<small class="mchip gmark">${G_MARK[RUN.circuit]}</small>'),'the wave card names it');
 assert(src.includes('const G_MARK = {downtown:\'Royal Banner\', rooftop:\'Vantage points\', harbor:\'Supply crates\', midnight:\'Bounty\'};'));
 assert(!src.includes("If the Ruler’s side gets there first"),'the Banner tip no longer says Ruler');
-assert(src.includes('const GAME_VERSION = 229;')&&sw.includes("'crownfall-v229'")&&!src.includes('?v=228'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=229&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: page cached once, ending and later walk-ins topped up later (first download under 8 MB), Arena marks from wave 3 by circuit (Banner/Vantage/Crates/Bounty), never in Crown Matches, campaign unchanged, version.');

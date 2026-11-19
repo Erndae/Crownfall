@@ -439,3 +439,12 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **First download about 40% smaller (≈11.8 MB → 7.1 MB).** The offline cache listed the 1.3 MB game page three times (`./`, `./index.html` twice); it now saves it once. The ending paintings and the walk-ins for Lands II–V (2.1 MB) are no longer part of the first download: they're cached when first shown, and topped up quietly about a minute into the first session (skipped on data saver or 2G), so the whole game still works offline. Checked in a browser: 39 files on install, 57 after the top-up, and an offline reload shows the ending art.
 - **Arena marks.** From wave 3, every Gauntlet wave brings its circuit's board mark, with the same rules as the campaign: the **Royal Banner** (Downtown), **Vantage points** (Rooftop), **Supply crates** (Harbor) or a **Bounty** (Midnight Market). The wave card names it, and the Board key explains it. Waves 1–2 stay plain; Crown Matches never have marks.
 - Tests: `validate-v229.cjs`; v160 and v228 updated.
+
+## v230 — the Daily Run (replaces the Gauntlet)
+- **One short run a day, the same for everyone on that date.** 10 waves, two in each Land (Crown City → the Fallen Throne), bosses at waves 5 and 10, board marks from wave 3. Waves, enemy armies and reward offers come from the date; the enemy's moves are its own.
+- **Pick 1 of 3 rewards after every wave:** recruit a piece, train a piece type, a relic, a card, or a life (only what still fits is offered).
+- **3 lives.** A lost fight replays the wave; a stalemate replays it with no life lost; the last life ends the run.
+- **Score:** points from won waves, +1,000 per wave cleared, +3,000 for all ten, +100 per $ you finish with (crates and bounties pay cash). Replays allowed: the day's best counts. A **streak** counts the days in a row with a finished run.
+- **Title panel:** today's best and your streak; Continue / Play today's run / Play again; Records show the last 14 days, streak and best ever.
+- Built on the Gauntlet's engine and its separate save space. The endless mode, Arena Tokens and the Armory no longer appear; an old endless run in progress is not continued (starting the Daily Run replaces it).
+- Tests: `validate-v230.cjs`; v229 version check updated.

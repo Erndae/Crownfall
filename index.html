@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=229"></script>
-<script src="piece-designs.js?v=229"></script>
-<script src="character-style.js?v=229"></script>
-<script src="campaign-opponents.js?v=229"></script>
-<script src="campaign-dialogue.js?v=229"></script>
-<link rel="stylesheet" href="character-style.css?v=229">
+<script src="gameplay-polish.js?v=230"></script>
+<script src="piece-designs.js?v=230"></script>
+<script src="character-style.js?v=230"></script>
+<script src="campaign-opponents.js?v=230"></script>
+<script src="campaign-dialogue.js?v=230"></script>
+<link rel="stylesheet" href="character-style.css?v=230">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=229">
-<link rel="stylesheet" href="ruler-style.css?v=229">
-<link rel="stylesheet" href="gameplay-polish.css?v=229">
+<link rel="stylesheet" href="city-board.css?v=230">
+<link rel="stylesheet" href="ruler-style.css?v=230">
+<link rel="stylesheet" href="gameplay-polish.css?v=230">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2394,7 +2394,7 @@ const rawSet = (k, v) => { try{ RAW_SET.call(localStorage, k, v); }catch(e){} };
 const rawDel = k => { try{ RAW_DEL.call(localStorage, k); }catch(e){} };
 const MODE = rawGet('crownfall-mode') === 'gauntlet' ? 'gauntlet' : 'campaign';
 const NS_C = 'cf151c-', NS_G = 'cf151g-', BETA_NS = MODE === 'gauntlet' ? NS_G : NS_C, BETA_ID = 'v151-' + MODE;
-const G_SHARED = ['crownfall-mode', 'crownfall-intent', 'crownfall-gauntlet-best', 'crownfall-gauntlet-history', 'crownfall-gauntlet-done', 'crownfall-gauntlet-last'];
+const G_SHARED = ['crownfall-mode', 'crownfall-intent', 'crownfall-gauntlet-best', 'crownfall-gauntlet-history', 'crownfall-gauntlet-done', 'crownfall-gauntlet-last', 'crownfall-daily'];
 (function(){ const SHARED = new Set(['gambit-sound','gambit-fast','crownfall-music','crownfall-music-vol','crownfall-chatter','crownfall-tut','crownfall-tips', ...G_SHARED]);
   const ns = k => (typeof k === 'string' && /^(gambit-|crownfall-)/.test(k) && !SHARED.has(k)) ? BETA_NS + k : k;
   const P = Storage.prototype, g = P.getItem, st = P.setItem, rm = P.removeItem;
@@ -3689,7 +3689,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 229;
+const GAME_VERSION = 230;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5587,10 +5587,11 @@ function title(){
       ${camp.ready ? `<p class="savebadge" style="color:#19e3c9;margin:0">${camp.ready}</p>` : ''}
     </div>
     <div class="modecard mc-gaunt">
-      <div class="mchead"><b>The Gauntlet</b><small>One army. Endless challengers. How far can you go?</small></div>
-      <div class="gstats"><span><small>Personal best</small><b>${gb ? `Wave ${gb.cleared}` : '—'}</b></span><span><small>Best run</small><b>${gb ? `${gb.wins} wins · ${gb.captures} captures` : 'No runs yet'}</b></span></div>
-      ${gs ? `<button class="btn gbtn" id="gcont">Continue Gauntlet<small>Wave ${gs.wave} · ${gs.lives} ${gs.lives === 1 ? 'life' : 'lives'} · ${gs.army} pieces</small></button>` : ''}
-      <div class="gbtns"><button class="btn ${gs ? 'ghost' : 'gbtn'}" id="gnew">${gs ? 'New run' : 'Enter the Gauntlet'}</button><button class="btn ghost" id="grec">Records</button></div>
+      ${(() => { const dr = dailyRec(), today = dr.days[dailyToday()], st = dailyStreak(dr);   // v230: the Daily Run replaces the Gauntlet
+        return `<div class="mchead"><b>Daily Run</b><small>Ten waves, the same for everyone today. A new run every day.</small></div>
+      <div class="gstats"><span><small>Today</small><b>${today ? `${(+today.best || 0).toLocaleString()}` : 'Not played'}</b></span><span><small>Streak</small><b>${st} day${st === 1 ? '' : 's'}</b></span></div>`; })()}
+      ${gs ? `<button class="btn gbtn" id="gcont">Continue Daily Run<small>${gs.date === dailyToday() ? 'Today' : dailyLabel(gs.date)} · Wave ${gs.wave} of ${DAILY_WAVES} · ${gs.lives} ${gs.lives === 1 ? 'life' : 'lives'}</small></button>` : ''}
+      <div class="gbtns"><button class="btn ${gs ? 'ghost' : 'gbtn'}" id="gnew">${gs ? 'New run' : dailyRec().days[dailyToday()] ? 'Play again' : 'Play today’s run'}</button><button class="btn ghost" id="grec">Records</button></div>
     </div>
     ${inC && worldCrowns() ? `<p class="savebadge runnertag" style="color:#ffd23d;font-family:var(--tag);font-size:15px">${runnerTitle()}</p>` : ''}
     <div class="titlenav"><button class="btn ghost landsbtn" id="lands">${inC ? `${crownRow(PACK)} Journey · ${worldCrowns()}/${WORLD_TOTAL}` : 'Campaign Journey'}</button>
@@ -5608,7 +5609,7 @@ function title(){
   $('#new').onclick = () => inC ? (hasCampaign() ? newGameAsk() : startNewGame()) : goMode('campaign', 'new');   // NEW CAMPAIGN always replaces the whole campaign
   { const c = $('#gcont'); if(c) c.onclick = () => MODE === 'gauntlet' ? gContinue() : goMode('gauntlet', 'cont'); }
   $('#gnew').onclick = () => gs ? gNewAsk(gs) : (MODE === 'gauntlet' ? gNewRun() : goMode('gauntlet', 'new'));
-  $('#grec').onclick = () => gRecords();
+  $('#grec').onclick = () => dailyRecords();   // v230
   $('#how').onclick = () => howTo(false);
   if(inC){
     if(kingTrainRefunded > 0){ const r = kingTrainRefunded; kingTrainRefunded = 0; setTimeout(() => showTip(`<b>King Training retired: +$${r} refunded</b><br>The King no longer trains. Your King grows through World Crowns.`), 600); }
@@ -6190,6 +6191,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   B = {board: deploy(RUN.roster), score:0, moves:mv, movesStart:mv, par, moveLimit:lim, moveCount:0, swaps:1 + (RUN.bonusSwaps || 0) + (isC('rooftop') ? 1 : 0) + RUN.relics.reduce((s,id)=>s+(R(id).swaps||0),0), caps:0, lost:0, streak:0, target:target(), wave:1, capBy:[]};
   RUN.bonusSwaps = 0;
   openGate.rejects = 0; openGate.fallback = 0; openGate.failed = 0;
+  const dSeed = RUN.gauntlet && RUN.daily && !MATCH ? dailySeed('army' + RUN.gWave) : null;   // v230: the same enemy army for everyone today
   for(let gTry = 0; gTry < 6; gTry++){ if(gTry) B.board = deploy(RUN.roster); const P = setupEnemyArmy(B.board);   // enemy army progression (see ENEMY_ARMY / ARMY_SIZE)   (v152: a Gauntlet opening is checked, see gOpeningOK)
     const en = B.board.filter(q => q && q.side === 'en'), comp = 'KQRBNP'.split('').map(t => t + en.filter(q => q.t === t).length).filter(x => x[1] !== '0').join(' ');
     B.fallenArmy = !!(P && P.fallenArmy);   // v228: for 'Know Thyself'
@@ -6199,6 +6201,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
       const later = () => { if(!app.classList.contains('play') || !B || B.done) return; if((document.querySelector('.oppin, .coach, .modal') || coachOn || (coachQ.length && !coachCool)) && tries++ < 150) return setTimeout(later, 400); showTip(tip); };
       setTimeout(later, 1600); } }
     B.aiRef = CFAI.material(B.board); if(!RUN.gauntlet || MATCH || gOpeningOK()) break; (window.__gOpen = window.__gOpen || []).push(RUN.gWave); }
+  if(dSeed) dSeed();
   B.startVal = enemyValue(B.board);
   B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; crInit();   // castling rights for this fight's own King/Rook pairs
   B.tac.n = crownTactics();   // v196: World Crowns start the fight with Tactics ready (not counted as earned)
@@ -6245,7 +6248,7 @@ function playBlind(resumed){
   app.innerHTML = `
     <div class="phud">
       <div class="pblind">${MATCH ? `<b>Crown Match</b><span>${matchDiff().name} · AI ${matchDiff().rating}</span><small class="mhudtag">Crown Arena · 16 vs 16</small>` : `${boss && boss.ruler && land() !== 'throne' ? '<span class="rtag">Ruler</span>' : ''}<b>${RUN.gauntlet ? gFoeTag() : boss ? bossName(boss.id) : roundName(RUN.blind)}</b><span>${RUN.gauntlet ? (gBossWave(RUN.gWave) ? '' : '') : boss && !boss.ruler ? `<i class="otag">${boss.mini ? 'Circuit Boss' : (['Intro', 'Rival', 'Elite'][RUN.ante - 1] || 'Boss')}</i> ` : ''}${RUN.gauntlet ? `<b class="gwavehud">Wave ${RUN.gWave}</b>` : rulerRoad() ? 'The Ruler’s Road' : `Stage ${RUN.ante} of ${nStages()}`} ${hearts(lives())}</span>${boss ? `<span class="ochips">${RUN.gauntlet && gBossWave(RUN.gWave) ? '<i class="otag gbt">Boss wave</i>' : ''}${dblRule() ? `<small class="shadowtag" id="shadowTag">${dblLabel()} · ${shadowState().left}</small>` : ''}${doubleMarch() ? '<small class="shadowtag dmtag" id="dmTag" title="This army’s Pawns can advance two squares on any move.">Double March</small>' : ''}${bossChips(boss.id).filter(c => !/^Blitz|Shadow Step|· 1$/.test(c)).map(c => `<small class="mchip">${c}</small>`).join('')}${sigChip()}</span>` : `${dblRule() ? `<small class="shadowtag" id="shadowTag">${dblLabel()} · ${shadowState().left}</small>` : ''}${doubleMarch() ? '<small class="shadowtag dmtag" id="dmTag" title="This army’s Pawns can advance two squares on any move.">Double March</small>' : ''}${blitzOn() ? `<small class="blitztag">Blitz · ${B.movesStart}-move limit</small>` : ''}`}`}</div>
-      <div class="pstats">${blitzOn() ? `<div class="blitzmv${B.moves <= 3 ? ' low' : ''}"><small>Moves left</small><b id="mv">${B.moves}</b></div>` : ''}<div><small>Swaps</small><b id="sw">${B.swaps}</b></div><button class="tacbtn" id="tacBtn" aria-label="Tactic"><small>Tactic</small><span class="tacpips" id="tacPips">${pips(tacState().n)}</span></button>${MATCH ? '' : `<div><small>${RUN.gauntlet ? 'Tokens' : 'Cash'}</small><b class="money" id="cash">$${RUN.money}</b></div>`}</div>
+      <div class="pstats">${blitzOn() ? `<div class="blitzmv${B.moves <= 3 ? ' low' : ''}"><small>Moves left</small><b id="mv">${B.moves}</b></div>` : ''}<div><small>Swaps</small><b id="sw">${B.swaps}</b></div><button class="tacbtn" id="tacBtn" aria-label="Tactic"><small>Tactic</small><span class="tacpips" id="tacPips">${pips(tacState().n)}</span></button>${MATCH ? '' : `<div><small>${RUN.gauntlet && !RUN.daily ? 'Tokens' : 'Cash'}</small><b class="money" id="cash">$${RUN.money}</b></div>`}</div>
     </div>
     <div class="pscore">
       <div class="sc"><small>Score</small><b id="score">${B.score.toLocaleString()}</b></div>
@@ -6543,11 +6546,11 @@ const G_MOVE_CARDS = ['hustler', 'blitzer'];   // v153: move-limited Challenges 
 const G_RULE_TAG = {wall:'Iron Wall', march:'Double Movers', tax:'Toll Collectors', crown:'High Stakes'};
 const gWave = () => (RUN && RUN.gWave) || 1;
 const gBossWave = w => w % 5 === 0;
-const gTier = w => w >= 26 ? G_TIERS[2] : w >= 11 ? G_TIERS[1] : G_TIERS[0];
-function gEnemyN(){ const w = Math.min(gWave(), 10000); return Math.min(16, 5 + Math.floor((w - 1) * 0.46) + (gBossWave(w) ? 1 : 0)); }
-function gRating(){ const w = Math.min(gWave(), 10000); return Math.min(AI_MAX, Math.round(560 + 28 * (w - 1) + (gBossWave(w) ? 40 : 0))); }
+const gTier = w => RUN && RUN.daily ? {id:'daily', name:'Daily Run', tok:0} : w >= 26 ? G_TIERS[2] : w >= 11 ? G_TIERS[1] : G_TIERS[0];
+function gEnemyN(){ const w = gDiff(); return Math.min(16, 5 + Math.floor((w - 1) * 0.46) + (gBossWave(w) ? 1 : 0)); }
+function gRating(){ const w = gDiff(); return Math.min(AI_MAX, Math.round(560 + 28 * (w - 1) + (gBossWave(w) ? 40 : 0))); }
 function gTarget(){
-  const w = Math.min(gWave(), 10000), n = (RUN.roster || []).filter(Boolean).length, sizeF = Math.max(0.6, Math.min(1, n / 15)), ppm = capacityPPM();
+  const w = gDiff(), n = (RUN.roster || []).filter(Boolean).length, sizeF = Math.max(0.6, Math.min(1, n / 15)), ppm = capacityPPM();
   const fresh = 600 * Math.pow(1.4, Math.min(w, 40) - 1);                 // a new army's curve (early waves)
   const cap = ppm * (4.5 + 0.12 * Math.min(w, 80));                        // what this army can score (Training / Forge), slowly rising, capped
   let t = Math.min(fresh, cap) * sizeF;
@@ -6588,7 +6591,7 @@ function gEntrance(){
   const host = document.querySelector('.boardArea'); if(!host) return;
   const w = gWave(), boss = gBossWave(w), T = gTier(w);
   const el = document.createElement('div'); el.className = `oppin gwv${boss ? ' gboss' : ''}`; el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<small class="oland">${T.name}</small><b>Wave ${w}</b><span class="otags">${boss ? '<i class="otag gbt">Boss wave</i>' : ''}<small class="mchip gfoe">${gFoeTag()}</small>${gMarks() && G_MARK[RUN.circuit] ? `<small class="mchip gmark">${G_MARK[RUN.circuit]}</small>` : ''}</span>`;   // v229
+  el.innerHTML = `<small class="oland">${T.name}</small><b>Wave ${w}${RUN.daily ? ` of ${DAILY_WAVES}` : ''}</b><span class="otags">${boss ? '<i class="otag gbt">Boss wave</i>' : ''}<small class="mchip gfoe">${gFoeTag()}</small>${gMarks() && G_MARK[RUN.circuit] ? `<small class="mchip gmark">${G_MARK[RUN.circuit]}</small>` : ''}</span>`;   // v229
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   if(boss && !calm){ document.body.classList.add('gflare'); setTimeout(() => document.body.classList.remove('gflare'), 1300); }
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
@@ -6613,7 +6616,7 @@ function gSummary(){
   let R0 = null;
   if(MODE === 'gauntlet') R0 = RUN && RUN.gauntlet ? RUN : null;
   else { try{ const x = JSON.parse(rawGet(NS_G + 'gambit-run') || 'null'); R0 = x && x.RUN && x.RUN.gauntlet ? x.RUN : null; }catch(e){} }
-  return R0 ? {wave:R0.gWave || 1, lives:R0.lives != null ? R0.lives : 3, army:(R0.roster || []).filter(Boolean).length} : null;
+  return R0 && R0.daily ? {wave:R0.gWave || 1, lives:R0.lives != null ? R0.lives : 3, army:(R0.roster || []).filter(Boolean).length, date:R0.daily} : null;   // v230: Daily Runs only
 }
 function campSummary(saved){
   const nameOf = l => (PACKS.find(x => x.id === l) || PACKS[0]).name;
@@ -6672,29 +6675,148 @@ function gMigrate152(){
   }
 }
 function gNewAsk(gs){
-  const m = modal(`<h2>Start a new Gauntlet run?</h2><p style="margin:0">Your current run ends here. It is recorded as <b>${Math.max(0, gs.wave - 1)} waves cleared</b>.</p>
+  const m = modal(`<h2>Start today’s run again?</h2><p style="margin:0">Your current run ends here. It counts as played, with <b>${Math.max(0, gs.wave - 1)} of ${DAILY_WAVES} waves cleared</b>.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="gnno" style="flex:1">Cancel</button><button class="btn red" id="gnyes" style="flex:1">New run</button></div>`, '#gnno');
   m.querySelector('#gnyes').onclick = () => { m.remove(); MODE === 'gauntlet' ? gNewRun() : goMode('gauntlet', 'new'); };
 }
+/* =================== v230 · THE DAILY RUN (replaces the endless Gauntlet) ===================
+   One short run a day, the same for everyone on that date: 10 waves across the five Lands (two each), a boss at waves 5
+   and 10, board marks from wave 3. After every wave you pick 1 of 3 rewards. 3 lives. Your score is the points you scored
+   in won waves, +1,000 per wave cleared, +3,000 for clearing all ten, +100 per $ left (crates and bounties pay cash). Waves, enemy armies and reward offers come from the
+   date (the enemy's moves are its own). Replays are allowed: the day's best counts, and a streak counts the days in a row
+   with a finished run. It runs on the Gauntlet's engine and save space; Arena Tokens and the Armory are gone. */
+const DAILY_WAVES = 10;
+const DAILY_DIFF = [1, 3, 5, 8, 10, 13, 15, 18, 21, 25];   // each wave plays like this endless-Gauntlet wave
+const dailyToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const dailyLabel = k => { try{ const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, {month:'long', day:'numeric'}); }catch(e){ return k; } };
+function dailyRng(tag){ let h = 2166136261; for(const ch of String(tag)){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return () => { h = (h + 0x6D2B79F5) >>> 0; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function dailySeed(tag){ const keep = Math.random; Math.random = dailyRng((RUN && RUN.daily || dailyToday()) + '|' + tag); return () => { Math.random = keep; }; }
+const dailyOn = () => !!(RUN && RUN.gauntlet && RUN.daily && !MATCH);
+const gDiff = () => dailyOn() ? DAILY_DIFF[Math.max(0, Math.min(DAILY_WAVES, gWave()) - 1)] : Math.min(gWave(), 10000);
+function dailyRec(){ const r = jget('crownfall-daily', null); return r && r.days && typeof r.days === 'object' ? r : {days:{}}; }
+function dailyStreak(rec = dailyRec()){
+  const done = k => rec.days[k] && rec.days[k].finished, d = new Date(); let n = 0;
+  const key = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+  if(!done(key(d))) d.setDate(d.getDate() - 1);   // today not played yet: the streak is still alive from yesterday
+  while(done(key(d))){ n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+const dailyBestEver = (rec = dailyRec()) => Object.values(rec.days).reduce((m, x) => Math.max(m, +x.best || 0), 0);
+function dailyScore(run, all){ const cleared = Math.max(0, Math.min(DAILY_WAVES, (run.gWave || 1) - 1)), cash = Math.max(0, Math.floor(+run.money || 0)); return {cleared, cash, score:Math.round((run.dScore || 0) + 1000 * cleared + (all ? 3000 : 0) + 100 * cash)}; }   // cash (crates, bounties) is worth 100 points per $
+function dailyRecord(run, all){
+  const rec = dailyRec(), k = run.daily, {cleared, score} = dailyScore(run, all), day = rec.days[k] || {best:0, waves:0, plays:0};
+  const newBest = score > (day.best || 0);
+  rec.days[k] = {best:Math.max(day.best || 0, score), waves:Math.max(day.waves || 0, cleared), plays:(day.plays || 0) + 1, finished:true, all:!!(day.all || all)};
+  const keys = Object.keys(rec.days).sort(); while(keys.length > 60) delete rec.days[keys.shift()];   // two months of history
+  jset('crownfall-daily', rec);
+  return {date:k, score, cleared, cash:dailyScore(run, all).cash, all, newBest, best:rec.days[k].best, streak:dailyStreak(rec), bestEver:dailyBestEver(rec)};
+}
+// the 1-of-3 reward after a won wave (the offers come from the date, and are kept until one is chosen)
+function dailyOffers(cleared){
+  const restore = dailySeed('pick' + cleared);
+  try{
+    const n = (RUN.roster || []).filter(Boolean).length, lv = RUN.lv || {}, have = t => RUN.roster.some(r => r && parseR(r).t === t);
+    const pool = [];
+    if(n < 16){ const t = pick(cleared >= 5 ? ['N', 'B', 'R', 'Q', 'N', 'B', 'R'] : ['N', 'B', 'R', 'P', 'N', 'B']); pool.push({k:'recruit', t}); }
+    { const ts = ['P', 'N', 'B', 'R', 'Q'].filter(t => have(t) && (lv[t] || 1) < LV_MAX); if(ts.length) pool.push({k:'train', t:pick(ts)}); }
+    if((RUN.relics || []).length < 5){ const rs = RELICS.filter(r => !RUN.relics.includes(r.id) && !r.swaps); if(rs.length) pool.push({k:'relic', id:pick(rs).id}); }
+    if((RUN.lives || 0) < 3) pool.push({k:'heal'});
+    if((RUN.cards || []).length < 2){ const cs = CARDS.filter(c => !c.circuit && !G_MOVE_CARDS.includes(c.id)); if(cs.length) pool.push({k:'card', id:pick(cs).id}); }
+    while(pool.length > 3) pool.splice(Math.floor(Math.random() * pool.length), 1);
+    return pool;
+  } finally { restore(); }
+}
+function dailyOfferText(o){
+  if(o.k === 'recruit') return [`Recruit a ${TYPE[o.t].name}`, `A new ${TYPE[o.t].name} joins your army.`];
+  if(o.k === 'train'){ const l = (RUN.lv && RUN.lv[o.t]) || 1; return [`Train your ${TYPE[o.t].name}s`, `Level ${l} → ${l + 1}: their captures score more.`]; }
+  if(o.k === 'relic'){ const r = R(o.id); return [`Relic: ${r.name}`, r.desc]; }
+  if(o.k === 'heal') return ['Recover', '+1 life.'];
+  if(o.k === 'card'){ const c = C(o.id); return [`${UI.card}: ${c.name}`, c.desc]; }
+  return ['', ''];
+}
+function dailyApply(o){
+  if(o.k === 'recruit') RUN.roster.push(o.t);
+  else if(o.k === 'train') RUN.lv[o.t] = Math.min(LV_MAX, (RUN.lv[o.t] || 1) + 1);
+  else if(o.k === 'relic' && RUN.relics.length < 5) RUN.relics.push(o.id);
+  else if(o.k === 'heal') RUN.lives = Math.min(3, (RUN.lives || 0) + 1);
+  else if(o.k === 'card' && RUN.cards.length < 2) RUN.cards.push(o.id);
+}
+function dailyPick(then){
+  const P = RUN.dPick; if(!P || !P.offers || !P.offers.length){ delete RUN.dPick; save(); return then(); }
+  const m = modal(`<div class="dpick"><small>Wave ${P.w} cleared</small><h2>Choose a reward</h2>
+    ${P.offers.map((o, i) => { const [a, b] = dailyOfferText(o); return `<button class="ed-card" data-i="${i}"><b>${a}</b><span>${b}</span></button>`; }).join('')}</div>`, null);
+  m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); const o = P.offers[+b.dataset.i]; delete RUN.dPick; dailyApply(o); save(); sfx.coin && sfx.coin(); then(); });
+}
+function dailyWin(vScore, vLog, laRes, mate, captureFinish){
+  gFight(true);
+  const cleared = RUN.gWave, boss = gBossWave(cleared), tag = gFoeTag(), all = cleared >= DAILY_WAVES;
+  RUN.dScore = (RUN.dScore || 0) + Math.max(0, Math.round(vScore || 0));
+  RUN.gWave++; RUN.gWaveSet = 0; RUN.fightTarget = null; RUN.gEntry = null; delete RUN.gRetry; delete RUN.gDrawInfo;
+  if(!all) RUN.dPick = {w:cleared, offers:dailyOffers(cleared)};
+  B = null; save();                                                     // committed before anything is shown
+  const so = dailyScore(RUN, all);
+  const html = `<p class="muted">${boss ? 'Boss wave · ' : ''}${tag} beaten</p><h2 style="color:var(--brass)">${mate ? 'Checkmate!' : 'Wave won!'}</h2>
+    ${captureFinishHTML(captureFinish)}<div class="kv"><span>Wave score</span><b>${Math.round(vScore || 0).toLocaleString()}</b></div>
+    <div class="kv"><span>Run score so far</span><b class="money">${so.score.toLocaleString()}</b></div>
+    ${laWinHtml(laRes)}<p class="gnext">${all ? 'All ten waves cleared!' : `Next · Wave ${RUN.gWave} of ${DAILY_WAVES}${gBossWave(RUN.gWave) ? ' · Boss wave' : ''}`}</p>
+    <button class="btn" id="cash">${all ? 'See your score' : 'Choose a reward'}</button><button class="btn ghost" id="peek">View the board</button>`;
+  const rewardView = battleView;
+  stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared} of ${DAILY_WAVES}`, name:tag, kick:'Wave cleared'}, captureFinish).then(() => {
+    if(rewardView !== battleView) return;
+    const m = modal(`<p class="gwave">Wave ${cleared} of ${DAILY_WAVES} cleared</p>` + html, null); m.classList.add('vicm', 'gvic'); addPeek(m, vLog);
+    let go = false; m.querySelector('#cash').onclick = () => { if(go) return; go = true; m.remove(); sfx.coin(); all ? dailyFinish(true) : dailyPick(() => gNextWave()); };
+  });
+}
+function dailyFinish(all, why){
+  if(!all) sfx.lose();
+  const lastLog = B && B.log, res = dailyRecord(RUN, all); clearRun();   // recorded and cleared before anything is shown
+  leaveBoard(); onTitle = false; sceneMusic('menu'); setLandBg(null); setCircuitData('');
+  app.innerHTML = `<section class="screen gend dend keepcash">
+    <p class="gend-k">${all ? 'Daily Run complete' : 'Daily Run over'}</p>
+    <p class="muted" style="text-align:center;margin:0">${dailyLabel(res.date)}${why ? ` · ${why}` : ''}</p>${all ? '' : lossHTML(CrownfallPolish.loss(why || '', lastLog || []))}
+    ${res.newBest ? `<p class="gend-pb">${res.best === res.score && res.score >= res.bestEver ? 'New best Daily Run!' : 'New best for today!'}</p>` : ''}
+    <div class="gend-big"><small>Score</small><b>${res.score.toLocaleString()}</b></div>
+    <div class="cash">
+      <div class="kv"><span>Waves cleared</span><b>${res.cleared} of ${DAILY_WAVES}</b></div>${res.cash ? `<div class="kv"><span>Cash bonus</span><b>$${res.cash} · +${(res.cash * 100).toLocaleString()}</b></div>` : ''}
+      <div class="kv"><span>Today’s best</span><b>${res.best.toLocaleString()}</b></div>
+      <div class="kv"><span>Streak</span><b>${res.streak} day${res.streak === 1 ? '' : 's'}</b></div>
+      <div class="kv"><span>Best ever</span><b>${res.bestEver.toLocaleString()}</b></div>
+    </div>
+    <p class="muted" style="text-align:center;margin:0">A new Daily Run starts tomorrow. You can replay today’s as often as you like: your best counts.</p>
+    <button class="btn gbtn" id="gagain">Play again</button><button class="btn ghost" id="gmenu">Main menu</button>
+  </section>`;
+  $('#gagain').onclick = () => gNewRun(); $('#gmenu').onclick = () => title();
+  return res;
+}
+function dailyRecords(){
+  const rec = dailyRec(), keys = Object.keys(rec.days).sort().reverse().slice(0, 14);
+  modal(`<p class="muted gk">Daily Run</p><h2>Records</h2>
+    <div class="cash"><div class="kv"><span>Streak</span><b>${dailyStreak(rec)} day${dailyStreak(rec) === 1 ? '' : 's'}</b></div><div class="kv"><span>Best ever</span><b>${dailyBestEver(rec).toLocaleString()}</b></div></div>
+    ${keys.length ? `<ol class="glb">${keys.map(k => { const d = rec.days[k]; return `<li><b>${(+d.best || 0).toLocaleString()}</b><span>${d.waves || 0} of ${DAILY_WAVES} waves${d.all ? ' · all cleared' : ''} · ${d.plays || 1} play${(d.plays || 1) === 1 ? '' : 's'}</span><small>${dailyLabel(k)}</small></li>`; }).join('')}</ol>` : '<p class="muted">No Daily Runs yet.</p>'}
+    <p class="muted" style="font-size:12.5px;margin:0">Records are kept on this device.</p>
+    <button class="btn" id="grok">Close</button>`, '#grok');
+}
 function gNewRun(){
-  if(RUN && RUN.gauntlet && (RUN.gWave || 1) > 1) gRecordRun(RUN, 'abandoned');   // an abandoned run still counts (never erased)
+  if(RUN && RUN.gauntlet && RUN.daily && (RUN.gWave || 1) > 1) dailyRecord(RUN, false);   // v230: an abandoned Daily Run still counts as played
   setPack('street'); newRun('downtown');
   Object.assign(RUN, {gauntlet:true, gv:153, gId:Date.now().toString(36) + Math.floor(Math.random() * 1e8).toString(36), gWave:1, gWaveSet:0, gStats:{wins:0, moves:0, caps:0, lifeLost:0, draws:0, tokens:0},
-    roster:G_START.slice(), money:6, lives:3, livesBought:0, cards:[], relics:[], lv:{P:1, N:1, B:1, R:1, Q:1, K:1}, fallen:[], journeys:1, armyStages:0, gEquip:{}, gPrep:null, gBuy:{}, gEntry:null});
+    roster:G_START.slice(), money:6, lives:3, livesBought:0, cards:[], relics:[], lv:{P:1, N:1, B:1, R:1, Q:1, K:1}, fallen:[], journeys:1, armyStages:0, gEquip:{}, gPrep:null, gBuy:{}, gEntry:null,
+    daily:dailyToday(), dScore:0});   // v230
   delete RUN.att; RUN.lifeLand = null;
   { const cp = cpGet(); cp.cur = null; cp.mid = null; setCheckpoint(cp); }    // (the Gauntlet never uses Circuit checkpoints)
   B = null; save(); gArenaSync(false);
-  const m = modal(`<p class="muted gk">The Gauntlet</p><h2>One army. Endless challengers.</h2>
-    <div class="grules"><p><b>3 Lives.</b> Lose a fight and you fight that wave again. Lose your last life and the run is over: no checkpoints.</p>
-    <p><b>Stalemate is a draw.</b> No Life lost, no reward: the same wave starts again.</p>
-    <p><b>Every 5th wave</b> is a boss. After it the <b>Armory</b> opens: recruit, train, forge, equip, recover. It takes <b>Arena Tokens</b>, earned by clearing waves.</p>
-    <p>Your Gauntlet army, Tokens, equipment and characters are separate from your Campaign.</p></div>
+  const m = modal(`<p class="muted gk">Daily Run · ${dailyLabel(RUN.daily)}</p><h2>Ten waves. Today only.</h2>
+    <div class="grules"><p><b>The same run for everyone today:</b> 10 waves through all five Lands, with bosses at waves 5 and 10.</p>
+    <p><b>After every wave,</b> choose 1 of 3 rewards: a recruit, training, a relic, a card or a life.</p>
+    <p><b>3 Lives.</b> Lose a fight and you fight that wave again. A stalemate replays the wave. Lose your last life and the run is over.</p>
+    <p><b>Score:</b> your points from won waves, +1,000 per wave cleared, +3,000 for all ten, +100 per $ you finish with. Replay as often as you like: the day’s best counts.</p></div>
     <button class="btn gbtn" id="gstart">Start Wave 1</button>`, null);
   m.querySelector('#gstart').onclick = () => { m.remove(); gNextWave(); };
 }
 // the next wave's arena and opponent are drawn once and saved, so a refresh never changes them
 function gPrepWave(){
-  const w = RUN.gWave, boss = gBossWave(w), L = G_LANDS[Math.floor((w - 1) / 5) % 5];
+  const w = RUN.gWave, boss = gBossWave(w), L = RUN.daily ? G_LANDS[Math.min(4, Math.floor((w - 1) / 2))] : G_LANDS[Math.floor((w - 1) / 5) % 5];   // v230: a Daily Run visits each Land for two waves
   const c = pick(boss ? G_CIRCS.filter(x => x !== 'downtown') : G_CIRCS);   // v153: no Blitz bosses (Downtown's Circuit boss rule is Blitz)
   const rules = BOSSES.map(b => b.id).filter(id => !['mini', 'ruler', 'clock'].includes(id) && !(L === 'throne' && id === 'crown'));   // never the Fallen Grandmaster; never Blitz
   RUN.land = L; RUN.circuit = c; RUN.tier = tierFor(c); RUN.blind = 2; RUN.ante = boss ? 4 : 1 + Math.floor(Math.random() * 3);
@@ -6704,12 +6826,13 @@ function gPrepWave(){
   RUN.gWaveSet = w; RUN.fightTarget = null; RUN.inShop = false; RUN.shop = null; RUN.gEntry = null; delete RUN.gRetry;
   setPack(L); save();
 }
-function gNextWave(){ if(!RUN || !RUN.gauntlet) return title(); if(RUN.gRetry) return gRetryWave(); if(RUN.gWaveSet !== RUN.gWave) gPrepWave(); setPack(RUN.land); startBlind(); }
+function gNextWave(){ if(!RUN || !RUN.gauntlet) return title(); if(RUN.gRetry) return gRetryWave(); if(RUN.dPick) return dailyPick(gNextWave); if(RUN.gWaveSet !== RUN.gWave){ const r = RUN.daily ? dailySeed('wave' + RUN.gWave) : null; try{ gPrepWave(); } finally { r && r(); } } setPack(RUN.land); startBlind(); }
 function gContinue(){
   if(!RUN || !RUN.gauntlet) return gNewRun();
   if(B && !B.done) return playBlind(true);
   if(RUN.gRetry) return gDrawShow();
-  if(RUN.inShop) return shop();
+  if(!RUN.daily) return gNewRun();   // v230: an old endless-Gauntlet run is not continued
+  if(RUN.dPick) return dailyPick(gNextWave);
   gNextWave();
 }
 function gFight(won){
@@ -6775,6 +6898,7 @@ function gRetryWave(){
 }
 /* ---------- victory: Arena Tokens, then the next wave (or the Armory after every fifth) ---------- */
 function gWin(vScore, vLog, laRes, chal, piggy, blitzLeft, mate, captureFinish){
+  if(RUN && RUN.daily) return dailyWin(vScore, vLog, laRes, mate, captureFinish);   // v230
   gFight(true);
   const cleared = RUN.gWave, boss = gBossWave(cleared), T = gTier(cleared), armory = cleared % 5 === 0, tag = gFoeTag();
   const parts = [[`Wave reward · ${T.name}`, T.tok]];
@@ -6967,7 +7091,7 @@ function gPickOpen(k, oi, ri){
 }
 /* ---------- Arena Tokens on screen: in the Gauntlet's storage world every $ amount is shown as a Token ---------- */
 function gTokScan(root){
-  if(!root || MODE !== 'gauntlet') return;
+  if(!root || MODE !== 'gauntlet' || (RUN && RUN.daily)) return;   // v230: a Daily Run shows plain cash
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:n => /\$\d/.test(n.nodeValue) && n.parentElement && !n.parentElement.closest('.keepcash,script,style,textarea') ? 1 : 3});
   const list = []; while(w.nextNode()) list.push(w.currentNode);
   list.forEach(n => { const parts = n.nodeValue.split(/\$(\d[\d,]*)/), f = document.createDocumentFragment();
@@ -7006,6 +7130,7 @@ function gRecordRun(run, why){
   return out;
 }
 function gEnd(why){
+  if(RUN && RUN.daily) return dailyFinish(false, why);   // v230
   sfx.lose(); const lastLog=B&&B.log,rec = gRecordRun(RUN, why); clearRun();           // recorded and cleared before anything is shown: a refresh can't revive the run
   gEndScreen(rec, why, lastLog);
 }
@@ -10584,7 +10709,7 @@ function loseLife(why){
   const log = B && B.log;
   B = null; save();
   const m = modal(`${quote}<h2 style="color:var(--mult)">You lost a life</h2><p>${why}</p>
-    <div class="lifebox">${hearts(RUN.lives, true)}<span>${evNote ? evNote + ' ' : ''}${RUN.lives} ${RUN.lives === 1 ? 'life' : 'lives'} left. ${RUN.gauntlet ? 'Your army, equipment and Arena Tokens are safe.' : `Your army, ${UI.tiles.toLowerCase()} and money are safe.`} Lose them all and ${RUN.gauntlet ? 'the Gauntlet run ends' : `you return to ${RUN.ante >= 3 && RUN.circuit !== 'ruler' ? 'this circuit’s halfway checkpoint (Stage 3)' : RUN.circuit === 'ruler' ? 'Stage 3 of the last circuit' : 'the start of this circuit'}`}.</span></div>
+    <div class="lifebox">${hearts(RUN.lives, true)}<span>${evNote ? evNote + ' ' : ''}${RUN.lives} ${RUN.lives === 1 ? 'life' : 'lives'} left. ${RUN.gauntlet ? (RUN.daily ? 'Your army and rewards are safe.' : 'Your army, equipment and Arena Tokens are safe.') : `Your army, ${UI.tiles.toLowerCase()} and money are safe.`} Lose them all and ${RUN.gauntlet ? 'the Gauntlet run ends' : `you return to ${RUN.ante >= 3 && RUN.circuit !== 'ruler' ? 'this circuit’s halfway checkpoint (Stage 3)' : RUN.circuit === 'ruler' ? 'Stage 3 of the last circuit' : 'the start of this circuit'}`}.</span></div>
     <button class="btn" id="retry">Try the round again</button><button class="btn ghost" id="peek">Review the round</button><button class="btn ghost" id="home">Save and go to title screen</button>`, null);
   m.dataset.lossReason=why;
   addPeek(m, log);
