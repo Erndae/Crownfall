@@ -14,5 +14,5 @@ E("coachMark('hunger');coachQ=[];coach('hunger')");assert.equal(E('coachQ.length
 for(const [n,a,b] of [[0,0,0],[1,20,10],[2,40,20],[3,60,30],[4,60,30],[9,60,30]]){assert.equal(E(`ngTargetPct(${n})`),a);assert.equal(E(`ngTargetPct(${n},true)`),b);}
 E('ACH.ngplus=5');assert.equal(+E('ngTargetMult()').toFixed(2),1.6);assert.equal(+E('ngTargetMult(true)').toFixed(2),1.3);E('ACH.ngplus=0');
 assert(src.includes('  t *= ngTargetMult(!!lim);')&&src.includes('Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)'));
-assert(src.includes('const GAME_VERSION = 227;')&&sw.includes("'crownfall-v227'")&&!src.includes('?v=226'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=227&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: New Game+ target rise capped (+60%, Blitz +30%); three new first-time tips (board marks at the Board key, the Hunger count, Edicts), shown once to everyone, wired, version.');

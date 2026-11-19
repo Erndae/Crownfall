@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=227"></script>
-<script src="piece-designs.js?v=227"></script>
-<script src="character-style.js?v=227"></script>
-<script src="campaign-opponents.js?v=227"></script>
-<script src="campaign-dialogue.js?v=227"></script>
-<link rel="stylesheet" href="character-style.css?v=227">
+<script src="gameplay-polish.js?v=228"></script>
+<script src="piece-designs.js?v=228"></script>
+<script src="character-style.js?v=228"></script>
+<script src="campaign-opponents.js?v=228"></script>
+<script src="campaign-dialogue.js?v=228"></script>
+<link rel="stylesheet" href="character-style.css?v=228">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=227">
-<link rel="stylesheet" href="ruler-style.css?v=227">
-<link rel="stylesheet" href="gameplay-polish.css?v=227">
+<link rel="stylesheet" href="city-board.css?v=228">
+<link rel="stylesheet" href="ruler-style.css?v=228">
+<link rel="stylesheet" href="gameplay-polish.css?v=228">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2595,7 +2595,7 @@ function unlockAch(id, needCircuit){
   ACH[id] = Date.now(); saveAch();
   const el = document.createElement('div'); el.className = 'achtoast';
   el.innerHTML = `<small>Achievement unlocked</small><b>${a.name}</b><span>${a.desc}</span>`;
-  el.style.setProperty('--ac', (CIRCUITS.find(c => c.id === a.c) || {}).col || (a.pk ? PACK_COL[a.pk] : '') || '#ffe14d');
+  el.style.setProperty('--ac', (CIRCUITS.find(c => c.id === a.c) || {}).col || (a.pk ? PACK_COL[a.pk] : '') || (a.story ? '#d9707a' : '') || '#ffe14d');
   document.body.appendChild(el); setTimeout(() => el.classList.add('out'), 3200); setTimeout(() => el.remove(), 3700);
   try{ kit.horn(0, 0.3); kit.kick(0); }catch(e){}
 }
@@ -2628,6 +2628,19 @@ const PACK_ACHS = [
   {id:'th_s8', pk:'throne', name:'The Crown of Crowns', desc:'Defeat the Crownless King and claim a crown.'},
 ];
 ACHS.push(...PACK_ACHS);
+// v228 Story achievements: the Hunger, the endings, New Game+ and the newer board marks. Kept across campaigns.
+const STORY_ACHS = [
+  {id:'sa_crowned', story:true, hidden:true, name:'Long Live the King', desc:'Wear the Crown of Crowns.'},
+  {id:'sa_true', story:true, hidden:true, name:'Crownbreaker', desc:'Break the Crown of Crowns.'},
+  {id:'sa_refuse', story:true, name:'Iron Will', desc:'Finish a campaign without feeding the Hunger once (refuse it at least once).'},
+  {id:'sa_fed', story:true, name:'Well Fed', desc:'Take 10 of the Hunger’s bargains in one campaign.'},
+  {id:'sa_mirror', story:true, hidden:true, name:'Know Thyself', desc:'Defeat the Crownless King while he leads your old army.'},
+  {id:'sa_again', story:true, hidden:true, name:'Haven’t We Done This Before?', desc:'Finish a New Game+ campaign.'},
+  {id:'sa_edicts', story:true, name:'By Royal Decree', desc:'Finish a campaign with 3 or more Edicts in force.'},
+  {id:'sa_crates', story:true, name:'Quartermaster', desc:'Open 3 supply crates in one fight.'},
+  {id:'sa_bounty', story:true, name:'Bounty Hunter', desc:'Capture the bounty piece within your first 10 moves.'},
+];
+ACHS.push(...STORY_ACHS);
 const PK = {street:'st', medieval:'md', greek:'gr', fantasy:'fn', throne:'th'};
 function packAch(key){ const pre = PK[PACK]; if(pre) unlockAch(pre + '_' + key); }
 function checkSpell(){ if(RUN && RUN.roster.some(x => x && eList(parseR(x).e).length >= 3)) packAch('spell'); }
@@ -3676,7 +3689,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 227;
+const GAME_VERSION = 228;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5293,7 +5306,7 @@ function matchStart(dk){
   B = {board, score:0, moves:999, movesStart:999, par:999, moveLimit:null, moveCount:0, swaps:1, caps:0, lost:0, streak:0, target:MATCH_TARGET, wave:REINF_MAX + 1, capBy:[]};
   B.ai = {rating:matchDiff().rating, n:16, comp:'K1 Q1 R2 B2 N2 P8', style:null, prot:0, sig:null};
   B.aiRef = CFAI.material(B.board); B.startVal = enemyValue(B.board);
-  B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; B.cmd = null; cmdState(); crInit();
+  B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; crInit();
   B.roll = window.__noRoll ? {state:'done', first:'me', me:6, en:1, ties:[]} : {state:'pending'};
   B.trapSq = []; B.trapsLeft = 0; B.openDone = true;
   logPos(`Crown Match · ${matchDiff().name}`, -1, -1, 'fx');
@@ -5597,7 +5610,7 @@ function title(){
   $('#gnew').onclick = () => gs ? gNewAsk(gs) : (MODE === 'gauntlet' ? gNewRun() : goMode('gauntlet', 'new'));
   $('#grec').onclick = () => gRecords();
   $('#how').onclick = () => howTo(false);
-  if(inC){ setTimeout(() => crownChoiceFlow(), 700);
+  if(inC){
     if(kingTrainRefunded > 0){ const r = kingTrainRefunded; kingTrainRefunded = 0; setTimeout(() => showTip(`<b>King Training retired: +$${r} refunded</b><br>The King no longer trains. Your King grows through World Crowns.`), 600); }
     if(worldCrowns() > 0 && coachSeen().crown) coach('journey'); }
   $('#achb').onclick = () => inC ? achScreen() : goMode('campaign', 'ach');
@@ -5623,7 +5636,7 @@ function leaveBoard(dialogs = false){
   app.classList.remove('play'); document.body.dataset.mood = 'calm'; document.body.classList.remove('peeking');
   document.querySelectorAll('.peekbar').forEach(x => { if(x._stop) x._stop(); x.remove(); });
   document.querySelectorAll('#speech,.lachat,.laring,.oppin,.carrive,.reinf,.vict,.coach,.initbar').forEach(x => x.remove());
-  if(dialogs){ document.querySelectorAll('.modal,.recintro').forEach(x => x.remove()); choiceOpen = false; }
+  if(dialogs){ document.querySelectorAll('.modal,.recintro').forEach(x => x.remove()); }
   clearTimeout(say.t); clearTimeout(tacSpotT); hideTip();
   if(csHz.ro) csHz.ro.disconnect();
   document.querySelectorAll('.coach-hl').forEach(x => x.classList.remove('coach-hl')); coachOn = false;
@@ -5633,7 +5646,6 @@ function leaveBoard(dialogs = false){
   window.scrollTo(0, 0);
 }
 function circuitSelect(startLand, startCircuit){
-  setTimeout(() => crownChoiceFlow(), 450);                                 // any World Crown still waiting for its power choice
   sceneMusic('menu');
   leaveBoard();
   onTitle = false; setCircuitData('');
@@ -5706,6 +5718,11 @@ function achScreen(){
     ${PACKS.map(x => `<div class="achgroup" style="--cc:${PACK_COL[x.id]}"><h3>${x.name}</h3>
       ${PACK_ACHS.filter(a => a.pk === x.id).map(a => `<div class="ach ${ACH[a.id] ? 'got' : ''}"><span class="badge">${ACH[a.id] ? '★' : '?'}</span><span><b>${a.name}</b><small>${a.desc}</small></span></div>`).join('')}
     </div>`).join('')}
+    <h2 style="font-size:24px;margin-top:6px">Story achievements</h2>
+    <p class="muted" style="margin:0">The Hunger, the endings and New Game+. These count anywhere in the campaign; some stay hidden until you earn them.</p>
+    <div class="achgroup" style="--cc:#d9707a"><h3>The Crown of Crowns</h3>
+      ${STORY_ACHS.map(a => { const show = ACH[a.id] || !a.hidden; return `<div class="ach ${ACH[a.id] ? 'got' : ''}"><span class="badge">${ACH[a.id] ? '★' : '?'}</span><span><b>${show ? a.name : 'Hidden achievement'}</b><small>${show ? a.desc : 'Keep playing the campaign to find it.'}</small></span></div>`; }).join('')}
+    </div>
   </section>`;
   $('#aback').onclick = title;
 }
@@ -5998,7 +6015,6 @@ const MSG_MS = 5000, MSG_INTRO_MS = 6000;
 const msgT = ms => Math.round(ms * (window.__msgScale || 1));   // (tests may scale reading times; the game always uses 1)
 function blindSelect(){
   if(app.classList.contains('play')) leaveBoard();
-  setTimeout(() => crownChoiceFlow(), 450);                                 // any World Crown still waiting for its power choice
   sceneMusic('land');
   setLandBg(RUN && land());
   window.scrollTo(0, 0);
@@ -6128,7 +6144,7 @@ function hungerReact(name){ const R = HUNGER_REACT[name], k = hungerLean(); retu
 const hungerRecordHTML = () => { const h = hungerTally(); if(!(h.fed + h.refused)) return '';   // v224: Journey shows how you have answered it
   const k = hungerLean(); return `<div class="jhunger"><span><small>The Hunger</small><b>Fed ${h.fed} · Refused ${h.refused}</b></span><em>${k === 'fed' ? 'It is getting a taste for you.' : k === 'refused' ? 'It has not owned you yet.' : 'It is still deciding about you.'}</em></div>`; };
 function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
-function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); }
+function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= 10) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
 function hungerOffer(){
@@ -6176,6 +6192,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   openGate.rejects = 0; openGate.fallback = 0; openGate.failed = 0;
   for(let gTry = 0; gTry < 6; gTry++){ if(gTry) B.board = deploy(RUN.roster); const P = setupEnemyArmy(B.board);   // enemy army progression (see ENEMY_ARMY / ARMY_SIZE)   (v152: a Gauntlet opening is checked, see gOpeningOK)
     const en = B.board.filter(q => q && q.side === 'en'), comp = 'KQRBNP'.split('').map(t => t + en.filter(q => q.t === t).length).filter(x => x[1] !== '0').join(' ');
+    B.fallenArmy = !!(P && P.fallenArmy);   // v228: for 'Know Thyself'
     B.ai = {rating: aiRating(), n: en.length, comp, style: P && P.style, prot: aiSlot().prot, sig: P && P.sig ? sigBase(P.sig) : null};
     B.cp = (P && P.cp) || null;   // v134
     if(P && P.sig && ARCHE[sigBase(P.sig)].tag && !coachSeen().sig){ coachMark('sig'); { const tip = `<b>${ARCHE[sigBase(P.sig)].tag}</b><br>Some bosses break the usual rules of army composition.`; let tries = 0;   // v184: one message at a time, after the opponent card and any tutorial card
@@ -6183,7 +6200,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
       setTimeout(later, 1600); } }
     B.aiRef = CFAI.material(B.board); if(!RUN.gauntlet || MATCH || gOpeningOK()) break; (window.__gOpen = window.__gOpen || []).push(RUN.gWave); }
   B.startVal = enemyValue(B.board);
-  B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; B.cmd = null; cmdState(); crInit();   // castling rights for this fight's own King/Rook pairs
+  B.seen = {}; B.seenEn = {}; B.checks = 0; B.log = []; B.tac = null; tacState(); B.shadow = null; crInit();   // castling rights for this fight's own King/Rook pairs
   B.tac.n = crownTactics();   // v196: World Crowns start the fight with Tactics ready (not counted as earned)
   cpChallenge();   // v134: some Circuits open with a free existing Challenge
   evStartFight();   // v139: next-fight event effects (once)
@@ -6220,7 +6237,7 @@ function playBlind(resumed){
   enterLand();
   setCircuitData(RUN && RUN.circuit);   // v133: also keeps the Circuit scene in step
   onTitle = false;
-  sel = null; swapMode = false; swapA = null; busy = false; pending = null; trapMode = false; tacSwap = false; gambitMode = false; cmdMode = null; cmdPick = null; if(B){ B.cmdMove = null; delete B.decreeNow; } RUN.cards = RUN.cards || [];
+  sel = null; swapMode = false; swapA = null; busy = false; pending = null; trapMode = false; tacSwap = false; gambitMode = false; if(B){ delete B.cmd; delete B.cmdMove; delete B.decreeNow; } RUN.cards = RUN.cards || [];
   if(B.trapsLeft === undefined){ B.trapsLeft = RUN.relics.includes('trap') ? 1 : 0; B.trapSq = B.trapSq || []; }
   const boss = bossId() ? bossObj(bossId()) : null;
   app.classList.add('play');
@@ -6257,7 +6274,6 @@ function playBlind(resumed){
   else {
     if(!resumed && curPersona()) later(() => { if(!(B && B.introSaid)) say('intro', true); }, boss && !boss.ruler ? 1750 : 1300);   // v132: after the name card (v154: the card already carries the line)
     if(resumed && B.promoPending) later(() => { if(B && B.promoPending && !busy) resumePromo(); }, 500);   // a promotion choice was open
-    if(CROWN_COMMAND && !resumed && !MATCH && !coachSeen().command && baseCrowns() > 0 && !crownChoicesDue().length) later(() => { if(B && !B.done && !busy && !document.querySelector('.modal') && !coachSeen().command){ coachMark('command'); cmdRules(); } }, 2600);   // first time Command is introduced (after the first win)
     if(!resumed && !(boss && !boss.ruler && !MATCH)) later(() => brilliant(MATCH ? 'Crown Match' : rulerRoad() ? 'The Ruler’s Road' : stageName(RUN.ante)), 250);   // (Rivals/Bosses get their name card instead)
     if(resumed) later(() => { if(B && B.pendingWin && !B.done && !busy && !document.querySelector('.modal')){ busy = true; return enemyPhase(-1); } if(B && !B.done && !busy && !document.querySelector('.modal') && loneKing()) return loneKingDefeat(); if(B && !B.done && !busy && !document.querySelector('.modal') && !canPlay()) gameOver(inCheck(B.board, 'me') ? 'Checkmate. Your King is trapped.' : 'Stalemate. You have no legal moves left.'); }, 700);   // a saved dead position
   }
@@ -6275,7 +6291,7 @@ function playBlind(resumed){
   csBoard();   // v133
   if(!resumed && B.cpChal && chalOn()){ const cid = B.cpChal; const t = () => { if(!B || B.done || !chalOn()) return; if(busy || (B.roll && B.roll.state === 'pending') || document.querySelector('.modal,.oppin,.vict,#speech')) return later(t, 400); chalToast(`${B.cpSrc === 'event' ? 'Event bonus' : B.cpSrc ? B.cpSrc : 'Circuit bonus'} · ${C(cid).name}`, CHALLENGES[cid].goal + ' · ' + CHALLENGES[cid].reward, 'go'); }; later(t, 900); }   // v134
   { const tier = oppTier(boss); document.body.dataset.opp = RUN.gauntlet ? 'gauntlet' : tier; document.body.dataset.otreat = oppTreat(boss);   // v132 atmosphere + opponent identity
-    const pb = app.querySelector('.pblind'); if(pb && boss && !MATCH){ pb.classList.add('tappable'); pb.onclick = () => { if(!busy && !cmdMode && !document.querySelector('.modal')) bossDetails(boss); }; }
+    const pb = app.querySelector('.pblind'); if(pb && boss && !MATCH){ pb.classList.add('tappable'); pb.onclick = () => { if(!busy && !document.querySelector('.modal')) bossDetails(boss); }; }
     if(!resumed && (tier === 'rival' || tier === 'boss')) later(() => oppEntrance(boss, tier), 200); }
   if(boss && boss.ruler && land() !== 'throne') document.body.dataset.ruler = '1'; else delete document.body.dataset.ruler;
   drawBoard();
@@ -7208,7 +7224,7 @@ function previewMove(from,to){
 function cancelMovePreview(){movePreview=null;sel=null;drawBoard();pieceInfo(null);}
 async function commitMovePreview(){
   const preview=movePreview;
-  if(!preview||!B||busy||B.done||B.board!==preview.board||sel!==preview.from||pending!==null||swapMode||trapMode||cmdMode||gambitMode||!legalMoves(preview.from).includes(preview.to)){cancelMovePreview();return;}
+  if(!preview||!B||busy||B.done||B.board!==preview.board||sel!==preview.from||pending!==null||swapMode||trapMode||gambitMode||!legalMoves(preview.from).includes(preview.to)){cancelMovePreview();return;}
   movePreview=null;pieceInfo(null);await doMove(preview.from,preview.to);
 }
 function lossHTML(review){const esc=CrownfallPolish.escape;return `<div class="loss-review"><b>${esc(review.title)}</b><p>${esc(review.tip)}</p>${review.note?`<p class="last-turn">Last exchange: ${esc(review.note)}</p>`:''}</div>`;}
@@ -7251,13 +7267,12 @@ function bindCaptureHold(square, bonus, move){
   };
 }
 function drawBoard(){
-  if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || cmdMode || gambitMode)){movePreview=null;pieceInfo(null);}
+  if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || gambitMode)){movePreview=null;pieceInfo(null);}
   const el = $('#board'); if(!el) return;
   boardSides(el);
   const displayBoard=movePreview?.position||B.board;
   const threats = new Set(attacksOn(displayBoard, 'en'));
   const legal = !movePreview&&sel !== null ? legalMoves(sel) : [];
-  const cmdEl = cmdMode && cmdPick === null ? cmdEligible(cmdMode) : [], advT = cmdMode && cmdPick !== null ? cmdTargets(cmdMode, cmdPick) : [];
   let h = '';
   for(let i=0;i<64;i++){
     const [r,c] = rc(i), p = displayBoard[i];
@@ -7269,7 +7284,6 @@ function drawBoard(){
     if(gambitMode && p && p.side === 'me' && p.t !== 'K') cls.push(gambitCheck(i) ? 'gbad' : 'gok');
     if(B.wisdom && i === B.wisdom.from) cls.push('wisF'); if(B.wisdom && i === B.wisdom.to) cls.push('wisT');
     if(p && p.mark) cls.push('marked'); if(p && p.charge) cls.push('charged');
-    if(cmdMode){ if(cmdMode !== 'shadowstrike' && inCmdRadius(i)) cls.push('cmdzone'); if(cmdPick === null && cmdEl.includes(i)) cls.push('cmdok'); if(i === cmdPick) cls.push('sel'); }
 
     if(p && p.side === 'me' && threats.has(i)) cls.push('threat');
     if(p && p.t === 'K' && inCheck(displayBoard, p.side)) cls.push('threat', 'chk');
@@ -7291,14 +7305,13 @@ function drawBoard(){
       const nb = applyMove(B.board, sel, i); const risk = attacksOn(nb, 'en').includes(i);
       const sc = scoreCapture(sel, i);
       inner += p || epVictim(B.board, sel, i) ? `<span class="ring ${risk?'risk':''}"></span>${p ? '' : '<span class="eptag">En passant</span>'}` : `<span class="dot ${risk?'risk':''}"></span>`;
-      if(!busy && !swapMode && !trapMode && !cmdMode && !gambitMode && pending === null && (p?.side === 'en' || epVictim(B.board, sel, i))){
+      if(!busy && !swapMode && !trapMode && !gambitMode && pending === null && (p?.side === 'en' || epVictim(B.board, sel, i))){
         captureBonus = captureBonusText(sc, B.board[sel]?.charge);
         if(captureBonus) inner += '<span class="capture-bonus-mark" aria-hidden="true"></span>';
       }
       if(sc) inner += `<span class="pv">+${sc.total.toLocaleString()}</span>`;
       if(risk)inner += '<span class="preview-warning" aria-label="Attacked destination">!</span>';
     }
-    if(advT.includes(i)) inner += p ? '<span class="ring"></span>' : '<span class="dot"></span>';
     if(c === 0) inner += `<span class="coord">${8-r}</span>`;
     h += `<div class="${cls.join(' ')}" data-i="${i}"${captureBonus ? ` data-capture-bonus="${CrownfallPolish.escape(captureBonus)}" title="${CrownfallPolish.escape(captureBonus)}"` : ''}${(B.crates || []).includes(i) ? ' aria-label="Supply crate on '+sqName(i)+': any piece except a pawn opens it for supplies; an enemy piece there first gains Armor"' : ''}${(B.lights || []).includes(i) ? ' aria-label="Green light on '+sqName(i)+': you gain 1 move; enemy entry costs you 1 move"' : ''}>${inner}</div>`;
   }
@@ -7374,7 +7387,6 @@ async function tapSquare(i){
   if(busy || !B || B.done || document.body.classList.contains('peeking')) return;
   const p = B.board[i];
   if(pending !== null){ return targetCard(i); }
-  if(cmdMode){ await cmdTap(i); return; }
   if(trapMode){
     if(p && p.side === 'en'){ trapMode = false; drawBoard(); updateHud(); $('#hand').textContent = 'Trap put away'; return; }
     if((B.trapSq || []).includes(i)){ sfx.bad(); return; }
@@ -7683,7 +7695,6 @@ async function askPromo(from, to, kind){
 async function resumePromo(){
   const pp = B && B.promoPending; if(!pp || !B.board[pp.from] || B.board[pp.from].t !== 'P'){ if(B) delete B.promoPending; return; }
   busy = true; const t = await askPromo(pp.from, pp.to, pp.kind); busy = false;
-  if(pp.kind === 'maneuver') return cmdMoveCommit('maneuver', pp.from, pp.to, t);
   if(pp.kind === 'strike') B.cmdMove = 'strike';
   return doMove(pp.from, pp.to, t);
 }
@@ -7776,6 +7787,7 @@ const bountyOn = p => !!(B && B.bounty && p && p.side === 'en' && p.id === B.bou
 function bountyClaim(victim, at){
   if(!B || !B.bounty || !victim || victim.side !== 'en' || victim.id !== B.bounty.id) return false;
   const pay = B.bounty.pay; B.bounty = null; RUN.money += pay;
+  if((B.moveCount || 0) <= 10) unlockAch('sa_bounty', false);   // v228
   pop(at, `Bounty · +$${pay}`, 'fxc'); sfx.coin();
   logPos(`Bounty collected on ${sqName(at)}: +$${pay}.`, at, at, 'fx');
   try{ updateHud(); }catch(e){}
@@ -7833,6 +7845,7 @@ function springDockCrate(at){
   else if(k === 'cash'){ const c = crateCash(); RUN.money += c; got = `+$${c}`; }
   else { B.swaps++; got = '+1 swap'; }
   pop(at, `Supplies · ${got}`, 'fxg'); sfx.coin();
+  if(B.cratesOpened >= 3) unlockAch('sa_crates', false);   // v228
   logPos(`Your ${TYPE[q.t].name} broke open the crate on ${sqName(at)}: ${got}.`, at, at, 'fx');
   try{ updateHud(); }catch(e){}
   return true;
@@ -8005,7 +8018,6 @@ function tacScout(){
    Command (B.cmd) is fight state: full at the start of every fight, never recharges, never carries over. */
 const KING_XP = {fight:1, stage:2, circuit:3, ruler:5};
 const KING_LEVELS = [0, 30, 140, 330];                 // total XP for Lv.1 / 2 / 3 / 4 (Lv.4 is the maximum)
-const CMD_RADIUS = 2;                                 // squares from the King, in any direction (a 5×5 box)
 const kxpKey = (l, c, a, bl) => `kxp_${l}_${c}_${a}_${bl}`;
 const kingXP = () => Object.keys(ACH).reduce((s, k) => s + (/^kxp_/.test(k) ? (+ACH[k] || 0) : 0), 0);
 const kingLvOf = xp => KING_LEVELS.reduce((lv, need, i) => xp >= need ? i + 1 : lv, 1);
@@ -8058,158 +8070,9 @@ function kingTrainMigrate(){
   return live;
 }
 const kingLvCell = () => `<div class="lv">${pieceSVG('K','me')}<div><b>King</b><br><span class="muted">World Crowns</span></div></div>`;   // v142: no King XP / Level
-/* ---------- CROWN COMMAND (v108): World Crown ability builds ----------
-   Command per fight = World Crowns owned (0-4). Each World Crown offers an Offensive, Defensive and Support ability;
-   the player picks one per Crown for the whole campaign (ACH.cpow_<land>, a campaign key: kept through refresh,
-   CONTINUE, checkpoints and cloud merges; cleared by NEW GAME). Each ability costs 1 Command, only ONE ability may be
-   used per player turn (B.cmd.lock, released when the enemy's whole response is over), and a few are once per fight. */
-const CROWN_POWERS = {
-  street:  {offensive:'strike',  defensive:'rally',   support:'maneuver'},
-  medieval:{offensive:'charge',  defensive:'fortify', support:'standard'},
-  greek:   {offensive:'focus',   defensive:'aegisc',  support:'wisdom'},
-  fantasy: {offensive:'shadowstrike', defensive:'ward', support:'phase'},
-};
-const ROLE_NAME = {offensive:'Offensive', defensive:'Defensive', support:'Support'};
-const CMD_INFO = {
-  strike:      {name:'Strike',        role:'offensive', desc:'Order a nearby piece to make a legal capture.', hint:'Tap a glowing piece to attack with'},
-  rally:       {name:'Rally',         role:'defensive', desc:'Give a nearby piece 1 Armor.', hint:'Tap a glowing piece to armor'},
-  maneuver:    {name:'Maneuver',      role:'support',   desc:'Order a nearby piece to make a legal non-capturing move.', hint:'Tap a glowing piece to reposition'},
-  charge:      {name:'Charge',        role:'offensive', desc:'A nearby piece’s next capture this turn scores +50%.', hint:'Tap a glowing piece to charge'},
-  fortify:     {name:'Fortify',       role:'defensive', desc:'Give a nearby piece 2 Armor. Once per fight.', once:true, hint:'Tap a glowing piece to fortify'},
-  standard:    {name:'Standard',      role:'support',   desc:'Your Command radius grows from 2 to 3 squares for this fight. Once per fight.', once:true, instant:true},
-  focus:       {name:'Focus Fire',    role:'offensive', desc:'Mark a nearby enemy. Capture it before the enemy’s reply ends: +1 Tactic.', hint:'Tap a glowing enemy to mark'},
-  aegisc:      {name:'Aegis',         role:'defensive', desc:'Give up to two nearby pieces 1 Armor each. Once per fight.', once:true, hint:'Tap up to two glowing pieces'},
-  wisdom:      {name:'Wisdom',        role:'support',   desc:'Reveal the best move the game can find. Information only.', instant:true},
-  shadowstrike:{name:'Shadow Strike', role:'offensive', desc:'Any of your pieces, anywhere, makes a legal capture. Once per fight.', once:true, hint:'Tap any glowing piece to attack with'},
-  ward:        {name:'Ward',          role:'defensive', desc:'Every unarmored piece next to your King gains 1 Armor. Once per fight.', once:true, instant:true},
-  phase:       {name:'Phase',         role:'support',   desc:'Move a nearby piece to any empty square within your Command radius. No capture. Once per fight.', once:true, hint:'Tap a glowing piece to phase'},
-};
-const CMD_COST = Object.fromEntries(Object.keys(CMD_INFO).map(k => [k, 1]));
-const cpowKey = l => 'cpow_' + l;
-const crownPower = l => { const k = ACH[cpowKey(l)]; return k && CMD_INFO[k] ? k : null; };
-/* v196: Crown Command is retired. It went unused: almost every ability only reached pieces beside the King. World Crowns now
-   start each fight with Tactics ready instead (crownTactics). The ability code below is kept inert so fights and campaigns
-   saved before v196 still load; nothing can open it. */
-const CROWN_COMMAND = false;
-const crownCmdMax = () => CROWN_COMMAND && !MATCH ? baseCrowns() : 0;
+/* v196: Crown Command was retired; v228 removed its code. World Crowns start each fight with Tactics ready instead. */
 const crownTactics = () => MATCH ? 0 : Math.min(TAC_MAX, Math.ceil(baseCrowns() / 2));   // 1 Tactic with the first World Crown, 2 with the third
 const crownTacticsText = n => n ? `Fights start with ${n} Tactic${n > 1 ? 's' : ''} ready` : 'World Crowns start your fights with Tactics ready';
-const crownChoicesDue = () => CROWN_COMMAND ? BASE_LANDS.filter(l => landWon(l) && !crownPower(l)) : [];
-const myPowers = () => BASE_LANDS.map(crownPower).filter(Boolean);
-let choiceOpen = false;
-// one Crown Choice screen per World Crown owned without a choice, in Land order; never auto-picks
-function crownChoiceFlow(done){
-  if(document.querySelector('.cchoice')) return; const due = crownChoicesDue(); if(!due.length){ if(done) done(); return; }
-  choiceOpen = true; const l = due[0], P = CROWN_POWERS[l];
-  const card = role => { const k = P[role], I = CMD_INFO[k]; return `<button class="cchoice ${role}" data-k="${k}"><small>${ROLE_NAME[role]}</small><b>${I.name} · 1</b><span>${I.desc}</span></button>`; };
-  const art = crownArt(l, WORLD_TIER(l));
-  const m = modal(`${art ? `<div class="cchead"><img src="${art}" alt=""></div>` : ''}<p class="tr-kicker" style="margin:0">${landCrownName(l)}</p><h2 style="margin:0">Claim the Crown’s power</h2>
-    <p class="muted" style="margin:0;font-size:13px">Choose one. It is yours for the rest of this campaign, and the Crown adds +1 Crown Command to every fight.</p>
-    ${card('offensive')}${card('defensive')}${card('support')}`, null);
-  if(document.querySelector('.vict.land')) m.classList.add('overv');   // v130: chosen over the World Crown ceremony
-  const born = performance.now();
-  m.querySelectorAll('.cchoice').forEach(b => b.onclick = () => {
-    if(performance.now() - born < 450) return;   // v143: a tap that skipped the ceremony can't pick a power by accident
-    if(crownPower(l)){ m.remove(); choiceOpen = false; return crownChoiceFlow(done); }   // never chosen twice
-    ACH[cpowKey(l)] = b.dataset.k; saveAch(); sfx.coin && sfx.coin();
-    m.remove(); choiceOpen = false;
-    if(B && !B.done && app.classList.contains('play') && $('#board')){ updateHud(); pieceInfo(null); }
-    crownChoiceFlow(done); });
-}
-function cmdState(){
-  if(!B.cmd || !B.cmd.v108){                              // new fight, or a v107 fight: Command = World Crowns, keep what is left
-    const m = crownCmdMax(), o = B.cmd;
-    B.cmd = {v108:1, max:m, left:o ? Math.max(0, Math.min(m, o.left)) : m, lock:false, once:{}, used:(o && o.used) || {}, radius:2};
-  }
-  return B.cmd;
-}
-const cmdRadius = () => (B && B.cmd && B.cmd.radius) || CMD_RADIUS;
-const cmdPips = c => c.max ? Array.from({length:c.max}, (_, k) => `<i class="${k < c.left ? 'on' : ''}"></i>`).join('') : '';
-const distK = i => { const k = kingIdx(B.board, 'me'); if(k < 0) return 99; const [r1, c1] = rc(k), [r2, c2] = rc(i); return Math.max(Math.abs(r1 - r2), Math.abs(c1 - c2)); };
-const inCmdRadius = i => distK(i) <= cmdRadius();
-let cmdMode = null, cmdPick = null;
-const capTargets = i => legalMoves(i).filter(t => (B.board[t] && B.board[t].side === 'en') || epVictim(B.board, i, t));   // en passant counts as a capture
-const phaseTargets = i => { const p = B.board[i]; if(!p) return [];
-  return B.board.map((q, t) => { if(q || !inCmdRadius(t)) return -1;
-    if(p.t === 'P' && (t >> 3 === 0 || t >> 3 === 7)) return -1;                 // a Phase never promotes and never sets a Pawn on its own back rank
-    const nb = B.board.slice(); nb[t] = p; nb[i] = null; return inCheck(nb, 'me') ? -1 : t; }).filter(t => t >= 0); };
-// legal destinations for an order
-const cmdTargets = (kind, i) => kind === 'strike' || kind === 'shadowstrike' ? capTargets(i)
-  : kind === 'maneuver' ? legalMoves(i).filter(t => !B.board[t]) : kind === 'phase' ? phaseTargets(i) : [];
-const unarmored = i => { const p = B.board[i]; return !!(p && p.side === 'me' && p.t !== 'K' && !(p.sh > 0)); };
-const cmdEligible = kind => B.board.map((p, i) => {
-  if(!p) return -1;
-  if(kind === 'focus') return p.side === 'en' && p.t !== 'K' && inCmdRadius(i) && !p.mark ? i : -1;
-  if(p.side !== 'me' || p.t === 'K') return -1;
-  if(kind === 'shadowstrike') return capTargets(i).length ? i : -1;
-  if(!inCmdRadius(i)) return -1;
-  if(kind === 'rally' || kind === 'fortify' || kind === 'aegisc') return unarmored(i) ? i : -1;
-  if(kind === 'charge') return p.charge ? -1 : i;
-  if(kind === 'ward' || kind === 'standard' || kind === 'wisdom') return -1;
-  return cmdTargets(kind, i).length ? i : -1; }).filter(i => i >= 0);
-const wardTargets = () => B.board.map((p, i) => distK(i) === 1 && unarmored(i) ? i : -1).filter(i => i >= 0);
-// why a Command can't be used right now (null = it can)
-function cmdWhy(kind){
-  const c = cmdState(), I = CMD_INFO[kind];
-  if(c.left < 1) return 'No Command left';
-  if(c.lock) return 'One Crown ability per turn';
-  if(I.once && c.once[kind]) return 'Already used this fight';
-  if((kind === 'rally' || kind === 'fortify' || kind === 'aegisc' || kind === 'ward') && inCheck(B.board, 'me')) return 'Your King is in check';
-  if(kind === 'standard') return null;
-  if(kind === 'wisdom') return anyLegal(B.board, 'me') ? null : 'No legal move';
-  if(kind === 'ward') return wardTargets().length ? null : 'No unarmored piece next to your King';
-  if(!cmdEligible(kind).length) return kind === 'focus' ? 'No enemy within range' : /strike/.test(kind) ? 'No piece can capture' : /rally|fortify|aegisc/.test(kind) ? 'No unarmored piece nearby' : 'No nearby piece can move';
-  return null;
-}
-function cmdMenu(){
-  if(MATCH) return;
-  if(busy || !B || B.done || pending !== null) return;
-  if(cmdMode){ return cmdCancel(); }
-  const c = cmdState();
-  if(!CROWN_COMMAND) return;
-  if(!c.max){ showTip('<b>Crown Command · Locked</b><br>Claim a World Crown to unlock Crown Command.'); return; }
-  if(crownChoicesDue().length) return crownChoiceFlow(cmdMenu);
-  if(!coachSeen().command){ coachMark('command'); return cmdRules(cmdMenu); }
-  const row = k => { const why = cmdWhy(k), I = CMD_INFO[k]; return `<button class="tacrow cmdrow" id="c_${k}" ${why ? 'disabled' : ''}><b>${I.name}</b><span class="tcost">1</span><small><i class="crole ${I.role}">${ROLE_NAME[I.role]}</i> ${why || I.desc}</small></button>`; };
-  const m = modal(`<h2 style="margin:0;display:flex;align-items:center;gap:8px">Crown Command <span class="cmdpips big">${cmdPips(c)}</span><button class="tachelp" id="cHelp" aria-label="Command rules">?</button></h2>
-    <p class="muted" style="margin:0;font-size:12.5px">${c.left}/${c.max} Command · World Crowns ${baseCrowns()}/${WORLD_TOTAL} · one ability per turn · reaches ${cmdRadius()} squares around your King</p>
-    ${myPowers().map(row).join('')}
-    <button class="btn ghost" id="cClose">Close</button>`, '#cClose');
-  m.querySelector('#cHelp').onclick = () => { m.remove(); cmdRules(cmdMenu); };
-  for(const k of myPowers()){ const b = m.querySelector('#c_' + k); if(b) b.onclick = () => { m.remove(); cmdStart(k); }; }
-}
-function cmdStart(k){
-  swapMode = gambitMode = tacSwap = trapMode = false; swapA = null; sel = null; pieceInfo(null);
-  const I = CMD_INFO[k];
-  if(I.instant) return cmdInstant(k);
-  cmdMode = k; cmdPick = null; B.cmdPicks = 0; drawBoard();
-  $('#hand').innerHTML = `<span class="money">${I.name}</span> ${I.hint}`;
-}
-function cmdCancel(){ if(cmdMode === 'aegisc' && B.cmdPicks) save(); cmdMode = null; cmdPick = null; sel = null; drawBoard(); pieceInfo(null); $('#hand').textContent = 'Tap a piece, then a target'; }
-function cmdRules(back){
-  const m = modal(`<div class="cmdtut"><b>Crown Command</b><span>Each World Crown you claim gives +1 Command every fight and one permanent Crown ability of your choice.</span>
-    <b>Build your Crownrunner</b><span>Every Crown offers an Offensive, a Defensive and a Support ability. Specialize in one style or mix them.</span>
-    <b>One per turn</b><span>Spend 1 Command to use an ability. Only one Crown ability per turn. Command does not recharge during battle.</span></div>
-    <p class="muted" style="margin:0;font-size:12.5px">Abilities normally affect pieces within ${CMD_RADIUS} squares of your King. Full list: How to play → Crown Powers.</p>
-    <button class="btn" id="crOk">${back ? 'Continue' : 'Got it'}</button>`, '#crOk');
-  m.querySelector('#crOk').onclick = () => { m.remove(); if(back) back(); };
-}
-function cmdSpend(kind){ const c = cmdState(); c.left -= 1; c.used[kind] = (c.used[kind] || 0) + 1; c.lock = true; if(CMD_INFO[kind].once) c.once[kind] = true; }
-const armorUp = (i, n, label) => { const p = B.board[i]; p.sh = n; p.rally = 1; pop(i, `${label}! +${n} Armor`, 'fxg'); logPos(`You: ${label}, ${TYPE[p.t].name} on ${sqName(i)} gains ${n} Armor`, i, i, 'me'); };
-function cmdDone(msg){ cmdMode = null; cmdPick = null; save(); drawBoard(); updateHud(); pieceInfo(null); $('#hand').innerHTML = msg; }
-// abilities with no target
-function cmdInstant(k){
-  if(cmdWhy(k)) return;
-  if(k === 'standard'){ cmdSpend(k); B.cmd.radius = 3; logPos('You: Standard raised, Command reaches 3 squares', -1, -1, 'me'); kit.clap(0, 0.3);
-    cmdMode = null; save(); updateHud(); pieceInfo(null); cmdMode = 'show'; drawBoard(); cmdMode = null; setTimeout(() => B && drawBoard(), 1200);
-    $('#hand').innerHTML = '<span class="money">Standard</span> Command now reaches 3 squares · still your move'; return; }
-  if(k === 'ward'){ const w = wardTargets(); cmdSpend(k); w.forEach(i => armorUp(i, 1, 'Ward')); kit.clap(0, 0.3); return cmdDone(`<span class="money">Ward</span> ${w.length} piece${w.length === 1 ? '' : 's'} armored · still your move`); }
-  if(k === 'wisdom'){ const w = wisdomMove(); cmdSpend(k);
-    if(!w){ return cmdDone('<span class="money">Wisdom</span> No move found'); }
-    B.wisdom = w; const p = B.board[w.from], v = B.board[w.to];
-    logPos(`You: Wisdom, best move ${TYPE[p.t].name} ${sqName(w.from)} → ${sqName(w.to)}${w.pt ? ' = ' + TYPE[w.pt].name : ''}`, w.from, w.to, 'me');
-    pop(w.from, 'Best move', 'fxg'); return cmdDone(`<span class="money">BEST MOVE</span> ${TYPE[p.t].name} ${sqName(w.from)} → ${sqName(w.to)}${w.pt ? ` = ${TYPE[w.pt].name}` : ''}${v ? ` · takes ${TYPE[v.t].name}` : ''}${w.mate ? ' · checkmate' : ''}`); }
-}
 /* promotion piece by evaluation: every option's position is searched for the other side's best reply
    (deterministic, no randomness). A mate wins outright; leaving the opponent no move at all is next best. */
 function promoPick(from, to, side, board){
@@ -8226,74 +8089,6 @@ function promoPick(from, to, side, board){
   return best.t;
 }
 const enemyPromoPick = (from, to, board) => window.__promoForce || promoPick(from, to, 'en', board);   // (__promoForce: tests only)
-/* Wisdom: the strongest legal move for the player on the current board. A mate in one always wins; otherwise the
-   game's own engine searches at its top rating from the player's side (no randomness, no hidden information). */
-function wisdomMove(){
-  const legal = []; for(let i = 0; i < 64; i++){ const q = B.board[i]; if(q && q.side === 'me') legalMoves(i).forEach(t => legal.push([i, t])); }
-  if(!legal.length) return null;
-  for(const [f, t] of legal) for(const pt of isPromo(B.board, f, t) ? PROMO_TYPES : [undefined]){ const nb = applyMove(B.board, f, t, pt); if(inCheck(nb, 'en') && !anyLegal(nb, 'en')) return {from:f, to:t, mate:true, pt}; }
-  let r = null;
-  try{ r = CFAI.choose(B.board, {side:'me', rating:AI_MAX, extra:specialMoves('me'), promoRow:has('promo') ? 2 : 0, ref:B.aiRef || CFAI.material(B.board), rng:() => 0.5}); }catch(e){ r = null; }
-  if(r && legal.some(([f, t]) => f === r.from && t === r.to)) return {from:r.from, to:r.to, pt:isPromo(B.board, r.from, r.to) ? promoPick(r.from, r.to, 'me') : undefined};
-  // fallback: the safest best-scoring capture, else the first legal move
-  let best = null; for(const [f, t] of legal){ const s = scoreCapture(f, t), nb = applyMove(B.board, f, t), risk = attacksOn(nb, 'en').includes(t) ? TYPE[B.board[f].t].val : 0, v = (s ? s.total : 0) - risk; if(!best || v > best.v) best = {from:f, to:t, v}; }
-  return {from:best.from, to:best.to, pt:isPromo(B.board, best.from, best.to) ? promoPick(best.from, best.to, 'me') : undefined};
-}
-// a tap while an ability is being given
-async function cmdTap(i){
-  const p = B.board[i], k = cmdMode;
-  if(p && p.side === 'me' && p.t === 'K' && cmdPick === null) return cmdCancel(), true;
-  if(k === 'aegisc' && B.cmdPicks === 1){                                    // the optional second piece
-    if(!unarmored(i) || !inCmdRadius(i)){ return cmdCancel(), true; }
-    armorUp(i, 1, 'Aegis'); B.cmdPicks = 2; kit.clap(0, 0.3); return cmdDone('<span class="money">Aegis</span> Still your move'), true; }
-  if(cmdWhy(k) && cmdPick === null){ cmdCancel(); return true; }
-  if(k === 'rally' || k === 'fortify' || k === 'aegisc'){
-    if(!unarmored(i) || !inCmdRadius(i)){ sfx.bad(); return true; }
-    cmdSpend(k); armorUp(i, k === 'fortify' ? 2 : 1, CMD_INFO[k].name); kit.clap(0, 0.3);
-    if(k === 'aegisc' && cmdEligible('aegisc').length){ B.cmdPicks = 1; save(); drawBoard(); updateHud(); $('#hand').innerHTML = '<span class="money">Aegis</span> Tap a second piece, or your King to finish'; return true; }
-    return cmdDone(`<span class="money">${CMD_INFO[k].name}</span> Still your move`), true;
-  }
-  if(k === 'charge'){ if(!cmdEligible('charge').includes(i)){ sfx.bad(); return true; }
-    cmdSpend(k); p.charge = 1; pop(i, 'Charge! +50%', 'fxx'); logPos(`You: Charge, ${TYPE[p.t].name} on ${sqName(i)}`, i, i, 'me');
-    return cmdDone('<span class="money">Charge</span> Its next capture this turn scores +50%'), true; }
-  if(k === 'focus'){ if(!cmdEligible('focus').includes(i)){ sfx.bad(); return true; }
-    cmdSpend(k); p.mark = 1; pop(i, 'Marked!', 'fxx'); logPos(`You: Focus Fire on the ${TYPE[p.t].name} at ${sqName(i)}`, i, i, 'me');
-    return cmdDone('<span class="money">Focus Fire</span> Capture the marked piece for +1 Tactic'), true; }
-  if(cmdPick !== null && cmdTargets(k, cmdPick).includes(i)){
-    const from = cmdPick; cmdSpend(k); cmdMode = null; cmdPick = null; sel = null; pieceInfo(null);
-    if(k === 'strike' || k === 'shadowstrike'){ B.cmdMove = 'strike'; pop(from, `${CMD_INFO[k].name}!`, 'fxg'); await doMove(from, i); return true; }   // a normal capture: scoring, Armor, Tactic, promotion, winning-capture rule
-    let pt = null; if(k === 'maneuver' && isPromo(B.board, from, i)){ busy = true; pt = await askPromo(from, i, 'maneuver'); }
-    return cmdMoveCommit(k, from, i, pt), true;
-  }
-  const ok = k === 'shadowstrike' ? cmdEligible(k).includes(i) : p && p.side === 'me' && p.t !== 'K' && inCmdRadius(i) && cmdTargets(k, i).length;
-  if(ok){ cmdPick = i; sel = null; sfx.pick(); drawBoard();
-    $('#hand').innerHTML = `<span class="money">${CMD_INFO[k].name}</span> ${/strike/.test(k) ? 'Tap the enemy to capture' : 'Tap an empty square'}`; return true; }
-  sfx.bad(); return true;
-}
-// Maneuver / Phase: no score, no Tactic (a Maneuver promotion gives none either), still your move
-async function cmdMoveCommit(k, from, i, pt){
-  {
-    const mover = B.board[from]; busy = true;
-    await animateMove(from, i, 'normal');
-    if(k === 'phase'){ const nb = B.board.slice(); nb[i] = mover; nb[from] = null; B.board = nb; epAfter('me', from, i, false); }   // Phase is not a Pawn move: never opens en passant
-    else { B.board = applyMove(B.board, from, i, pt || undefined); epAfter('me', from, i, mover.t === 'P'); }
-    const promo = mover.t === 'P' && B.board[i].t !== 'P'; if(promo) keepPromotion(B.board[i], i, 'command');
-    armorBreakOnCheck('me');   // v154
-    B.seen = B.seen || {}; B.seen[posKey(B.board)] = 1;
-    const chk = inCheck(B.board, 'en');
-    logPos(`You: ${CMD_INFO[k].name}, ${TYPE[mover.t].name} to ${sqName(i)}${promo ? ' and promotes' : ''}${chk ? ', check' : ''}`, from, i, 'me');
-    sfx.move(); if(chk){ pop(kingIdx(B.board, 'en'), 'Check!', 'fxx'); sfx.check(); }
-    busy = false; save(); drawBoard(); updateHud();
-    if(mateNow()) return true;                                              // v156
-    $('#hand').innerHTML = `<span class="money">${CMD_INFO[k].name}</span> Still your move`; return true;
-  }
-}
-function kingLevelUp(lv, then){
-  sfx.win && sfx.win();
-  const m = modal(`<div class="kingup"><span class="kuk">${pieceSVG('K', 'me')}</span><h2>King level up</h2><p class="kul">KING LV. ${lv}</p>
-    <p style="margin:0">Your King grows stronger.</p></div><button class="btn" id="kuOk">Onward</button>`, '#kuOk');
-  m.querySelector('#kuOk').onclick = () => { m.remove(); if(then) then(); };
-}
 // why a piece can't be Gambited (null = it can)
 function gambitCheck(i){
   const p = B.board[i]; if(!p || p.side !== 'me' || p.t === 'K') return 'Not that piece';
@@ -8395,7 +8190,7 @@ async function enemyPhaseRun(to){
   }
   B.enPhase = null;
   B.enemyOwes = false;                                                      // the reply is complete
-  cmdState().lock = false; B.board.forEach(q => { if(q && q.mark) delete q.mark; });
+  B.board.forEach(q => { if(q && q.mark) delete q.mark; });
   B.ep = (B.ep || []).filter(e => e.by !== 'me');                          // the enemy's en passant chances end with its response   // the whole reply is over: a new turn for Crown abilities; Focus Fire marks expire
   tacResolve();
   // Winning capture resolved: the scoring piece survived the whole reply (both moves for Morwen), or it was taken back
@@ -8893,20 +8688,17 @@ async function playScore(res, at, capture = false){
 const MOVES_TXT = {P:'Moves forward, captures diagonally', N:'Jumps in an L shape', B:'Slides diagonally', R:'Slides straight', Q:'Slides any direction', K:'One square any direction'};
 function pieceInfo(p){
   const el = $('#pinfo'); if(!el) return;
-  const cmdBtn = () => { if(MATCH || !CROWN_COMMAND) return ''; const c = cmdState(); return `<button class="btn cmdbtn${cmdMode ? ' on' : ''}${c.max ? '' : ' locked'}" id="cmdBtn" aria-label="Crown Command"><small>${cmdMode ? 'Cancel' : 'Command'}</small><span class="cmdpips">${c.max ? cmdPips(c) : '🔒'}</span></button>`; };
-  const bindCmd = () => { const b = el.querySelector('#cmdBtn'); if(b) b.onclick = e => { e.stopPropagation(); cmdMenu(); }; };
   if(!p){ const marks = B && !B.done ? boardMarks() : [];
-    el.className = 'pinfo idle'; el.innerHTML = `<span class="muted">${marks.length ? 'Tap a piece or a mark to see what it does' : 'Tap any piece to see its level and powers'}</span>${marks.length ? `<button class="btn ghost keybtn" id="keyBtn" aria-label="Board key: what the marks on the board do">Board key</button>` : ''}${B && !B.done ? cmdBtn() : ''}`; bindCmd();
+    el.className = 'pinfo idle'; el.innerHTML = `<span class="muted">${marks.length ? 'Tap a piece or a mark to see what it does' : 'Tap any piece to see its level and powers'}</span>${marks.length ? `<button class="btn ghost keybtn" id="keyBtn" aria-label="Board key: what the marks on the board do">Board key</button>` : ''}`;
     const kb = el.querySelector('#keyBtn'); if(kb) kb.onclick = e => { e.stopPropagation(); boardKey(); }; return; }
   const T0 = TYPE[p.t];
   if(p.side === 'me' && p.t === 'K' && !MATCH){                       // the Crownrunner
-    const c = cmdState();
     el.className = 'pinfo kingp'; el.style.setProperty('--pc', 'var(--brass)');
     el.innerHTML = `<span class="pi">${pieceSVG('K','me',p.e)}</span><div class="pt"><b><span data-character-name>You</span> <span class="lvtag">King</span></b>
       <span class="cs">World Crowns ${baseCrowns()}/${WORLD_TOTAL}</span>
-      <span class="cs">${CROWN_COMMAND ? (c.max ? `Crown Command <span class="cmdpips">${cmdPips(c)}</span> ${c.left}/${c.max}` : 'Crown Command · <b>Locked</b>: claim a World Crown') : crownTacticsText(crownTactics())}</span></div>${cmdBtn()}`;
+      <span class="cs">${crownTacticsText(crownTactics())}</span></div>`;
     el.querySelector('[data-character-name]').textContent=CrownfallCharacter.get().name;
-    bindCmd(); return;
+    return;
   }
   if(p.side === 'me'){
     const lv = scoreLv(p.t), ch = T0.chips + T0.lc*(lv-1), mu = T0.mult + T0.lm*(lv-1);
@@ -9534,7 +9326,7 @@ async function swapReply(){
   else if(RUN && RUN.gauntlet && !MATCH && !inCheck(B.board, 'en') && !B.pendingWin){ busy = false; return gDraw('player'); }   // v152
   if(!canPlay()){ busy = false; return gameOver(inCheck(B.board, 'me') ? 'Checkmate. Your King is trapped.' : 'Stalemate. You have no legal moves left.'); }
   if(loneKing()){ busy = false; return loneKingDefeat(); }   // before reinforcements, Blitz or another turn
-  cmdState().lock = false; B.board.forEach(q => { if(q){ delete q.mark; delete q.charge; } });   // v120 fix: the reply to a Swap ends the turn like any other reply (Crown Command unlocks; Charge/Focus Fire expire)
+  B.board.forEach(q => { if(q){ delete q.mark; delete q.charge; } });   // v120 fix: the reply to a Swap ends the turn like any other reply (old Charge/Focus marks expire)
   save(); busy = false; drawBoard();
 }
 async function castleAmbush(){
@@ -9894,7 +9686,6 @@ async function landConquered(l){
       vm.innerHTML = M.map(x => `<span>${x}</span>`).join('') + (S ? `<span class="vsay"><b>${S.who}</b>“${S.line}”</span>` : '') + `<span class="vperk">${crownTacticsText(crownTactics())}</span>`; beat('bm');   // v196: what the Crown gives, in place of the ability choice
       for(let t = 900 + (M.join(' ') + (S ? S.line : '')).length * 38; t > 0 && !T.skipped(); t -= 700) await T.wait(Math.min(700, t)); } }   // (full reading time under reduced motion too)
   // v130: the Crown's permanent ability is chosen right here, over the ceremony (same choice, same rule: one of three, for good)
-  if(crownChoicesDue().length) await new Promise(res => crownChoiceFlow(res));
   if(all){ ov.classList.add('out'); await new Promise(r => setTimeout(r, 400)); ov.remove(); musicDip(1); return fourthReveal(l); }
   beat('b6');
   musicDip(1);
@@ -9917,6 +9708,7 @@ function winBlind(){
   const endingWin = RUN.blind === 2 && RUN.ante === nStages() && !RUN.won && RUN.circuit === 'ruler' && land() === 'throne';
   if(MM.want === 'crownless' && !endingWin) setMusicContext('silence');   // from here on nothing (including Score Damage) can undo the win
   if(!endingWin) sfx.win();   // the Crownless King's fall is not a triumph
+  if(endingWin && B.fallenArmy) unlockAch('sa_mirror', false);   // v228
   const bl = BLINDS[RUN.blind], reward = RUN.debt ? 0 : bl.reward, blitzLeft = blitzOn() ? Math.max(0, B.moves) : 0, movesBonus = blitzLeft * (B.hustle ? 2 : 1), interest = CrownfallPolish.savings(RUN.money,RUN.circuit,land()), piggy = RUN.relics.reduce((s,id)=>s+(R(id).endMoney||0),0);
   const debtNote = RUN.debt; RUN.debt = false;
   const kx = {gain:0, from:1, to:1};             // v142: King XP retired (nothing is awarded or shown)
@@ -10332,9 +10124,16 @@ function endingSave(){
 function endingWrite(s){ try{ localStorage.setItem(ENDING_KEY, JSON.stringify(s)); }catch(e){} }
 function endingPending(type, step){ const s = endingSave(); s.pending = step ? {type, step, at:Date.now()} : null; endingWrite(s); }
 function endingComplete(type){
+  try{ storyAchsAtEnd(type); }catch(e){}   // v228 (before the true ending marks the Lands free)
   const s = endingSave(); s.seen[type] = s.seen[type] || Date.now(); s.pending = null; s.lastType = type;
   if(type === 'standard'){ s.standardEndingSeen = true; try{ localStorage.setItem('crownfall-ending-seen', '1'); }catch(e){} }
   endingWrite(s);
+}
+function storyAchsAtEnd(type){
+  unlockAch(type === 'true' ? 'sa_true' : 'sa_crowned', false);
+  const h = hungerTally(); if(!h.fed && h.refused >= 1) unlockAch('sa_refuse', false);
+  if(ngLevel() >= 1) unlockAch('sa_again', false);
+  if(edictList().length >= 3) unlockAch('sa_edicts', false);
 }
 let endingOn = false;
 // a refresh during the ending: the crown was saved before it began, so it resumes from its last checkpoint and grants nothing again

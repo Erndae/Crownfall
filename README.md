@@ -423,3 +423,14 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - Each shows once, to every player (existing players included, since these systems are new).
 - **New Game+ targets are capped.** They rose +20% every cycle with no limit while Blitz fights also lost a move each cycle, so by cycle 3 a Blitz target was 1.6× what a strong army scores in its moves (2× by cycle 5). Now: +20% per cycle up to **+60%** (cycle 3); Blitz rises half as fast, up to **+30%**. Measured against army capacity across 170 fight positions: normal fights top out at 1.6×, Blitz at 1.3×, at any cycle. Past cycle 3, New Game+ gets harder through Edicts. The New Game+ offer shows both numbers.
 - Tests: `validate-v227.cjs`; v210 updated.
+
+## v228 — story achievements and a cleanup
+- **Nine story achievements** in a new "Story achievements" section (kept across campaigns, never from Crown Matches):
+  - Long Live the King · Crownbreaker · Know Thyself · Haven't We Done This Before? (hidden until earned, so the twists stay secret)
+  - Iron Will: finish a campaign without feeding the Hunger once (refusing it at least once)
+  - Well Fed: take 10 of the Hunger's bargains in one campaign
+  - By Royal Decree: finish a campaign with 3 or more Edicts in force
+  - Quartermaster: open 3 supply crates in one fight
+  - Bounty Hunter: capture the bounty piece within your first 10 moves
+- **Crown Command code removed** (retired in v196): about 21 KB of abilities, menus, board highlights and choice screens. The turn, promotion and Gambit helpers that lived beside it stay. A fight saved with old Command data simply drops it when it loads.
+- Tests: `validate-v228.cjs`; v196 and v227 updated.
