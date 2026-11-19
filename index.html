@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=225"></script>
-<script src="piece-designs.js?v=225"></script>
-<script src="character-style.js?v=225"></script>
-<script src="campaign-opponents.js?v=225"></script>
-<script src="campaign-dialogue.js?v=225"></script>
-<link rel="stylesheet" href="character-style.css?v=225">
+<script src="gameplay-polish.js?v=226"></script>
+<script src="piece-designs.js?v=226"></script>
+<script src="character-style.js?v=226"></script>
+<script src="campaign-opponents.js?v=226"></script>
+<script src="campaign-dialogue.js?v=226"></script>
+<link rel="stylesheet" href="character-style.css?v=226">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=225">
-<link rel="stylesheet" href="ruler-style.css?v=225">
-<link rel="stylesheet" href="gameplay-polish.css?v=225">
+<link rel="stylesheet" href="city-board.css?v=226">
+<link rel="stylesheet" href="ruler-style.css?v=226">
+<link rel="stylesheet" href="gameplay-polish.css?v=226">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2564,7 +2564,7 @@ const isC = id => RUN && RUN.circuit === id;
    capped at $3 instead of $5 outside Crown City. Targets follow the army's real upgrades, so they ease if it buys less.
    Gauntlet and Crown Match prices are unchanged; sell values are unchanged. */
 const LAND_PRICE_STEP = 0.3, LAND_PRICE_ORDER = ['street', 'medieval', 'greek', 'fantasy', 'throne'];
-function landPriceMult(){ if(!RUN || RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH)) return 1; return (1 + LAND_PRICE_STEP * Math.max(0, LAND_PRICE_ORDER.indexOf(land()))) * (1 + 0.1 * ngLevel()); }
+function landPriceMult(){ if(!RUN || RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH)) return 1; return (1 + LAND_PRICE_STEP * Math.max(0, LAND_PRICE_ORDER.indexOf(land()))) * (1 + 0.1 * ngLevel()) * (edictOn('tithe') ? 1.15 : 1); }   // v226: Royal Tithe
 const savingsCap = () => (land() === 'street' ? 5 : 3) + (isC('midnight') ? 1 : 0);
 function price(x){ if(RUN && RUN.gauntlet) return x;   // (v152: Gauntlet prices are fixed)
   return Math.max(1, Math.round((isC('midnight') ? Math.max(1, x - 1) : x) * landPriceMult())); }
@@ -3109,6 +3109,40 @@ function askName(then){
    and Knights from 3), Blitz move limits 1 tighter per cycle, store prices +10% per cycle. A plain New Campaign returns to cycle 0.
    The cycle (ACH.ngplus) is not a campaign key, so starting the next campaign keeps it. */
 const ngLevel = () => (RUN && (RUN.gauntlet || (typeof MATCH !== 'undefined' && MATCH))) ? 0 : Math.max(0, Math.min(99, Math.floor(+ACH.ngplus || 0)));
+/* v226 Edicts. Each New Game+ cycle you choose 1 of 3 Edicts: harder rules that stack for as long as you keep going in
+   New Game+ (a plain New Campaign clears them). Each one in force adds 15% to your campaign score. Never in the Gauntlet
+   or Crown Matches. */
+const EDICTS = {
+  iron:{name:'Iron Rulers', desc:'In Ruler fights, the enemy’s two strongest pieces start Armored.'},
+  vanguard:{name:'Vanguard', desc:'In Stage Battles, enemy Knights and Bishops start Armored.'},
+  hungry:{name:'Hungry Crowns', desc:'The Hunger bargains from your first Stage Battle, and refusing it costs $2.'},
+  fuse:{name:'Short Fuse', desc:'Blitz fights have 1 fewer move.'},
+  bound:{name:'Bound Hands', desc:'Every fight starts with 1 fewer swap.'},
+  fragile:{name:'Fragile', desc:'Each new army starts with 2 lives instead of 3.'},
+  tithe:{name:'Royal Tithe', desc:'Store prices +15%.'}};
+function edictList(){ return (Array.isArray(ACH.edicts) ? ACH.edicts : []).filter(id => EDICTS[id]); }
+function edictOn(id){ return !(typeof MATCH !== 'undefined' && MATCH) && !(RUN && RUN.gauntlet) && edictList().includes(id); }
+const edictScoreMult = () => 1 + 0.15 * edictList().length;
+function edictPick(then){
+  const held = edictList(), pool = Object.keys(EDICTS).filter(id => !held.includes(id));
+  if(!pool.length) return then();
+  const offer = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+  const m = modal(`<div class="edicts"><small>${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)}</small><h2>Choose an Edict</h2>
+    <p>A new rule for this cycle. It stays for every cycle after, and each Edict adds <b>+15%</b> to your campaign score.</p>
+    ${offer.map(id => `<button class="ed-card" data-ed="${id}"><b>${EDICTS[id].name}</b><span>${EDICTS[id].desc}</span></button>`).join('')}
+    ${held.length ? `<p class="muted ed-held">Already in force: ${held.map(id => EDICTS[id].name).join(', ')}</p>` : ''}</div>`);
+  m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.edict_next = b.dataset.ed; saveAch(); then(); });
+}
+function edictsApply(){   // at the start of every campaign fight
+  if(!B || !edictList().length || MATCH || (RUN && RUN.gauntlet)) return;
+  const armor = list => list.forEach(x => { x.q.sh = (x.q.sh || 0) + 1; });
+  const en = () => B.board.map((q, i) => ({q, i})).filter(x => x.q && x.q.side === 'en' && x.q.t !== 'K');
+  if(edictOn('iron') && rulerFight()) armor(en().sort((a, b) => TYPE[b.q.t].val - TYPE[a.q.t].val).slice(0, 2));
+  if(edictOn('vanguard') && RUN.blind === 2) armor(en().filter(x => x.q.t === 'N' || x.q.t === 'B'));
+  if(edictOn('bound')) B.swaps = Math.max(0, B.swaps - 1);
+}
+const edictsHTML = () => { const l = edictList(); if(!l.length) return '';
+  return `<div class="jedicts"><small>Edicts in force · +${15 * l.length}% campaign score</small>${l.map(id => `<span><b>${EDICTS[id].name}</b>${EDICTS[id].desc}</span>`).join('')}</div>`; };
 const ngLabel = (n = ngLevel()) => n ? `New Game+${n > 1 ? ' ' + n : ''}` : '';
 const campaignComplete = () => { try{ return landWon('throne'); }catch(e){ return false; } };
 const ngTargetMult = () => 1 + 0.2 * ngLevel();
@@ -3124,9 +3158,10 @@ function ngAsk(){
   const m = modal(`<div class="ngask"><small>${free ? 'The Lands were free' : 'The Crown of Crowns is yours'}</small><h2>${ngLabel(next)}</h2>
     <p>${free ? 'Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
     <ul><li>Score targets <b>+${20 * next}%</b></li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
+    ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. You choose one more.</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
-  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); askName(() => draftScreen()); };
+  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); edictPick(() => askName(() => draftScreen())); };   // v226: choose an Edict first
 }
 const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
 function mergeAch(local, cloud){
@@ -3141,6 +3176,8 @@ function mergeAch(local, cloud){
 const cloudIsOlderCampaign = x => (+((x && x.ACH) || {}).campaign_epoch || 0) < (+ACH.campaign_epoch || 0);
 function newCampaign(){
   ACH.ngplus = Math.max(0, Math.floor(+ACH.ng_next || 0)); delete ACH.ng_next; ACH.ng_best = Math.max(+ACH.ng_best || 0, ACH.ngplus);   // v210: New Game+ cycle, or 0 for a plain new campaign
+  if(!ACH.ngplus) ACH.edicts = []; else if(EDICTS[ACH.edict_next] && !edictList().includes(ACH.edict_next)) ACH.edicts = [...edictList(), ACH.edict_next];   // v226: Edicts stack through New Game+
+  delete ACH.edict_next;
   for(const k of Object.keys(ACH)) if(isCampaignKey(k)) delete ACH[k];      // crowns, conquered circuits, old-format progress
   ACH.prog_v = PROG_VERSION; ACH.campaign_epoch = Date.now(); ACH.kxv = 1;   // King XP 0 → King Lv.1, 1 Command
   try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){}
@@ -3381,7 +3418,7 @@ function landsScreen(after){
   const m = modal(`<div class="jtop"><div><small>${runnerTitle()}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
     ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}${bestCampaign() ? `<br>Best campaign $${bestCampaign().toLocaleString('en-US')}` : ''}</em></div>` : ''}
-    ${hungerRecordHTML()}
+    ${hungerRecordHTML()}${edictsHTML()}
     <div class="jpath"><svg class="jcracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${cracks}</svg>
       ${PACKS.map((x, i) => (i ? link(i - 1) : '') + chapter(x, i)).join('')}</div>`, '#pdone', after);
   m.classList.add('journey');
@@ -3554,7 +3591,7 @@ function newRun(circuit){
     if(RUN.circuit !== 'ruler'){ cp.cur = {land:RUN.land, circuit:RUN.circuit, carry:entry, at:Date.now()}; cp.mid = null; setCheckpoint(cp); }
     else if(!(cp.ruler && cp.ruler.land === RUN.land)){ cp.ruler = {land:RUN.land, carry:entry, at:Date.now(), approx:true}; setCheckpoint(cp); } }
   roadStart();
-  RUN.cards = []; RUN.lives = 3; RUN.livesBought = 0; RUN.journeys = 1; RUN.armyStages = 0;   // a new army: step 1, no Stages cleared yet
+  RUN.cards = []; RUN.lives = edictOn('fragile') ? 2 : 3; RUN.livesBought = 0; RUN.journeys = 1; RUN.armyStages = 0;   // a new army: step 1, no Stages cleared yet
   RUN.money = DF().money + (isC('midnight') ? 4 : 0);
   const carry = getCarry();
   if(carry){
@@ -3636,7 +3673,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 225;
+const GAME_VERSION = 226;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4621,6 +4658,25 @@ function screenLines(b){
     b[ok] = pc;
   }
 }
+/* v226: in a later campaign (after an ending, not the true one), the Crownless King fights with the army you brought
+   to the throne last time: the same pieces in your usual formation, mirrored to his side, each one named after the
+   soldier it was (see fallenNameOf). A smaller army is filled out with Pawns to a full 16. Falls back to his own army
+   if the opening check rejects it. */
+function fallenThroneArmy(board){
+  const F = fallenRecord(); if(!F || F.army.length < 2) return null;
+  const order = ['Q','R','B','N','P'], list = F.army.map(c => c.t).filter(t => order.includes(t)).slice(0, 15);
+  while(list.length < 15) list.push('P');
+  list.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  // his back rank first (your usual places, mirrored), extra pieces on the second rank, then Pawns: the gaps in the
+  // second rank, a screen in front of any piece standing there, and the rest on the third
+  const b = board.slice(); b[4] = {t:'K', side:'en', id:uid++};
+  const home = {Q:[3], R:[0,7], B:[2,5], N:[1,6]}, back = [3,5,2,6,1,7,0], second = [11,12,10,13,9,14,8,15];
+  const put = (t, sqs) => { const sq = sqs.find(i => !b[i]); if(sq === undefined) return false; b[sq] = {t, side:'en', id:uid++}; return true; };
+  for(const t of list.filter(t => t !== 'P')) if(!put(t, home[t] || []) && !put(t, back) && !put(t, second)) return null;
+  const screen = second.filter(i => b[i] && b[i].t !== 'P').map(i => i + 8), third = [20,19,21,18,22,17,23,16];
+  for(const t of list.filter(t => t === 'P')) if(!put('P', [12,11,13,10,14,9,15,8]) && !put('P', screen) && !put('P', third)) return null;
+  openGate.last = false; return armyOK(b, list.length + 1, true) ? b : null;
+}
 function rulerArmy(board, l){
   const specs = (RULER_ARMY[l] || RULER_ARMY.street).split('|').map(x => x.split(' '));
   return specs.flatMap(spec => [false, true].map(mirror => { const b = board.slice();
@@ -4719,6 +4775,7 @@ function setupEnemyArmy(board, test){
     const gateOnly = [];
     for(let tries = 0; tries < 160; tries++){ const b = formationArmy(board, list, P); openGate.last = false; if(armyOK(b, list.length, true)){ for(let i = 0; i < 64; i++) board[i] = b[i]; return P; } if(openGate.last && gateOnly.length < 12) gateOnly.push(b); }
     if(gateOnly.length){ const fx = openingFix(gateOnly, list.length, true); if(fx){ for(let i = 0; i < 64; i++) board[i] = fx[i]; return P; } } }
+  if(P.ruler && P.land === 'throne'){ const fb = fallenThroneArmy(board); if(fb){ for(let i = 0; i < 64; i++) board[i] = fb[i]; P.fallenArmy = true; return P; } }   // v226
   if(P.ruler){ const all = rulerArmy(board, P.land), cnt = b => b.filter(q => q && q.side === 'en').length, gateOnly = [];
     const opts = all.filter(b => { openGate.last = false; const ok = armyOK(b, cnt(b), true); if(!ok && openGate.last) gateOnly.push(b); return ok; });
     if(opts.length){ const b = pick(opts); for(let i = 0; i < 64; i++) board[i] = b[i]; return P; }
@@ -4993,7 +5050,7 @@ function purseSpill(){
   if(!ACH.hoard_tip){ ACH.hoard_tip = 1; saveAch(); setTimeout(() => { try{ showTip(`<b>Purse full · $${PURSE_CAP}</b><br>Money above $${PURSE_CAP} goes to your <b>Hoard</b>. It can’t be spent, but at the end it counts toward your campaign score and the Royal Treasury.`); }catch(e){} }, 400); }
   return x;
 }
-function campaignScore(){ const n = hoardNow() + Math.max(0, Math.floor(+(RUN && RUN.money) || 0)); const best = n > bestCampaign(); if(best) ACH.best_campaign = n; ACH.last_campaign = n; ACH.campaign_best_new = best ? 1 : 0; saveAch(); return n; }
+function campaignScore(){ const n = Math.round((hoardNow() + Math.max(0, Math.floor(+(RUN && RUN.money) || 0))) * edictScoreMult());   /* v226: Edicts raise it */ const best = n > bestCampaign(); if(best) ACH.best_campaign = n; ACH.last_campaign = n; ACH.campaign_best_new = best ? 1 : 0; saveAch(); return n; }
 function runnerTitle(){ const n = worldCrowns(); return n >= 4 ? 'Bearer of the Four Crowns' : n >= 2 ? 'The Crownrunner' : n >= 1 ? 'Crownrunner' : 'Unknown challenger'; }
 // v219: what each crown whispers (the Lands are taken in order, so the whisper grows as you go)
 const CROWN_WHISPER = {street:'Win.', medieval:'More.', greek:'Make them kneel.', fantasy:'Come home.', throne:'You are home.'};
@@ -6014,7 +6071,7 @@ function moveLimitFor(par, bossKey, baseOnly){
     if(n != null) lim = lim == null ? n : Math.min(lim, n); }
   if(lim == null) return null;
   const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossRuleName(id)] || 0) : 0;
-  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - ngLevel());   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
+  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ? 1 : 0));   // v226: Short Fuse   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
 }
 const blitzOn = () => !!(B && B.moveLimit);
 /* v132 opponent identity (presentation only): tier = normal | rival | boss | ruler | crownless, plus one of five
@@ -6067,9 +6124,9 @@ const hungerRecordHTML = () => { const h = hungerTally(); if(!(h.fed + h.refused
 function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
 function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
-function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && baseCrowns() >= 1 && RUN.pactKey !== hungerKey()); }
+function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
 function hungerOffer(){
-  const n = Math.min(4, baseCrowns()), key = hungerKey(); let h = 7; for(const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const n = Math.max(1, Math.min(4, baseCrowns())), key = hungerKey(); let h = 7; for(const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   let k = HUNGER_OFFERS[h % HUNGER_OFFERS.length]; if(k === 'reach' && (RUN.money || 0) < 2 * n) k = 'power';
   const s = x => x > 1 ? 's' : '';
   const O = {power:{boon:`Start with ${n} extra Tactic${s(n)}`, cost:`Score target +${8 * n}%`},
@@ -6084,10 +6141,10 @@ function hungerAsk(go){
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
     <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
     <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>
-    <div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
+    ${edictOn('hungry') ? '<p class="hg-so">Hungry Crowns: refusing costs $2.</p>' : ''}<div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse${edictOn('hungry') ? ' · $2' : ''}</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
     if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed'); }
-    else hungerNote('refused');
+    else { hungerNote('refused'); if(edictOn('hungry')) RUN.money = Math.max(0, RUN.money - 2); }   // v226: Hungry Crowns
     save(); go(); };
   m.querySelector('#hgYes').onclick = () => pick(true); m.querySelector('#hgNo').onclick = () => pick(false);
 }
@@ -6131,6 +6188,7 @@ function startBlind(){ try{ laClear(); }catch(e){}
   B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);   // v200: Rooftop Kings and Midnight Market fights
   B.banner = bannerSquare(B.board);   // v205: Ruler fights
   ngArmor(B.board);   // v210: New Game+
+  edictsApply();   // v226
   hungerApply();   // v223: the Hunger's bargain, if one was taken for this battle
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
   if(has('aegis')){ const bi = aegisIdx(B.board); if(bi >= 0) B.board[bi].sh = Math.max(B.board[bi].sh || 0, 2); }   // (the same piece the Fallen Throne opening check armed)

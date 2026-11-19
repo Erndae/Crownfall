@@ -36,5 +36,5 @@ assert.equal(E("bountyStrikes(B.board[26],{t:'P',side:'me'},20)"),true);assert.e
 // texts
 for(const x of ['supply crates: break one open with any piece <b>except a pawn</b>','Supply crate: any piece except a pawn opens it for supplies','Capture it for <b>double score</b> and +$','you lose 1 swap','Bounty: capture it for double score and cash; its captures cost you 1 swap',"Those crates are my supplies."])assert(src.includes(x),x);
 assert(!/Crate trap[ :!]|lose up to \$2|you lose \$1/.test(src.replace('were crate traps','')));
-assert(src.includes('const GAME_VERSION = 225;')&&sw.includes("'crownfall-v225'")&&!src.includes('?v=224'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=225&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: supply crates (fair mid-board race, pawns walk past, Tactic/cash/swap, enemy loot = Armor, cash grows by Land), bounty (officer first, double score, -1 swap per capture), texts, version.');

@@ -402,3 +402,16 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Bounty (Midnight Market).** The $ tag goes on a Rook, Bishop or Knight (the Queen or a Pawn only when none is left). Capturing it scores **double** and still pays $3–4. Each piece it takes from you costs **1 swap** instead of $1.
 - Every explanation (fight brief, Board key, square labels, move preview, piece info, Dockmaster Dee's line) matches.
 - Tests: `validate-v225.cjs`; v160, v199, v200, v204, v222 and v224 updated.
+
+## v226 — New Game+: Edicts, and your old army on the throne
+- **Edicts.** Starting a New Game+ cycle, you choose 1 of 3 Edicts (ones you don't already have). They stack for as long as you keep going in New Game+; a plain New Campaign clears them. Each adds **+15% to your campaign score**. Never in the Gauntlet or Crown Matches.
+  - **Iron Rulers:** in Ruler fights, the enemy's two strongest pieces start Armored.
+  - **Vanguard:** in Stage Battles, enemy Knights and Bishops start Armored.
+  - **Hungry Crowns:** the Hunger bargains from your first Stage Battle, and refusing costs $2.
+  - **Short Fuse:** Blitz fights have 1 fewer move.
+  - **Bound Hands:** every fight starts with 1 fewer swap.
+  - **Fragile:** each new army starts with 2 lives instead of 3.
+  - **Royal Tithe:** store prices +15%.
+  - The New Game+ offer and Journey list the Edicts in force.
+- **The Crownless King fights with your previous army.** In a later campaign (after an ending other than the true one), his pieces are the army you brought to the throne last time, in your formation mirrored to his side, each named after the soldier it was. A smaller army is filled out with Pawns to 16; extra pieces stand behind a screen of pawns. If the opening fairness check rejects it (only extreme armies, like eight Queens), he uses his own army, still with your soldiers' names.
+- Tests: `validate-v226.cjs`; v224, v225 and the balance audit updated.
