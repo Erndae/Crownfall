@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const c=require('./test-support/game-runtime.cjs'),E=c.testEval;c.CrownfallCharacter={get:()=>({name:'Ernesto'}),art:()=>'',save:()=>true};
 const src=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
-const S=JSON.parse(E('JSON.stringify(STORY_ACHS)'));assert.equal(S.length,9);
+const S=JSON.parse(E('JSON.stringify(STORY_ACHS)'));assert(S.length>=9);
 for(const a of S){assert(E(`ACHS.some(x=>x.id==='${a.id}')`),a.id);assert.equal(E(`isCampaignKey('${a.id}')`),false,'kept across campaigns: '+a.id);assert(a.name&&a.desc.length>10);}
 assert.deepEqual(S.filter(a=>a.hidden).map(a=>a.id).sort(),['sa_again','sa_crowned','sa_mirror','sa_true'],'the spoilers stay hidden until earned');
 for(const a of S)assert(!/was once|became him|every king/i.test(a.desc));

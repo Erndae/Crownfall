@@ -40,5 +40,5 @@ assert(E("JSON.stringify(G_SHARED)").includes('crownfall-daily'),'readable from 
 for(const x of ["if(RUN && RUN.daily) return dailyWin(vScore, vLog, laRes, mate, captureFinish);","if(RUN && RUN.daily) return dailyFinish(false, why);","const dSeed = RUN.gauntlet && RUN.daily && !MATCH ? dailySeed('army' + RUN.gWave) : null;","if(dSeed) dSeed();",
   "if(RUN.dPick) return dailyPick(gNextWave);","<b>Daily Run</b><small>Ten waves, the same for everyone today. A new run every day.</small>","$('#grec').onclick = () => dailyRecords();","daily:dailyToday(), dScore:0});"])assert(src.includes(x),x);
 assert(!src.includes('Enter the Gauntlet')&&!src.includes('One army. Endless challengers.'),'the endless Gauntlet is gone from view');
-assert(src.includes('const GAME_VERSION = 230;')&&sw.includes("'crownfall-v230'")&&!src.includes('?v=229'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=230&&sw.includes("'crownfall-v"+RegExp.$1+"'")&&!src.includes('?v=229'));
 console.log('PASS: 10 seeded waves (same run per date, two per Land, bosses at 5 and 10), difficulty curve, 1-of-3 rewards from the date, score with cash bonus, daily best, plays and streak, title and routing, version.');

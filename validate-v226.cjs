@@ -43,10 +43,10 @@ E("ACH.edicts=[]");const p0=E("(()=>{RUN={land:'greek',circuit:'harbor',ante:2,m
 E("ACH.edicts=[];for(const k of Object.keys(ACH))if(/^crown_/.test(k))delete ACH[k]");E("RUN={land:'street',circuit:'harbor',ante:2,blind:2,money:30,relics:[],roster:['K']}");assert.equal(E('hungerDue()'),false);
 E("ACH.edicts=['hungry']");assert.equal(E('hungerDue()'),true,'Hungry Crowns: bargains before the first crown');assert.equal(E('hungerOffer().n'),1);
 assert(src.includes("else { hungerNote('refused'); if(edictOn('hungry')) RUN.money = Math.max(0, RUN.money - 2); }"));
-assert(src.includes("lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ? 1 : 0)")&&src.includes("RUN.lives = edictOn('fragile') ? 2 : 3;"));
+assert(src.includes("lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ? 1 : 0)")&&src.includes("(edictOn('fragile') ? 2 : 3)"));
 // score, display
 E("ACH.edicts=['iron','fuse'];RUN={land:'greek',circuit:'harbor',ante:2,money:100,relics:[],roster:['K']}");assert.equal(E('campaignScore()'),Math.round((E('hoardNow()')+100)*1.3),'+15% each');
 assert(E('edictsHTML()').includes('Iron Rulers')&&E('edictsHTML()').includes('+30% campaign score'));E('ACH.edicts=[]');assert.equal(E('edictsHTML()'),'');
-assert(src.includes("edictPick(() => askName(() => draftScreen()));")&&src.includes('${hungerRecordHTML()}${edictsHTML()}')&&css.includes('.ed-card{'));
+assert(src.includes("edictPick(() => diffPick(() => askName(() => draftScreen())));")&&src.includes('${hungerRecordHTML()}${edictsHTML()}')&&css.includes('.ed-card{'));
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=226&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 console.log('PASS: Crownless King fields your last army (types, names, padding, fallbacks), seven Edicts stack through New Game+ and clear on a new campaign, pick 1 of 3, every effect, campaign score bonus, display, version.');

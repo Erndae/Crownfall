@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=230"></script>
-<script src="piece-designs.js?v=230"></script>
-<script src="character-style.js?v=230"></script>
-<script src="campaign-opponents.js?v=230"></script>
-<script src="campaign-dialogue.js?v=230"></script>
-<link rel="stylesheet" href="character-style.css?v=230">
+<script src="gameplay-polish.js?v=231"></script>
+<script src="piece-designs.js?v=231"></script>
+<script src="character-style.js?v=231"></script>
+<script src="campaign-opponents.js?v=231"></script>
+<script src="campaign-dialogue.js?v=231"></script>
+<link rel="stylesheet" href="character-style.css?v=231">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2376,9 +2376,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=230">
-<link rel="stylesheet" href="ruler-style.css?v=230">
-<link rel="stylesheet" href="gameplay-polish.css?v=230">
+<link rel="stylesheet" href="city-board.css?v=231">
+<link rel="stylesheet" href="ruler-style.css?v=231">
+<link rel="stylesheet" href="gameplay-polish.css?v=231">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2639,8 +2639,15 @@ const STORY_ACHS = [
   {id:'sa_edicts', story:true, name:'By Royal Decree', desc:'Finish a campaign with 3 or more Edicts in force.'},
   {id:'sa_crates', story:true, name:'Quartermaster', desc:'Open 3 supply crates in one fight.'},
   {id:'sa_bounty', story:true, name:'Bounty Hunter', desc:'Capture the bounty piece within your first 10 moves.'},
+  {id:'sa_d_easy', story:true, name:'The Long Road', desc:'Finish a campaign on any difficulty.'},
+  {id:'sa_d_normal', story:true, name:'Rightful Claim', desc:'Finish a campaign on Normal or Hard.'},
+  {id:'sa_d_hard', story:true, name:'Heavy Is the Head', desc:'Finish a campaign on Hard.'},
 ];
 ACHS.push(...STORY_ACHS);
+// v231: a campaign finished before difficulties existed was played on Normal (checked once)
+if(!ACH.dach_mig){ ACH.dach_mig = 1; const t = Date.now();
+  if(!ACH.cdiff && (ACH.sa_crowned || ACH.sa_true || +ACH.ng_best > 0 || +ACH.ngplus > 0 || ACH.crown_throne_hard)){ ACH.sa_d_easy = ACH.sa_d_easy || t; ACH.sa_d_normal = ACH.sa_d_normal || t; }
+  try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){} }
 const PK = {street:'st', medieval:'md', greek:'gr', fantasy:'fn', throne:'th'};
 function packAch(key){ const pre = PK[PACK]; if(pre) unlockAch(pre + '_' + key); }
 function checkSpell(){ if(RUN && RUN.roster.some(x => x && eList(parseR(x).e).length >= 3)) packAch('spell'); }
@@ -3162,6 +3169,25 @@ const campaignComplete = () => { try{ return landWon('throne'); }catch(e){ retur
 // fast (+10% per cycle, at most +30%). Past cycle 3, New Game+ gets harder through Edicts instead of bigger numbers.
 const ngTargetPct = (n = ngLevel(), blitz = false) => blitz ? Math.min(30, 10 * n) : Math.min(60, 20 * n);
 const ngTargetMult = (blitz = false) => 1 + ngTargetPct(ngLevel(), blitz) / 100;
+/* v231 CAMPAIGN DIFFICULTY: Normal, Easy or Hard, chosen once when a campaign (or a New Game+ cycle) starts and kept for
+   that whole campaign (ACH.cdiff, a campaign key; missing = Normal, so older saves are Normal). Enemy army sizes are the
+   same on every difficulty. Story, endings, achievements and campaign score are the same; three story achievements
+   record the finish (a harder finish also earns the easier ones). Never touches the Daily Run or Crown Matches.
+   target: score target multiplier · blitz: extra Blitz moves · rating: enemy AI rating · rand: looseness of the enemy's
+   move choice · money: each new army's starting $ · lives: a new army's lives */
+const CDIFF = {
+  easy: {name:'Easy', target:0.75, blitz:2,  rating:-150, rand:1.5, money:2,  lives:2,  desc:'Lower score targets, a weaker enemy AI, 5 lives, more starting money and 2 extra moves in Blitz fights.'},
+  hard: {name:'Hard', target:1.2,  blitz:-1, rating:150,  rand:0.6, money:-1, lives:-1, desc:'Higher score targets, a sharper enemy AI, 2 lives, less starting money and 1 fewer move in Blitz fights.'}};
+const cdiff = () => (CDIFF[ACH.cdiff] && !MATCH && !(RUN && RUN.gauntlet)) ? ACH.cdiff : 'normal';
+const DX = k => (CDIFF[cdiff()] || {})[k] || 0;
+const easyOn = () => cdiff() === 'easy';
+function diffPick(then){
+  const card = (id, name, desc) => `<button class="ed-card" data-d="${id}"><b>${name}</b><span>${desc}</span></button>`;
+  const m = modal(`<div class="edicts dpickc"><small>For this whole campaign</small><h2>Choose difficulty</h2>
+    ${card('easy', 'Easy', CDIFF.easy.desc)}${card('normal', 'Normal', 'The full challenge.')}${card('hard', 'Hard', CDIFF.hard.desc)}
+    <p class="muted ed-held">Enemy armies are the same size on every difficulty. Your choice stays until you start a new campaign.</p></div>`);
+  m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.cdiff_next = b.dataset.d; saveAch(); then(); });
+}
 function ngArmor(board){
   const n = ngLevel(); if(!n || !Array.isArray(board)) return 0; let c = 0;
   const types = n >= 3 ? ['Q', 'R', 'B', 'N'] : n >= 2 ? ['Q', 'R'] : ['Q'];
@@ -3177,9 +3203,9 @@ function ngAsk(){
     ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. You choose one more.</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
-  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); edictPick(() => askName(() => draftScreen())); };   // v226: choose an Edict first
+  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); edictPick(() => diffPick(() => askName(() => draftScreen()))); };   // v231: then the difficulty   // v226: choose an Edict first
 }
-const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
+const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'cdiff' || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
 function mergeAch(local, cloud){
   const le = +local.campaign_epoch || 0, ce = +cloud.campaign_epoch || 0, out = {};
   for(const k in cloud) if(!isCampaignKey(k)) out[k] = cloud[k];
@@ -3193,8 +3219,9 @@ const cloudIsOlderCampaign = x => (+((x && x.ACH) || {}).campaign_epoch || 0) < 
 function newCampaign(){
   ACH.ngplus = Math.max(0, Math.floor(+ACH.ng_next || 0)); delete ACH.ng_next; ACH.ng_best = Math.max(+ACH.ng_best || 0, ACH.ngplus);   // v210: New Game+ cycle, or 0 for a plain new campaign
   if(!ACH.ngplus) ACH.edicts = []; else if(EDICTS[ACH.edict_next] && !edictList().includes(ACH.edict_next)) ACH.edicts = [...edictList(), ACH.edict_next];   // v226: Edicts stack through New Game+
-  delete ACH.edict_next;
+  delete ACH.edict_next; const cd = CDIFF[ACH.cdiff_next] ? ACH.cdiff_next : null; delete ACH.cdiff_next;   // v231: the difficulty chosen for this campaign
   for(const k of Object.keys(ACH)) if(isCampaignKey(k)) delete ACH[k];      // crowns, conquered circuits, old-format progress
+  if(cd) ACH.cdiff = cd;
   ACH.prog_v = PROG_VERSION; ACH.campaign_epoch = Date.now(); ACH.kxv = 1;   // King XP 0 → King Lv.1, 1 Command
   try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){}
   setCarry(null); setRebuild(null); setCheckpoint(null);                     // carried army, old rebuild record, Circuit checkpoint
@@ -3268,7 +3295,7 @@ function draftForm(list){
     h += `<i class="${(r + c) & 1 ? 'dk' : 'lt'}">${q ? pieceSVG(q.t, 'me', q.e) : ''}</i>`; }
   return h;
 }
-function startNewGame(){ delete ACH.ng_next; askName(() => draftScreen()); }   // v210: a name first; a plain New Campaign is cycle 0   // v155: the old campaign is only replaced when the new army is confirmed
+function startNewGame(){ delete ACH.ng_next; diffPick(() => askName(() => draftScreen())); }   // v231: difficulty first   // v210: a name first; a plain New Campaign is cycle 0   // v155: the old campaign is only replaced when the new army is confirmed
 function draftScreen(init){
   if(MODE !== 'campaign') return goMode('campaign', 'new');
   sceneMusic('menu'); leaveBoard(); onTitle = false; setCircuitData(''); setLandBg(null); window.scrollTo(0, 0);
@@ -3431,7 +3458,7 @@ function landsScreen(after){
       <div class="jrul">${rulerFace(l, 'talk') || crownSVG(l, 'hard', true)}<span><small>Ruler</small><b>${R.name}</b></span><span class="jcount">${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits`}${pipsJ}</span></div>
       ${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : ''}
       <div class="jone">${slot(l)}</div></section>`; };
-  const m = modal(`<div class="jtop"><div><small>${runnerTitle()}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
+  const m = modal(`<div class="jtop"><div><small>${runnerTitle()}${CDIFF[ACH.cdiff] ? ' · ' + CDIFF[ACH.cdiff].name : ''}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
     ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}${bestCampaign() ? `<br>Best campaign $${bestCampaign().toLocaleString('en-US')}` : ''}</em></div>` : ''}
     ${hungerRecordHTML()}${edictsHTML()}
@@ -3607,8 +3634,8 @@ function newRun(circuit){
     if(RUN.circuit !== 'ruler'){ cp.cur = {land:RUN.land, circuit:RUN.circuit, carry:entry, at:Date.now()}; cp.mid = null; setCheckpoint(cp); }
     else if(!(cp.ruler && cp.ruler.land === RUN.land)){ cp.ruler = {land:RUN.land, carry:entry, at:Date.now(), approx:true}; setCheckpoint(cp); } }
   roadStart();
-  RUN.cards = []; RUN.lives = edictOn('fragile') ? 2 : 3; RUN.livesBought = 0; RUN.journeys = 1; RUN.armyStages = 0;   // a new army: step 1, no Stages cleared yet
-  RUN.money = DF().money + (isC('midnight') ? 4 : 0);
+  RUN.cards = []; RUN.lives = Math.max(1, (edictOn('fragile') ? 2 : 3) + DX('lives')); RUN.livesBought = 0; RUN.journeys = 1; RUN.armyStages = 0;   // a new army: step 1, no Stages cleared yet
+  RUN.money = Math.max(0, DF().money + (isC('midnight') ? 4 : 0) + DX('money'));   // v231 difficulty
   const carry = getCarry();
   if(carry){
     if(carry.lv && (carry.lv.K | 0) > 1) kingTrainRefunded += dropKingTraining(carry);   // a carried army that missed the v105 migration
@@ -3689,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 230;
+const GAME_VERSION = 231;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3794,7 +3821,7 @@ function targetParts(i){
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
   if(lim) t = Math.max(t, Math.min(blitz * bf, BLITZ_FLOOR * targetParts(0).final));   // v177: Blitz floor (the Warm-up already includes the build factor)
-  t *= ngTargetMult(!!lim);   // v210: New Game+ (v227: capped, half in Blitz), after every cap so it always applies
+  t *= ngTargetMult(!!lim); if(cdiff() !== 'normal') t *= DX('target');   // v231 difficulty   // v210: New Game+ (v227: capped, half in Blitz), after every cap so it always applies
   const r = x => x == null ? null : Math.max(10, Math.round(x / 10) * 10);
   return {prog:r(prog), cap:r(cap), fresh:r(fresh), blitz:r(blitz), final:r(t), build:+bf.toFixed(2), ppm:campaignPPM(), power:+campaignPower().toFixed(3), sizeF:+(lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF()).toFixed(2)};
 }
@@ -4343,7 +4370,7 @@ function aiRating(){
   if(MATCH) return matchDiff().rating;
   if(RUN.gauntlet) return gRating();   // v151
   const lad = AI_LADDER[land()] || AI_LADDER.street, st = RUN.circuit === 'ruler' ? 0 : STAGE_AI[clamp(RUN.ante, 1, 4) - 1];
-  return Math.min(AI_MAX, lad[aiSlot().ci] + st);
+  return Math.min(AI_MAX, lad[aiSlot().ci] + st + DX('rating'));   // v231 difficulty
 }
 function armySize(){
   if(RUN && RUN.gauntlet) return gEnemyN();   // v151
@@ -5582,7 +5609,7 @@ function title(){
     <p class="titlemotto">${crownsReforged() ? 'Everybody wants a crown. <b class="freemark">The crowns were forged again.</b>' : landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>
     <div class="modecard mc-camp keepcash">
       <div class="mchead"><b>Campaign</b><small>85 battles · five Lands · claim the Crowns</small></div>
-      ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${inC && !saved && !RUN && campaignComplete() ? `Start ${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)} · harder` : `${ngLevel() ? ngLabel() + ' · ' : ''}${camp.cont}`}</small></button>` : ''}
+      ${camp.cont ? `<button class="btn contbtn" id="cont">Continue Campaign<small>${inC && !saved && !RUN && campaignComplete() ? `Start ${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)} · harder` : `${ngLevel() ? ngLabel() + ' · ' : ''}${CDIFF[ACH.cdiff] ? CDIFF[ACH.cdiff].name + ' · ' : ''}${camp.cont}`}</small></button>` : ''}
       <button class="btn ${camp.cont ? 'ghost' : ''}" id="new">New Campaign</button>
       ${camp.ready ? `<p class="savebadge" style="color:#19e3c9;margin:0">${camp.ready}</p>` : ''}
     </div>
@@ -6094,7 +6121,7 @@ function moveLimitFor(par, bossKey, baseOnly){
     if(n != null) lim = lim == null ? n : Math.min(lim, n); }
   if(lim == null) return null;
   const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossRuleName(id)] || 0) : 0;
-  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ? 1 : 0));   // v226: Short Fuse   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
+  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - ngLevel() - (edictOn('fuse') ? 1 : 0) + DX('blitz'));   // v231 difficulty (Hard keeps the 60% floor)   // v226: Short Fuse   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
 }
 const blitzOn = () => !!(B && B.moveLimit);
 /* v132 opponent identity (presentation only): tier = normal | rival | boss | ruler | crownless, plus one of five
@@ -8376,7 +8403,7 @@ function enemyMoveValue(from, to){
   if(mover.t === 'K') score -= 6;
   if(B.seenEn && B.seenEn[posKey(nb)]) score -= 14;
   score += styleBonus(from, to);
-  return score + Math.random() * Math.max(2, 14 - RUN.ante*1.5) * DF().rand;
+  return score + Math.random() * Math.max(2, 14 - RUN.ante*1.5) * DF().rand * (DX('rand') || 1);
 }
 const pv = t => t === 'K' ? 400 : TYPE[t].val;
 // what is the most the player can win back with one capture after the enemy plays nb
@@ -10263,6 +10290,8 @@ function storyAchsAtEnd(type){
   const h = hungerTally(); if(!h.fed && h.refused >= 1) unlockAch('sa_refuse', false);
   if(ngLevel() >= 1) unlockAch('sa_again', false);
   if(edictList().length >= 3) unlockAch('sa_edicts', false);
+  const d = cdiff();   // v231: a harder finish also earns the easier ones
+  unlockAch('sa_d_easy', false); if(d !== 'easy') unlockAch('sa_d_normal', false); if(d === 'hard') unlockAch('sa_d_hard', false);
 }
 let endingOn = false;
 // a refresh during the ending: the crown was saved before it began, so it resumes from its last checkpoint and grants nothing again

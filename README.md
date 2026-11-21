@@ -448,3 +448,12 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Title panel:** today's best and your streak; Continue / Play today's run / Play again; Records show the last 14 days, streak and best ever.
 - Built on the Gauntlet's engine and its separate save space. The endless mode, Arena Tokens and the Armory no longer appear; an old endless run in progress is not continued (starting the Daily Run replaces it).
 - Tests: `validate-v230.cjs`; v229 version check updated.
+
+## v231 — campaign difficulty: Easy, Normal, Hard
+- **Chosen once, when a campaign starts** (New Campaign, and each New Game+ cycle after the Edict). It stays for that whole campaign. Older saves are Normal.
+- **Enemy armies are the same size on every difficulty.**
+- **Easy:** score targets ×0.75, Blitz +2 moves, enemy AI 150 rating points weaker with looser move choices, +$2 for each new army, 5 lives (4 with Fragile).
+- **Hard:** score targets ×1.2, Blitz −1 move (never below 60% of par), enemy AI 150 points sharper (up to the 1700 ceiling) with tighter move choices, −$1 for each new army, 2 lives (1 with Fragile).
+- **Achievements** (Story group): The Long Road (finish on any difficulty), Rightful Claim (Normal or Hard), Heavy Is the Head (Hard). A harder finish earns the easier ones; a campaign finished before v231 counts as Normal.
+- The difficulty shows on the Continue Campaign button and the Journey header. The Daily Run and Crown Matches are never affected.
+- Tests: `validate-v231.cjs`; v210, v226, v228, v230 checks and audit-balance updated.
