@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const c=require('./test-support/game-runtime.cjs'),E=c.testEval;c.CrownfallCharacter={get:()=>({name:'Ernesto'}),art:()=>'',save:()=>true};
 const src=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
-assert(src.includes('const GAME_VERSION = 231;')&&sw.includes("'crownfall-v231'")&&!src.includes('?v=230'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=231&&sw.includes("'crownfall-v"+RegExp.$1+"'")&&!src.includes('?v=230'));
 // a campaign key: wiped by a new campaign, set again from the choice
 assert.equal(E("isCampaignKey('cdiff')"),true);assert.equal(E("isCampaignKey('cdiff_next')"),false);
 E("ACH.cdiff='hard';ACH.cdiff_next='normal';newCampaign()");assert.equal(E("ACH.cdiff||''"),'','Normal chosen');assert.equal(E("'cdiff_next' in ACH"),false);

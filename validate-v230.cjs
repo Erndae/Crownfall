@@ -37,7 +37,7 @@ E(`RUN={gauntlet:true,daily:'${today}',gWave:3,dScore:10,money:0}`);r=JSON.parse
 assert.equal(JSON.parse(E("localStorage.getItem('crownfall-daily')")).days[today].plays,2);
 assert(E("JSON.stringify(G_SHARED)").includes('crownfall-daily'),'readable from the Campaign title too');
 // wiring
-for(const x of ["if(RUN && RUN.daily) return dailyWin(vScore, vLog, laRes, mate, captureFinish);","if(RUN && RUN.daily) return dailyFinish(false, why);","const dSeed = RUN.gauntlet && RUN.daily && !MATCH ? dailySeed('army' + RUN.gWave) : null;","if(dSeed) dSeed();",
+for(const x of ["return dailyWin(vScore, vLog, laRes, mate, captureFinish);","return dailyFinish(false, why);","const dSeed = RUN.gauntlet && RUN.daily && !MATCH ? dailySeed('army' + RUN.gWave) : null;","if(dSeed) dSeed();",
   "if(RUN.dPick) return dailyPick(gNextWave);","<b>Daily Run</b><small>Ten waves, the same for everyone today. A new run every day.</small>","$('#grec').onclick = () => dailyRecords();","daily:dailyToday(), dScore:0});"])assert(src.includes(x),x);
 assert(!src.includes('Enter the Gauntlet')&&!src.includes('One army. Endless challengers.'),'the endless Gauntlet is gone from view');
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=230&&sw.includes("'crownfall-v"+RegExp.$1+"'")&&!src.includes('?v=229'));

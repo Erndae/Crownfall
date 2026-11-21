@@ -23,3 +23,20 @@ Arithmetic scenario checks using the production target functions, 3 representati
 ## Practical follow-up
 
 Track real clear rates, moves per win, unspent cash and training purchases over player runs before making broader difficulty changes. Existing score, checkmate, reinforcement and retry rules are retained.
+
+## Difficulty (v232)
+
+Worst-case demand = target ÷ (army points per move × moves available; Blitz uses the real move limit). Lower is easier.
+
+| | Normal | Easy | Hard |
+|---|---:|---:|---:|
+| First campaign · Blitz | 0.45 | 0.34 | 0.54 |
+| First campaign · other fights | 1.96 | 1.47 | 2.35 |
+| New Game+ 1 · Blitz | 0.50 | 0.37 | 0.59 |
+| New Game+ 1 · other fights | 2.35 | 1.76 | 2.82 |
+| New Game+ 2 · Blitz | 0.54 | 0.41 | 0.59 |
+| New Game+ 2 · other fights | 2.74 | 2.06 | 3.14 |
+| New Game+ 3 · Blitz | 0.59 | 0.44 | 0.59 |
+| New Game+ 3 · other fights | 3.14 | 2.35 | 3.14 |
+
+Hard targets stop rising at the New Game+ ceiling (+60%, Blitz +30%); past that, Hard stays harder through its sharper AI and 2 lives (its one-fewer Blitz move counts toward the New Game+ 3-move cut).

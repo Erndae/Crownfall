@@ -457,3 +457,9 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Achievements** (Story group): The Long Road (finish on any difficulty), Rightful Claim (Normal or Hard), Heavy Is the Head (Hard). A harder finish earns the easier ones; a campaign finished before v231 counts as Normal.
 - The difficulty shows on the Continue Campaign button and the Journey header. The Daily Run and Crown Matches are never affected.
 - Tests: `validate-v231.cjs`; v210, v226, v228, v230 checks and audit-balance updated.
+
+## v232 — Hard mode balance check, old Gauntlet code removed
+- **Hard + New Game+ is capped at the New Game+ ceiling.** Hard's ×1.2 and New Game+'s rise together stop at +60% (Blitz +30%), and Hard's one-fewer Blitz move counts toward New Game+'s 3-move cut. Hard alone (×1.2, −1 Blitz move) is unchanged; past the ceiling Hard stays harder through its sharper AI and 2 lives.
+- **Balance audit:** `audit-balance.mjs` now checks every fight on Easy, Normal and Hard at New Game+ 0–3 (2,940 checks): Easy never asks more than Normal, Hard never less, and Hard's hardest fight never asks more than Normal's hardest at New Game+ 3. `BALANCE-AUDIT.md` has the table.
+- **Removed (about 37 KB):** the endless Gauntlet's Arena Tokens, Armory, equipment (Shield, Emblem, Charm, Crest, Medallion, Seal), wave preparations (Banner, Scout Lens, Temporary Shield), endless end screen and records, and the v152/v153 save migrations, with their CSS. Nothing reached them since v230. An old endless save is still simply replaced by today's Daily Run; the Daily Run never opens a store.
+- Tests: `validate-v232.cjs`; v210, v226, v227, v230, v231 checks updated.
