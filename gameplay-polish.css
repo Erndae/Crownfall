@@ -481,3 +481,7 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .dpick{text-align:center}
 .dpick small{display:block;font:600 11px/1.2 var(--body);letter-spacing:.2em;text-transform:uppercase;color:#e8c37a}
 .dpick h2{margin:4px 0 12px}
+/* v233 Daily Run share */
+.dend .dgrid{margin:2px auto 0;font:20px/1.2 system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;letter-spacing:2px;text-align:center;white-space:pre;overflow:hidden;max-width:100%}
+.dshare{width:100%;box-sizing:border-box;font:14px/1.45 system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:inherit;resize:none}
+.rbnote.easytip{margin-top:4px}.rbnote.easytip b{color:#9fe0a8}

@@ -463,3 +463,8 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Balance audit:** `audit-balance.mjs` now checks every fight on Easy, Normal and Hard at New Game+ 0–3 (2,940 checks): Easy never asks more than Normal, Hard never less, and Hard's hardest fight never asks more than Normal's hardest at New Game+ 3. `BALANCE-AUDIT.md` has the table.
 - **Removed (about 37 KB):** the endless Gauntlet's Arena Tokens, Armory, equipment (Shield, Emblem, Charm, Crest, Medallion, Seal), wave preparations (Banner, Scout Lens, Temporary Shield), endless end screen and records, and the v152/v153 save migrations, with their CSS. Nothing reached them since v230. An old endless save is still simply replaced by today's Daily Run; the Daily Run never opens a store.
 - Tests: `validate-v232.cjs`; v210, v226, v227, v230, v231 checks updated.
+
+## v233 — share your Daily Run, and a tip about Easy
+- **Share result** on the Daily Run end screen: the date, one square per wave (green cleared, a crown for a cleared boss wave, red where the run ended, black not reached), waves and score, the streak from 2 days, and the game's link. It uses the phone's share sheet, otherwise copies to the clipboard ("Copied!"), otherwise shows the text to copy. The wave squares also show on the end screen.
+- **Easy tip:** the first time a campaign falls in Crown City on Normal or Hard (first campaign, not New Game+), the Game Over screen mentions Easy for the next campaign. Shown once ever; nothing changes mid-run.
+- Tests: `validate-v233.cjs`; v232 version check made forward-compatible.

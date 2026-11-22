@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const c=require('./test-support/game-runtime.cjs'),E=c.testEval;c.CrownfallCharacter={get:()=>({name:'Ernesto'}),art:()=>'',save:()=>true};
 const src=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
-assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=232&&sw.includes("'crownfall-v"+RegExp.$1+"'")&&!src.includes('?v=231'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=232&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 // target multiplier: Hard × New Game+ stops at +60% (Blitz +30%)
 const tgt=(d,ng,blind)=>E(`(()=>{MATCH=null;B=null;ACH.edicts=[];ACH.ngplus=${ng};ACH.cdiff=${d?`'${d}'`:'undefined'};setPack('medieval');newRun('harbor');RUN.ante=3;RUN.blind=${blind};RUN.fightTarget=null;return targetParts(${blind}).final})()`);
 const base=tgt(null,0,1);

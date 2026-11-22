@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=232"></script>
-<script src="piece-designs.js?v=232"></script>
-<script src="character-style.js?v=232"></script>
-<script src="campaign-opponents.js?v=232"></script>
-<script src="campaign-dialogue.js?v=232"></script>
-<link rel="stylesheet" href="character-style.css?v=232">
+<script src="gameplay-polish.js?v=233"></script>
+<script src="piece-designs.js?v=233"></script>
+<script src="character-style.js?v=233"></script>
+<script src="campaign-opponents.js?v=233"></script>
+<script src="campaign-dialogue.js?v=233"></script>
+<link rel="stylesheet" href="character-style.css?v=233">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=232">
-<link rel="stylesheet" href="ruler-style.css?v=232">
-<link rel="stylesheet" href="gameplay-polish.css?v=232">
+<link rel="stylesheet" href="city-board.css?v=233">
+<link rel="stylesheet" href="ruler-style.css?v=233">
+<link rel="stylesheet" href="gameplay-polish.css?v=233">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3664,7 +3664,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 232;
+const GAME_VERSION = 233;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6709,6 +6709,20 @@ function dailyWin(vScore, vLog, laRes, mate, captureFinish){
     let go = false; m.querySelector('#cash').onclick = () => { if(go) return; go = true; m.remove(); sfx.coin(); all ? dailyFinish(true) : dailyPick(() => gNextWave()); };
   });
 }
+/* v233 SHARE: a short spoiler-free result to paste anywhere. One square per wave: green = cleared (a crown for a cleared
+   boss wave), red = the wave that ended the run, black = not reached. The phone's share sheet when there is one,
+   otherwise the clipboard, otherwise the text shown to copy by hand. */
+function dailyShareText(res){
+  const grid = Array.from({length:DAILY_WAVES}, (_, i) => i < res.cleared ? ((i + 1) % 5 === 0 ? '👑' : '🟩') : i === res.cleared && !res.all ? '🟥' : '⬛').join('');
+  return `Crownfall Daily · ${dailyLabel(res.date)}\n${grid}\n${res.cleared} of ${DAILY_WAVES} waves · ${res.score.toLocaleString()}${res.streak > 1 ? `\n🔥 ${res.streak}-day streak` : ''}\nhttps://erndae.github.io/Crownfall/`;
+}
+async function dailyShare(res, btn){
+  const text = dailyShareText(res), done = t => { if(btn){ btn.textContent = t; setTimeout(() => { btn.textContent = 'Share result'; }, 2200); } };
+  try{ if(navigator.share){ await navigator.share({text}); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+  try{ await navigator.clipboard.writeText(text); done('Copied!'); return; }catch(e){}
+  modal(`<h2>Share result</h2><textarea class="dshare" readonly rows="6">${text}</textarea><p class="muted" style="margin:0">Copy this and paste it anywhere.</p><button class="btn" id="dsok">Close</button>`, '#dsok');
+  const ta = document.querySelector('.dshare'); if(ta){ ta.focus(); ta.select(); }
+}
 function dailyFinish(all, why){
   if(!all) sfx.lose();
   const lastLog = B && B.log, res = dailyRecord(RUN, all); clearRun();   // recorded and cleared before anything is shown
@@ -6725,9 +6739,10 @@ function dailyFinish(all, why){
       <div class="kv"><span>Best ever</span><b>${res.bestEver.toLocaleString()}</b></div>
     </div>
     <p class="muted" style="text-align:center;margin:0">A new Daily Run starts tomorrow. You can replay today’s as often as you like: your best counts.</p>
-    <button class="btn gbtn" id="gagain">Play again</button><button class="btn ghost" id="gmenu">Main menu</button>
+    <pre class="dgrid" aria-hidden="true">${dailyShareText(res).split('\n')[1]}</pre>
+    <button class="btn gbtn" id="dshare">Share result</button><button class="btn ghost" id="gagain">Play again</button><button class="btn ghost" id="gmenu">Main menu</button>
   </section>`;
-  $('#gagain').onclick = () => gNewRun(); $('#gmenu').onclick = () => title();
+  $('#dshare').onclick = e => dailyShare(res, e.currentTarget); $('#gagain').onclick = () => gNewRun(); $('#gmenu').onclick = () => title();
   return res;
 }
 function dailyRecords(){
@@ -10395,6 +10410,13 @@ function midCheckpoint(){
   (window.__cpLog = window.__cpLog || []).push({k:'mid-taken', land:l, circuit:RUN.circuit, money:RUN.money, roster:RUN.roster.length});
 }
 let defeatLock = false;                 // one resolved defeat = one life (reset when a round starts)
+/* v233: the first time a campaign falls in Crown City on Normal or Hard (first campaign only), the Game Over screen
+   mentions Easy for the next campaign. Shown once ever ('easytip' in crownfall-tips). Nothing changes mid-run. */
+function easyTipHTML(gl){
+  if(gl !== 'street' || cdiff() === 'easy' || ngLevel() > 0 || coachSeen().easytip) return '';
+  coachMark('easytip');
+  return `<p class="rbnote easytip"><b>Finding it tough?</b><span>Easy mode is there for your next campaign: lower score targets, a weaker enemy and 5 lives. Choose it when you start a New Campaign.</span></p>`;
+}
 function gameOver(why){ try{ laClear(); }catch(e){}
   if(RUN && RUN.gauntlet && !MATCH && /^Stalemate/.test(why || '')) return gDraw('enemy', why);   // v152: you have no legal move and aren't in check: a draw
   enSnap = null; enCommitted = false;
@@ -10409,11 +10431,12 @@ function gameOver(why){ try{ laClear(); }catch(e){}
   if(reached > BEST.ante){ BEST.ante = reached; saveBest(); }
   const log = B && B.log;
   const rulerFall = !!(RUN && RUN.circuit === 'ruler'), gl = RUN && land(), failed = RUN && RUN.circuit;
+  const tip = easyTipHTML(gl);   // v233 (worked out before the run is cleared)
   // restore the checkpoint now (before anything is shown): a refresh can only come back to the restored army
   const cp = cpGet();
   { const mid = rulerFall ? cp.rulerMid : cp.mid;   // beta 2: halfway checkpoint
     const okMid = mid && mid.land === gl && (rulerFall ? mid.circuit === REBUILD_CIRCUIT : (mid.circuit === failed && RUN.ante >= 3 && mid.att === RUN.att));
-    if(okMid) return midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid); }
+    if(okMid) return midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid, tip); }
   let back = rulerFall ? cp.ruler : cp.cur;
   if(!back || back.land !== gl || (!rulerFall && back.circuit !== failed)) back = {land:gl, circuit:rulerFall ? REBUILD_CIRCUIT : failed, carry:null, at:Date.now(), approx:true};   // no checkpoint: fresh army
   const restartC = rulerFall ? REBUILD_CIRCUIT : failed;
@@ -10428,7 +10451,7 @@ function gameOver(why){ try{ laClear(); }catch(e){}
   const gm = modal(`${quote}<h2 style="color:var(--mult)">${rulerFall ? 'The Ruler holds the throne' : 'The run has fallen'}</h2><p>${why}</p>
     <p class="rbnote"><b>${rulerFall ? 'Return to the circuit.' : 'The circuit begins again.'}</b><span>Your army returns to the strength it had ${rulerFall ? 'before this circuit began' : 'when you entered this circuit'}.${rulerFall ? ` Clear ${CIRCUITS.find(c => c.id === restartC).name} again to face ${rulerShort(gl)}.` : ''}</span></p>
     <div class="kv"><span>Reached</span><b>Stage ${reached}: ${stageName(reached)}</b></div>
-    <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>
+    <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>${tip}
     <button class="btn" id="again">Restart circuit${rulerFall ? ' ' + cName : ''}</button><button class="btn ghost" id="peek">View the board</button><button class="btn ghost" id="home">Title screen</button>`, null);
   gm.dataset.lossReason=why;
   addPeek(gm, log);
@@ -10436,7 +10459,7 @@ function gameOver(why){ try{ laClear(); }catch(e){}
   gm.querySelector('#home').onclick = () => { gm.remove(); title(); };
 }
 
-function midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid){
+function midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid, tip = ''){
   const LIFE_FLOOR = 3;                                      // same recovery rule as a Circuit restart
   const run = clone(mid.run); run.lives = Math.max(LIFE_FLOOR, run.lives || 0); run.won = false; run.inShop = false; run.shop = run.shop || [];
   run.midRestores = (run.midRestores || 0) + 1;
@@ -10454,7 +10477,7 @@ function midGameOver(why, quote, log, reached, rulerFall, gl, cp, mid){
   const gm = modal(`${quote}<h2 style="color:var(--mult)">${rulerFall ? 'The Ruler holds the throne' : 'The run has fallen'}</h2><p>${why}</p>
     <p class="rbnote"><b>Back to the halfway checkpoint.</b><span>${rulerFall ? `Return to ${cName}, Stage 3. Clear Stages 3 and 4 again to face ${rulerShort(gl)}.` : `${cName} resumes at Stage 3.`} Your army returns to the strength it had when Stage 3 first began.</span></p>
     <div class="kv"><span>Reached</span><b>${rulerFall ? 'The Ruler' : `Stage ${reached}: ${stageName(reached)}`}</b></div>
-    <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>
+    <div class="kv"><span>Best capture ever</span><b>${BEST.hand.toLocaleString()}</b></div>${tip}
     <button class="btn" id="again">Return to Stage 3</button><button class="btn ghost" id="peek">View the board</button><button class="btn ghost" id="home">Title screen</button>`, null);
   gm.dataset.lossReason=why;
   addPeek(gm, log);
