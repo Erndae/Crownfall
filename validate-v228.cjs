@@ -14,7 +14,7 @@ clear();E("ACH.hunger={ep:5,fed:1,refused:5};ACH.ngplus=0;ACH.edicts=['iron'];st
 clear();E("ACH.hunger={ep:5,fed:0,refused:0};storyAchsAtEnd('true')");assert(!got('sa_refuse'),'Iron Will needs at least one refusal');
 assert(src.indexOf('try{ storyAchsAtEnd(type); }catch(e){}')<src.indexOf("s.seen[type] = s.seen[type] || Date.now(); s.pending = null; s.lastType = type;\n  if(type === 'standard')"),'checked before the ending is marked seen');
 // the Hunger
-clear();E("ACH.hunger={ep:5,fed:8,refused:0};hungerNote('fed')");assert(!got('sa_fed'));E("hungerNote('fed')");assert(got('sa_fed'),'ten bargains');
+clear();E("ACH.hunger={ep:5,fed:HUNGER_FED_ACH-2,refused:0};hungerNote('fed')");assert(!got('sa_fed'));E("hungerNote('fed')");assert(got('sa_fed'),'the Well Fed count');
 // supply crates and the Bounty
 clear();E("PACK='greek';RUN={land:'greek',circuit:'harbor',ante:3,blind:1,money:5,relics:[],roster:['K']};B={board:Array(64).fill(null),swaps:1,log:[],tac:null,crates:[34,37,29]};tacState();[34,37,29].forEach((i,k)=>{B.board[i]={t:'N',side:'me',id:50+k};})");
 E('springDockCrate(34);springDockCrate(37)');assert(!got('sa_crates'));E('springDockCrate(29)');assert(got('sa_crates'),'three crates in one fight');

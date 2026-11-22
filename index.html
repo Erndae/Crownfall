@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=234"></script>
-<script src="piece-designs.js?v=234"></script>
-<script src="character-style.js?v=234"></script>
-<script src="campaign-opponents.js?v=234"></script>
-<script src="campaign-dialogue.js?v=234"></script>
-<link rel="stylesheet" href="character-style.css?v=234">
+<script src="gameplay-polish.js?v=235"></script>
+<script src="piece-designs.js?v=235"></script>
+<script src="character-style.js?v=235"></script>
+<script src="campaign-opponents.js?v=235"></script>
+<script src="campaign-dialogue.js?v=235"></script>
+<link rel="stylesheet" href="character-style.css?v=235">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=234">
-<link rel="stylesheet" href="ruler-style.css?v=234">
-<link rel="stylesheet" href="gameplay-polish.css?v=234">
+<link rel="stylesheet" href="city-board.css?v=235">
+<link rel="stylesheet" href="ruler-style.css?v=235">
+<link rel="stylesheet" href="gameplay-polish.css?v=235">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2581,7 +2581,7 @@ const STORY_ACHS = [
   {id:'sa_crowned', story:true, hidden:true, name:'Long Live the King', desc:'Wear the Crown of Crowns.'},
   {id:'sa_true', story:true, hidden:true, name:'Crownbreaker', desc:'Break the Crown of Crowns.'},
   {id:'sa_refuse', story:true, name:'Iron Will', desc:'Finish a campaign without feeding the Hunger once (refuse it at least once).'},
-  {id:'sa_fed', story:true, name:'Well Fed', desc:'Take 10 of the Hunger’s bargains in one campaign.'},
+  {id:'sa_fed', story:true, name:'Well Fed', desc:'Take 6 of the Hunger’s bargains in one campaign.'},
   {id:'sa_mirror', story:true, hidden:true, name:'Know Thyself', desc:'Defeat the Crownless King while he leads your old army.'},
   {id:'sa_again', story:true, hidden:true, name:'Haven’t We Done This Before?', desc:'Finish a New Game+ campaign.'},
   {id:'sa_edicts', story:true, name:'By Royal Decree', desc:'Finish a campaign with 3 or more Edicts in force.'},
@@ -3083,7 +3083,7 @@ const ngLevel = () => (RUN && (RUN.gauntlet || (typeof MATCH !== 'undefined' && 
 const EDICTS = {
   iron:{name:'Iron Rulers', desc:'In Ruler fights, the enemy’s two strongest pieces start Armored.'},
   vanguard:{name:'Vanguard', desc:'In Stage Battles, enemy Knights and Bishops start Armored.'},
-  hungry:{name:'Hungry Crowns', desc:'The Hunger bargains from your first Stage Battle, and refusing it costs $2.'},
+  hungry:{name:'Hungry Crowns', desc:'The Hunger can bargain before your first World Crown, and refusing it costs $2.'},
   fuse:{name:'Short Fuse', desc:'Blitz fights have 1 fewer move.'},
   bound:{name:'Bound Hands', desc:'Every fight starts with 1 fewer swap.'},
   fragile:{name:'Fragile', desc:'Each new army starts with 2 lives instead of 3.'},
@@ -3664,7 +3664,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 234;
+const GAME_VERSION = 235;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6100,10 +6100,10 @@ function oppEntrance(boss, tier){
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
   el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
 }
-/* v223 The Hunger's bargain. Once you carry a World Crown, the Hunger makes an offer before each Stage Battle (the third
+/* v223 The Hunger's bargain. Once you carry a World Crown, the Hunger may make an offer before a Stage Battle (the third
    fight of a stage): a boon and a price, both growing with the World Crowns you carry (1-4). Take it or refuse it; the
-   choice is counted for the campaign, and the endings remember. Offered once per Stage Battle (a retry after a lost life
-   is not offered again). */
+   choice is counted for the campaign, and the endings remember. Decided once per Stage Battle (a retry after a lost life
+   is not offered again). v235: only sometimes, see hungerComes. */
 const HUNGER_OFFERS = ['power', 'greed', 'fury', 'reach'];
 /* v224: Rulers (and the Hollow Crown) notice whether you have mostly fed the Hunger or mostly refused it this campaign.
    Nothing is said on a tie or before the first bargain. Vex is fought before any bargain is offered, so he has no line. */
@@ -6118,7 +6118,7 @@ function hungerReact(name){ const R = HUNGER_REACT[name], k = hungerLean(); retu
 const hungerRecordHTML = () => { const h = hungerTally(); if(!(h.fed + h.refused)) return '';   // v224: Journey shows how you have answered it
   const k = hungerLean(); return `<div class="jhunger"><span><small>The Hunger</small><b>Fed ${h.fed} · Refused ${h.refused}</b></span><em>${k === 'fed' ? 'It is getting a taste for you.' : k === 'refused' ? 'It has not owned you yet.' : 'It is still deciding about you.'}</em></div>`; };
 function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
-function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= 10) unlockAch('sa_fed', false); }
+function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
 function hungerOffer(){
@@ -6131,9 +6131,20 @@ function hungerOffer(){
     reach:{boon:`Start with ${n >= 3 ? 2 : 1} extra swap${n >= 3 ? 's' : ''}`, cost:`Pay $${2 * n} now`}}[k];
   return {k, n, boon:O.boon, cost:O.cost, cash:3 * n, pay:2 * n, swaps:n >= 3 ? 2 : 1};
 }
+/* v235: the Hunger no longer bargains before every Stage Battle. Each eligible Stage Battle it comes with a 1-in-4
+   chance, never two Stage Battles in a row, and at the latest after 6 quiet ones. The roll comes from the campaign and
+   the battle (not Math.random), so losing a life or reloading never re-rolls it; it is decided once per Stage Battle. */
+const HUNGER_ODDS = 0.25, HUNGER_PITY = 6, HUNGER_FED_ACH = 6;
+function hungerRoll(){ let h = 2166136261;
+  for(const ch of `${ACH.campaign_epoch || 0}|${ACH.ngplus || 0}|${hungerKey()}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  return (h % 10000) / 10000; }
+function hungerComes(){ const h = hungerTally(), gap = h.gap == null ? 1 : h.gap;   // Stage Battles since the last bargain (kept for the campaign, across Circuits and Lands)
+  const yes = gap >= 1 && (hungerRoll() < HUNGER_ODDS || gap >= HUNGER_PITY);
+  h.gap = yes ? 0 : gap + 1; ACH.hunger = h; saveAch(); return yes; }
 function hungerAsk(go){
   if(!hungerDue()) return go();
-  const o = hungerOffer(); RUN.pactKey = hungerKey(); save();
+  RUN.pactKey = hungerKey(); if(!hungerComes()){ save(); return go(); }   // v235: decided once for this Stage Battle
+  const o = hungerOffer(); save();
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
     <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
     <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>

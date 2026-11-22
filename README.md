@@ -474,3 +474,9 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Records calendar:** one month at a time with ‹ › between months that have runs. Each played day shows its best score, shaded by waves cleared (gold when all ten fell); tap a day for score, waves and plays. Today is outlined.
 - History now keeps about a year of days (was 60), and Best ever is kept even after its day is pruned.
 - Tests: `validate-v234.cjs`; v233 version check made forward-compatible.
+
+## v235 — the Hunger comes only sometimes
+- The Hunger no longer bargains before every Stage Battle. Each eligible Stage Battle (you carry a World Crown, or Hungry Crowns is on) it comes with a **1-in-4 chance**, **never two Stage Battles in a row**, and at the latest after 6 quiet ones. About 15 bargains in a whole campaign instead of about 64.
+- The roll comes from the campaign and the battle, not a random draw at the moment, so losing a life or reloading never re-rolls it.
+- **Well Fed** now needs 6 bargains taken in one campaign (was 10). Hungry Crowns' description updated.
+- Tests: `validate-v235.cjs` (200 simulated campaigns); v228 and v234 checks updated.

@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const c=require('./test-support/game-runtime.cjs'),E=c.testEval;c.CrownfallCharacter={get:()=>({name:'Ernesto'}),art:()=>'',save:()=>true};
 const src=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
-assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=234&&sw.includes("'crownfall-v"+RegExp.$1+"'")&&!src.includes('?v=233'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=234&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 // the preview matches the waves the run really plays, for several dates
 for(const date of ['2026-11-21','2026-11-22','2027-01-01','2026-12-31']){
   const plan=JSON.parse(E(`JSON.stringify(dailyPlan('${date}'))`));
