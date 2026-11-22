@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=233"></script>
-<script src="piece-designs.js?v=233"></script>
-<script src="character-style.js?v=233"></script>
-<script src="campaign-opponents.js?v=233"></script>
-<script src="campaign-dialogue.js?v=233"></script>
-<link rel="stylesheet" href="character-style.css?v=233">
+<script src="gameplay-polish.js?v=234"></script>
+<script src="piece-designs.js?v=234"></script>
+<script src="character-style.js?v=234"></script>
+<script src="campaign-opponents.js?v=234"></script>
+<script src="campaign-dialogue.js?v=234"></script>
+<link rel="stylesheet" href="character-style.css?v=234">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=233">
-<link rel="stylesheet" href="ruler-style.css?v=233">
-<link rel="stylesheet" href="gameplay-polish.css?v=233">
+<link rel="stylesheet" href="city-board.css?v=234">
+<link rel="stylesheet" href="ruler-style.css?v=234">
+<link rel="stylesheet" href="gameplay-polish.css?v=234">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3664,7 +3664,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 233;
+const GAME_VERSION = 234;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6643,13 +6643,14 @@ function dailyStreak(rec = dailyRec()){
   while(done(key(d))){ n++; d.setDate(d.getDate() - 1); }
   return n;
 }
-const dailyBestEver = (rec = dailyRec()) => Object.values(rec.days).reduce((m, x) => Math.max(m, +x.best || 0), 0);
+const dailyBestEver = (rec = dailyRec()) => Object.values(rec.days).reduce((m, x) => Math.max(m, +x.best || 0), +rec.bestEver || 0);
 function dailyScore(run, all){ const cleared = Math.max(0, Math.min(DAILY_WAVES, (run.gWave || 1) - 1)), cash = Math.max(0, Math.floor(+run.money || 0)); return {cleared, cash, score:Math.round((run.dScore || 0) + 1000 * cleared + (all ? 3000 : 0) + 100 * cash)}; }   // cash (crates, bounties) is worth 100 points per $
 function dailyRecord(run, all){
   const rec = dailyRec(), k = run.daily, {cleared, score} = dailyScore(run, all), day = rec.days[k] || {best:0, waves:0, plays:0};
   const newBest = score > (day.best || 0);
   rec.days[k] = {best:Math.max(day.best || 0, score), waves:Math.max(day.waves || 0, cleared), plays:(day.plays || 0) + 1, finished:true, all:!!(day.all || all)};
-  const keys = Object.keys(rec.days).sort(); while(keys.length > 60) delete rec.days[keys.shift()];   // two months of history
+  rec.bestEver = dailyBestEver(rec);   // v234: kept even after old days are pruned
+  const keys = Object.keys(rec.days).sort(); while(keys.length > 400) delete rec.days[keys.shift()];   // v234: about a year of history (for the calendar)
   jset('crownfall-daily', rec);
   return {date:k, score, cleared, cash:dailyScore(run, all).cash, all, newBest, best:rec.days[k].best, streak:dailyStreak(rec), bestEver:dailyBestEver(rec)};
 }
@@ -6745,13 +6746,49 @@ function dailyFinish(all, why){
   $('#dshare').onclick = e => dailyShare(res, e.currentTarget); $('#gagain').onclick = () => gNewRun(); $('#gmenu').onclick = () => title();
   return res;
 }
+/* v234 RECORDS CALENDAR: one month at a time (‹ › to move between months that have runs). Each played day shows its
+   best score, shaded by waves cleared (gold when all ten fell); tap a day for its details. Today is outlined. */
 function dailyRecords(){
-  const rec = dailyRec(), keys = Object.keys(rec.days).sort().reverse().slice(0, 14);
-  modal(`<p class="muted gk">Daily Run</p><h2>Records</h2>
+  const rec = dailyRec(), keys = Object.keys(rec.days).sort(), today = dailyToday();
+  const ym = k => k.slice(0, 7), first = keys.length ? ym(keys[0]) : ym(today);
+  let cur = ym(today);
+  const short = n => n >= 10000 ? (n / 1000).toFixed(0) + 'k' : n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+  const detail = k => { const d = rec.days[k]; return d ? `<b>${dailyLabel(k)}</b> · ${(+d.best || 0).toLocaleString()} · ${d.waves || 0} of ${DAILY_WAVES} waves${d.all ? ' · all cleared' : ''} · ${d.plays || 1} play${(d.plays || 1) === 1 ? '' : 's'}`
+    : `<b>${dailyLabel(k)}</b> · ${k === today ? 'not played yet' : k > today ? 'still to come' : 'not played'}`; };
+  const month = () => {
+    const [y, m] = cur.split('-').map(Number), start = new Date(y, m - 1, 1), days = new Date(y, m, 0).getDate(), lead = start.getDay(), cells = [];
+    for(let i = 0; i < lead; i++) cells.push('<span class="dcd empty"></span>');
+    for(let d = 1; d <= days; d++){ const k = `${cur}-${String(d).padStart(2, '0')}`, r = rec.days[k];
+      const lv = r ? (r.all ? 'all' : `w${Math.min(4, Math.ceil((r.waves || 0) / 2.5))}`) : '';
+      cells.push(`<button class="dcd${r ? ' played ' + lv : ''}${k === today ? ' today' : ''}${k > today ? ' future' : ''}" data-k="${k}" aria-label="${dailyLabel(k)}${r ? ', ' + (+r.best || 0).toLocaleString() : ''}"><b>${d}</b>${r ? `<small>${short(+r.best || 0)}</small>` : ''}</button>`); }
+    return `<div class="dcal-top"><button class="dcal-nav" id="dcp"${cur <= first ? ' disabled' : ''} aria-label="Previous month">‹</button><b>${start.toLocaleDateString(undefined, {month:'long', year:'numeric'})}</b><button class="dcal-nav" id="dcn"${cur >= ym(today) ? ' disabled' : ''} aria-label="Next month">›</button></div>
+      <div class="dcal-wk">${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(x => `<span>${x}</span>`).join('')}</div><div class="dcal">${cells.join('')}</div>`; };
+  const m = modal(`<p class="muted gk">Daily Run</p><h2>Records</h2>
     <div class="cash"><div class="kv"><span>Streak</span><b>${dailyStreak(rec)} day${dailyStreak(rec) === 1 ? '' : 's'}</b></div><div class="kv"><span>Best ever</span><b>${dailyBestEver(rec).toLocaleString()}</b></div></div>
-    ${keys.length ? `<ol class="glb">${keys.map(k => { const d = rec.days[k]; return `<li><b>${(+d.best || 0).toLocaleString()}</b><span>${d.waves || 0} of ${DAILY_WAVES} waves${d.all ? ' · all cleared' : ''} · ${d.plays || 1} play${(d.plays || 1) === 1 ? '' : 's'}</span><small>${dailyLabel(k)}</small></li>`; }).join('')}</ol>` : '<p class="muted">No Daily Runs yet.</p>'}
+    <div class="dcalw"></div><p class="dcal-d"></p>
     <p class="muted" style="font-size:12.5px;margin:0">Records are kept on this device.</p>
     <button class="btn" id="grok">Close</button>`, '#grok');
+  const box = m.querySelector('.dcalw'), info = m.querySelector('.dcal-d');
+  const draw = sel => { box.innerHTML = month(); info.innerHTML = detail(sel);
+    box.querySelectorAll('.dcd[data-k]').forEach(b => { if(b.dataset.k === sel) b.classList.add('sel'); b.onclick = () => draw(b.dataset.k); });
+    const mv = n => { const [y, mo] = cur.split('-').map(Number), d = new Date(y, mo - 1 + n, 1); cur = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const inMonth = keys.filter(k => ym(k) === cur); draw(cur === ym(today) ? today : inMonth.length ? inMonth[inMonth.length - 1] : `${cur}-01`); };
+    const p = box.querySelector('#dcp'), n = box.querySelector('#dcn'); if(p) p.onclick = () => mv(-1); if(n) n.onclick = () => mv(1); };
+  draw(today);
+}
+/* v234 TODAY'S ROUTE: the day's ten waves before you start: the Land, each wave's rule, the boss waves and the board
+   mark (from wave 3). Drawn exactly as the waves will be (same seed); the enemy's formation is still a surprise. */
+function dailyPlan(date){
+  const keep = Math.random, out = [];
+  try{ for(let w = 1; w <= DAILY_WAVES; w++){ Math.random = dailyRng(date + '|wave' + w); out.push(gWavePlan(w, true)); } } finally { Math.random = keep; }
+  return out.map(P => { const id = P.bosses[(P.ante - 1) % P.bosses.length], r = id === 'mini' ? MINI_RULE[P.c] : id;
+    return {w:P.w, boss:P.boss, land:P.L, rule:r && r !== 'thief' ? r : null, tag:G_RULE_TAG[r] || 'No special rule', mark:P.w >= 3 ? G_MARK[P.c] : null}; });
+}
+function dailyRouteHTML(date){
+  const plan = dailyPlan(date), name = id => (PACKS.find(p => p.id === id) || {}).name || id;
+  const lands = [...new Set(plan.map(x => x.land))];
+  return `<div class="droute"><p class="droute-h">Today’s route</p>${lands.map(l => `<div class="drl"><small>${name(l)}</small>${plan.filter(x => x.land === l).map(x =>
+    `<span class="drw${x.boss ? ' boss' : ''}${x.rule ? '' : ' plain'}"><b>${x.w}</b><em>${x.tag}</em>${x.boss ? '<i>Boss</i>' : ''}${x.mark ? `<u>${x.mark}</u>` : ''}</span>`).join('')}</div>`).join('')}</div>`;
 }
 function gNewRun(){
   if(RUN && RUN.gauntlet && RUN.daily && (RUN.gWave || 1) > 1) dailyRecord(RUN, false);   // v230: an abandoned Daily Run still counts as played
@@ -6767,18 +6804,24 @@ function gNewRun(){
     <p><b>After every wave,</b> choose 1 of 3 rewards: a recruit, training, a relic, a card or a life.</p>
     <p><b>3 Lives.</b> Lose a fight and you fight that wave again. A stalemate replays the wave. Lose your last life and the run is over.</p>
     <p><b>Score:</b> your points from won waves, +1,000 per wave cleared, +3,000 for all ten, +100 per $ you finish with. Replay as often as you like: the day’s best counts.</p></div>
+    ${dailyRouteHTML(RUN.daily)}
     <button class="btn gbtn" id="gstart">Start Wave 1</button>`, null);
   m.querySelector('#gstart').onclick = () => { m.remove(); gNextWave(); };
 }
 // the next wave's arena and opponent are drawn once and saved, so a refresh never changes them
-function gPrepWave(){
-  const w = RUN.gWave, boss = gBossWave(w), L = RUN.daily ? G_LANDS[Math.min(4, Math.floor((w - 1) / 2))] : G_LANDS[Math.floor((w - 1) / 5) % 5];   // v230: a Daily Run visits each Land for two waves
+// v234: the wave's draw on its own (no side effects), so the Daily Run can preview the day's route
+function gWavePlan(w, daily){
+  const boss = gBossWave(w), L = daily ? G_LANDS[Math.min(4, Math.floor((w - 1) / 2))] : G_LANDS[Math.floor((w - 1) / 5) % 5];   // v230: a Daily Run visits each Land for two waves
   const c = pick(boss ? G_CIRCS.filter(x => x !== 'downtown') : G_CIRCS);   // v153: no Blitz bosses (Downtown's Circuit boss rule is Blitz)
   const rules = BOSSES.map(b => b.id).filter(id => !['mini', 'ruler', 'clock'].includes(id) && !(L === 'throne' && id === 'crown'));   // never the Fallen Grandmaster; never Blitz
-  RUN.land = L; RUN.circuit = c; RUN.tier = tierFor(c); RUN.blind = 2; RUN.ante = boss ? 4 : 1 + Math.floor(Math.random() * 3);
-  RUN.bosses = [pick(rules), pick(rules), pick(rules), 'mini'];
-  RUN.gExtra = null;                                                            // v152: from wave 45 boss waves may combine two rules (always from 70)
-  if(boss && w >= 45 && Math.random() < Math.min(1, (w - 40) / 30)){ const mr = MINI_RULE[c] || 'crown'; RUN.gExtra = pick(['wall', 'tax', 'march'].filter(x => x !== mr)); }
+  const ante = boss ? 4 : 1 + Math.floor(Math.random() * 3), bosses = [pick(rules), pick(rules), pick(rules), 'mini'];
+  let gExtra = null;                                                            // v152: from wave 45 boss waves may combine two rules (always from 70)
+  if(boss && w >= 45 && Math.random() < Math.min(1, (w - 40) / 30)){ const mr = MINI_RULE[c] || 'crown'; gExtra = pick(['wall', 'tax', 'march'].filter(x => x !== mr)); }
+  return {w, boss, L, c, ante, bosses, gExtra};
+}
+function gPrepWave(){
+  const P = gWavePlan(RUN.gWave, !!RUN.daily), w = P.w, L = P.L;
+  RUN.land = L; RUN.circuit = P.c; RUN.tier = tierFor(P.c); RUN.blind = 2; RUN.ante = P.ante; RUN.bosses = P.bosses; RUN.gExtra = P.gExtra;
   RUN.gWaveSet = w; RUN.fightTarget = null; RUN.inShop = false; RUN.shop = null; RUN.gEntry = null; delete RUN.gRetry;
   setPack(L); save();
 }

@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const c=require('./test-support/game-runtime.cjs'),E=c.testEval;c.CrownfallCharacter={get:()=>({name:'Ernesto'}),art:()=>'',save:()=>true};
 const src=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
-assert(src.includes('const GAME_VERSION = 233;')&&sw.includes("'crownfall-v233'")&&!src.includes('?v=232'));
+assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=233&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 const share=r=>E(`dailyShareText(${JSON.stringify(r)})`);
 const a=share({date:'2026-11-21',cleared:7,all:false,score:14250,streak:3}).split('\n');
 assert.equal(a[0],'Crownfall Daily · '+E("dailyLabel('2026-11-21')"));

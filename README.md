@@ -468,3 +468,9 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - **Share result** on the Daily Run end screen: the date, one square per wave (green cleared, a crown for a cleared boss wave, red where the run ended, black not reached), waves and score, the streak from 2 days, and the game's link. It uses the phone's share sheet, otherwise copies to the clipboard ("Copied!"), otherwise shows the text to copy. The wave squares also show on the end screen.
 - **Easy tip:** the first time a campaign falls in Crown City on Normal or Hard (first campaign, not New Game+), the Game Over screen mentions Easy for the next campaign. Shown once ever; nothing changes mid-run.
 - Tests: `validate-v233.cjs`; v232 version check made forward-compatible.
+
+## v234 — Daily Run: today's route and a records calendar
+- **Today's route** in the Daily Run intro: the ten waves grouped by Land, each with its rule (Iron Wall, Toll Collectors, Double Movers, High Stakes or no special rule), the two Boss waves and the board mark from wave 3. It is drawn exactly as the waves will be (same seed; `gWavePlan` is the wave draw with no side effects, used by both the preview and the real wave), so it always matches. The enemy's formation is still a surprise.
+- **Records calendar:** one month at a time with ‹ › between months that have runs. Each played day shows its best score, shaded by waves cleared (gold when all ten fell); tap a day for score, waves and plays. Today is outlined.
+- History now keeps about a year of days (was 60), and Best ever is kept even after its day is pruned.
+- Tests: `validate-v234.cjs`; v233 version check made forward-compatible.
