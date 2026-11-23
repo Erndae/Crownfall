@@ -16,6 +16,6 @@ for(const n of all){const f=face(n);assert(!/undefined|NaN|null|<script|on\w+=|h
 for(const m of [ctx.CAMPAIGN_BOSS_FACES,ctx.CAMPAIGN_OTHER_FACES])for(const n in m.throne)assert.equal(m.throne[n][1],'hollow',n);
 const ruler={street:'fox',fantasy:'crow'};for(const l in ruler)for(const m of [ctx.CAMPAIGN_BOSS_FACES,ctx.CAMPAIGN_OTHER_FACES])for(const n in m[l])assert.notEqual(m[l][n][0],ruler[l],n);
 for(const bad of [null,undefined,'',5,{},'Kingpin Vex'])assert.equal(face(bad),null);
-assert(src.includes("oface${f.boss ? ' boss' : ''}"));
+assert(src.includes("${f.boss ? ' boss' : ''}"));
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=192);assert(fs.readFileSync(__dirname+'/sw.js','utf8').includes('crownfall-v'+RegExp.$1));
 console.log('PASS: 20 Circuit Bosses with a gold ring, 30 rule-named opponents, 107 unique safe faces, only Rulers keep portraits, version.');

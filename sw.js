@@ -1,16 +1,16 @@
 // Crownfall offline cache. Bump VERSION when you upload a new index.html.
 // Music in soundtrack/ is cached on demand.
-const VERSION = 'crownfall-v236';
+const VERSION = 'crownfall-v237';
 // v229: the first visit downloads only what the first session needs (the page once, scripts, icons, land and crown art,
 // portraits, Crown City's walk-in). Later art (the other Lands' walk-ins, the ending paintings) is cached the first time
 // it is shown, and topped up quietly a little after launch on a good connection, so the game still works offline.
 const FILES = [
   './assets/opponents/iron-kingdom.webp', './assets/opponents/olympian-court.webp', './assets/opponents/road-opponents.webp', './assets/intro/bg-street.webp',
   './assets/intro/fig-city.webp', './assets/splash/crown-city-night.webp', './assets/splash/royal-courtyard.webp', './assets/splash/road-to-the-crown.webp',
-  './gameplay-polish.js?v=236', './gameplay-polish.css?v=236', './assets/rulers/raven.webp', './assets/rulers/stag.webp',
-  './assets/rulers/owl.webp', './assets/rulers/lion.webp', './assets/rulers/fox.webp', './piece-designs.js?v=236',
-  './character-style.js?v=236', './character-style.css?v=236', './campaign-opponents.js?v=236', './campaign-dialogue.js?v=236',
-  './city-board.css?v=236', './ruler-style.css?v=236', './downtown-journey.webp', './index.html',
+  './gameplay-polish.js?v=237', './gameplay-polish.css?v=237', './assets/rulers/raven.webp', './assets/rulers/stag.webp',
+  './assets/rulers/owl.webp', './assets/rulers/lion.webp', './assets/rulers/fox.webp', './piece-designs.js?v=237',
+  './character-style.js?v=237', './character-style.css?v=237', './campaign-opponents.js?v=237', './campaign-dialogue.js?v=237',
+  './city-board.css?v=237', './ruler-style.css?v=237', './downtown-journey.webp', './index.html',
   './manifest.webmanifest', './cf-icon-192.png', './cf-icon-512.png', './cf-touch-180.png',
   './cf-favicon-32.png', './crownfall-logo.webp', './crown-city.webp', './iron-kingdom.webp',
   './olympian-court.webp', './shattered-realm.webp', './fallen-throne.webp', './spray-paint-crown.webp',

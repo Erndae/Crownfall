@@ -490,3 +490,8 @@ Since v235 the Hunger comes rarely, so each bargain is bigger (n = World Crowns 
 - **Blood (new, lasting):** your strongest piece type gains a level for good · one of your Pawns, named, is gone for good. The offer says "This bargain lasts beyond this battle."
 - Reach needs the cash, Blood needs a Pawn and a type below the top level; otherwise the offer becomes Power. The offer text now reads "The Hunger rarely comes. Each World Crown you carry makes its bargain bigger, and its price real."
 - Tests: `validate-v236.cjs`; v223 effect checks updated to the new sizes.
+
+## v237 — no more old faces flashing before the paintings
+- Painted opponents (the Iron Kingdom onward, 43 of them) showed their old drawn face underneath the painting, and it was visible for a moment while the painting sheet loaded. A painted opponent now shows only its painting; Crown City's opponents, who have no painting, keep their drawn faces.
+- The three painting sheets are loaded and decoded ahead of time: this Land's sheet a second after start-up and at each fight, the others when the browser is idle (skipped on data-saving or very slow connections).
+- Tests: `validate-v237.cjs`; v192 check updated.
