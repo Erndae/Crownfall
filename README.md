@@ -480,3 +480,13 @@ The crowns carry a dark power, the Hunger. It makes its wearer stronger and bend
 - The roll comes from the campaign and the battle, not a random draw at the moment, so losing a life or reloading never re-rolls it.
 - **Well Fed** now needs 6 bargains taken in one campaign (was 10). Hungry Crowns' description updated.
 - Tests: `validate-v235.cjs` (200 simulated campaigns); v228 and v234 checks updated.
+
+## v236 — bigger Hunger bargains with real prices
+Since v235 the Hunger comes rarely, so each bargain is bigger (n = World Crowns carried, 1-4):
+- **Power:** +2n Tactics (extra beyond the cap become swaps) · score target +10n%.
+- **Greed:** winning pays +$5n · your strongest piece (not the King) sits out this battle (it stays in your army).
+- **Fury:** every capture +2n Brilliance · n+1 of the enemy's strongest pieces start Armored.
+- **Reach:** +2 swaps (+3 with 3+ crowns) · pay $3n now.
+- **Blood (new, lasting):** your strongest piece type gains a level for good · one of your Pawns, named, is gone for good. The offer says "This bargain lasts beyond this battle."
+- Reach needs the cash, Blood needs a Pawn and a type below the top level; otherwise the offer becomes Power. The offer text now reads "The Hunger rarely comes. Each World Crown you carry makes its bargain bigger, and its price real."
+- Tests: `validate-v236.cjs`; v223 effect checks updated to the new sizes.

@@ -14,17 +14,17 @@ run(2,"RUN.pactKey=hungerKey()");assert.equal(E('hungerDue()'),false,'once per S
 const kinds=new Set();for(const n of [1,2,3,4]){crowns(n);for(const circ of ['downtown','rooftop','harbor','midnight','ruler'])for(const a of [1,2,3,4]){
   run(2,`RUN.circuit='${circ}';RUN.ante=${a}`);const o=JSON.parse(E('JSON.stringify(hungerOffer())'));kinds.add(o.k);assert.equal(o.n,n);assert(o.boon&&o.cost);
   assert.equal(E('JSON.stringify(hungerOffer())'),JSON.stringify(o),'stable for the same battle');}}
-assert.deepEqual([...kinds].sort(),['fury','greed','power','reach'],'all four bargains appear');
+assert(['fury','greed','power','reach'].every(k=>kinds.has(k)),'the battle bargains appear');   // v236 adds blood (needs a Pawn), tested in validate-v236
 crowns(2);run(2,"RUN.circuit='x';RUN.money=1");for(let i=0;i<40;i++){E(`RUN.ante=${i}`);assert.notEqual(E('hungerOffer().k'),'reach','no bargain you cannot pay for');}
 // effects
 const fight=(o,x='')=>E(`(()=>{B={board:Array(64).fill(null),swaps:2,target:1000,log:[],tac:null};tacState().n=0;B.board[0]={t:'Q',side:'en'};B.board[1]={t:'R',side:'en'};B.board[2]={t:'P',side:'en'};B.board[3]={t:'K',side:'en'};RUN.pactPending=${JSON.stringify(o)};${x};hungerApply();return 0})()`);
 crowns(3);run(2);
-fight({k:'power',n:3,boon:'b',cost:'c'});assert.equal(E('tacState().n'),3);assert.equal(E('B.target'),1240,'+24% target');assert.equal(E('RUN.pactPending'),undefined);
-fight({k:'power',n:3,boon:'b',cost:'c'},'tacState().n=TAC_MAX-1');assert.equal(E('tacState().n'),E('TAC_MAX'));assert.equal(E('B.swaps'),4,'overflow becomes swaps');
-fight({k:'greed',n:3,cash:9,boon:'b',cost:'c'});assert.equal(E('B.swaps'),1);assert.equal(E('B.pact.cash'),9);
+fight({k:'power',n:3,boon:'b',cost:'c'});assert.equal(E('tacState().n'),E('TAC_MAX'));assert.equal(E('B.target'),1300,'+30% target (v236)');assert.equal(E('RUN.pactPending'),undefined);
+fight({k:'power',n:3,boon:'b',cost:'c'},'tacState().n=TAC_MAX-1');assert.equal(E('tacState().n'),E('TAC_MAX'));assert.equal(E('B.swaps'),7,'overflow becomes swaps (v236: 6 Tactics)');
+fight({k:'greed',n:3,cash:15,boon:'b',cost:'c'});assert.equal(E('B.swaps'),2);assert.equal(E('B.pact.cash'),15);
 fight({k:'reach',n:3,swaps:2,boon:'b',cost:'c'});assert.equal(E('B.swaps'),4);
-fight({k:'fury',n:2,boon:'b',cost:'c'});assert.deepEqual(JSON.parse(E('JSON.stringify(B.board.slice(0,4).map(q=>q.sh||0))')),[1,1,0,0],'the two strongest non-King pieces are Armored');
-assert(src.includes("if(victim && B.pact && B.pact.k === 'fury'){ mult += B.pact.n;"));
+fight({k:'fury',n:2,boon:'b',cost:'c'});assert.deepEqual(JSON.parse(E('JSON.stringify(B.board.slice(0,4).map(q=>q.sh||0))')),[1,1,1,0],'v236: the three strongest non-King pieces are Armored');
+assert(src.includes("if(victim && B.pact && B.pact.k === 'fury'){ mult += (B.pact.fury || B.pact.n);"));
 assert(src.includes("const pactCash = B.pact && B.pact.k === 'greed' ? B.pact.cash || 0 : 0;")&&src.includes('+ chal.cash + pactCash;'));
 E('B=null;RUN.pactPending=undefined');E('hungerApply()');
 // choices are counted for this campaign only
@@ -32,7 +32,7 @@ E('ACH.campaign_epoch=111;delete ACH.hunger');E("hungerNote('fed');hungerNote('f
 E('ACH.campaign_epoch=222');assert.deepEqual(JSON.parse(E('JSON.stringify(hungerTally())')),{ep:222,fed:0,refused:0},'a new campaign starts clean');
 // wiring and endings
 assert(src.includes("$('#play').onclick = () => hungerAsk(startBlind);")&&src.includes('hungerApply();   // v223'));
-assert(src.includes("if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed');"));
+assert(src.includes("if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay);")&&src.includes("hungerNote('fed'); }"));
 const std=src.slice(src.indexOf('async function endingStandard'),src.indexOf('/* ---------- crown artwork'));assert(std.indexOf('It remembered every one.')>std.indexOf('The Hunger finishes what the crowns began.'));
 const tr=src.slice(src.indexOf('async function endingTrue'),src.indexOf('const ENDING_PRE'));assert(tr.indexOf('It never owned you.')>tr.indexOf('The Hunger dies with it.'));
 const version = Number(src.match(/const GAME_VERSION = (\d+);/)[1]);

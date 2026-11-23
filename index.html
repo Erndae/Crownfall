@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=235"></script>
-<script src="piece-designs.js?v=235"></script>
-<script src="character-style.js?v=235"></script>
-<script src="campaign-opponents.js?v=235"></script>
-<script src="campaign-dialogue.js?v=235"></script>
-<link rel="stylesheet" href="character-style.css?v=235">
+<script src="gameplay-polish.js?v=236"></script>
+<script src="piece-designs.js?v=236"></script>
+<script src="character-style.js?v=236"></script>
+<script src="campaign-opponents.js?v=236"></script>
+<script src="campaign-dialogue.js?v=236"></script>
+<link rel="stylesheet" href="character-style.css?v=236">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=235">
-<link rel="stylesheet" href="ruler-style.css?v=235">
-<link rel="stylesheet" href="gameplay-polish.css?v=235">
+<link rel="stylesheet" href="city-board.css?v=236">
+<link rel="stylesheet" href="ruler-style.css?v=236">
+<link rel="stylesheet" href="gameplay-polish.css?v=236">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3664,7 +3664,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 235;
+const GAME_VERSION = 236;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5219,7 +5219,7 @@ function scoreCapture(from, to, pt){
   if(victim && hasE(me,'crystal')){ mult *= 2; steps.push({src:'ench', name:ENCH.crystal.name, x:2}); }
   if(victim && a === 'K' && isC('rooftop')){ mult *= 2; steps.push({src:'circuit', x:2}); }
   if(victim && B.bounty && victim.id === B.bounty.id){ mult *= 2; steps.push({src:'ench', name:'Bounty', x:2}); }   // v225: the bounty capture scores double
-  if(victim && B.pact && B.pact.k === 'fury'){ mult += B.pact.n; steps.push({src:'ench', name:'The Hunger', m:B.pact.n}); }   // v223
+  if(victim && B.pact && B.pact.k === 'fury'){ mult += (B.pact.fury || B.pact.n); steps.push({src:'ench', name:'The Hunger', m:(B.pact.fury || B.pact.n)}); }   // v223
   if(victim && chalBonusNow()){ chips += CHALLENGES.blitzer.material; steps.push({src:'card', name:CHALLENGES.blitzer.name || 'Blitzer', c:CHALLENGES.blitzer.material}); }   // the capture that completes the challenge
   if(victim && a === 'N' && B.knightBuff){ mult += B.knightBuff; steps.push({src:'card', name:C('stampede').name, m:B.knightBuff}); }
   if(victim && a === 'K' && B.kingX){ mult *= B.kingX; steps.push({src:'card', name:C('decree').name, x:B.kingX}); }
@@ -6104,7 +6104,15 @@ function oppEntrance(boss, tier){
    fight of a stage): a boon and a price, both growing with the World Crowns you carry (1-4). Take it or refuse it; the
    choice is counted for the campaign, and the endings remember. Decided once per Stage Battle (a retry after a lost life
    is not offered again). v235: only sometimes, see hungerComes. */
-const HUNGER_OFFERS = ['power', 'greed', 'fury', 'reach'];
+const HUNGER_OFFERS = ['power', 'greed', 'fury', 'reach', 'blood'];
+/* v236 BIGGER BARGAINS: since v235 the Hunger comes rarely, so each bargain is bigger and its price is real (n = World
+   Crowns carried, 1-4):
+   power  +2n Tactics (extra beyond the cap become swaps)       · score target +10n%
+   greed  winning pays +$5n                                     · your strongest piece (not the King) sits out this battle
+   fury   every capture +2n Brilliance                          · n+1 of the enemy's strongest pieces start Armored
+   reach  +2 swaps (+3 with 3+ crowns)                          · pay $3n now
+   blood  your strongest piece type gains a level FOR GOOD      · one of your Pawns is gone FOR GOOD
+   reach needs the cash and blood needs a Pawn and a type below the top level; otherwise the offer becomes power. */
 /* v224: Rulers (and the Hollow Crown) notice whether you have mostly fed the Hunger or mostly refused it this campaign.
    Nothing is said on a tie or before the first bargain. Vex is fought before any bargain is offered, so he has no line. */
 const HUNGER_REACT = {
@@ -6121,15 +6129,25 @@ function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; retu
 function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
+function hungerBloodType(){   // the strongest piece type in your army that can still level up
+  if(!RUN || !RUN.roster) return null;
+  const own = [...new Set(RUN.roster.map(x => parseR(x).t))].filter(t => t !== 'K' && t !== 'P' && effLv(t) < LV_MAX);
+  return own.sort((a, b) => TYPE[b].val - TYPE[a].val)[0] || null;
+}
+const hungerPawnAt = () => RUN && RUN.roster ? RUN.roster.findIndex(x => parseR(x).t === 'P') : -1;
 function hungerOffer(){
   const n = Math.max(1, Math.min(4, baseCrowns())), key = hungerKey(); let h = 7; for(const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  let k = HUNGER_OFFERS[h % HUNGER_OFFERS.length]; if(k === 'reach' && (RUN.money || 0) < 2 * n) k = 'power';
-  const s = x => x > 1 ? 's' : '';
-  const O = {power:{boon:`Start with ${n} extra Tactic${s(n)}`, cost:`Score target +${8 * n}%`},
-    greed:{boon:`Winning pays +$${3 * n}`, cost:'Start with 1 fewer swap'},
-    fury:{boon:`Every capture gets +${n} Brilliance`, cost:n > 1 ? `${n} enemy pieces start Armored` : 'Your opponent\'s strongest piece starts Armored'},
-    reach:{boon:`Start with ${n >= 3 ? 2 : 1} extra swap${n >= 3 ? 's' : ''}`, cost:`Pay $${2 * n} now`}}[k];
-  return {k, n, boon:O.boon, cost:O.cost, cash:3 * n, pay:2 * n, swaps:n >= 3 ? 2 : 1};
+  let k = HUNGER_OFFERS[h % HUNGER_OFFERS.length];
+  if(k === 'reach' && (RUN.money || 0) < 3 * n) k = 'power';
+  const bt = hungerBloodType(); if(k === 'blood' && (!bt || hungerPawnAt() < 0)) k = 'power';
+  const s = x => x > 1 ? 's' : '', sw = n >= 3 ? 3 : 2;
+  const O = {power:{boon:`Start with ${2 * n} extra Tactics`, cost:`Score target +${10 * n}%`},
+    greed:{boon:`Winning pays +$${5 * n}`, cost:'Your strongest piece sits out this battle'},
+    fury:{boon:`Every capture gets +${2 * n} Brilliance`, cost:`${n + 1} enemy pieces start Armored`},
+    reach:{boon:`Start with ${sw} extra swaps`, cost:`Pay $${3 * n} now`},
+    blood:{boon:`Your ${bt ? TYPE[bt].name + 's gain' : 'army gains'} a level for good`, cost:(() => { const pi = hungerPawnAt(), c = pi >= 0 ? laParse(RUN.roster[pi]) : null;
+      return c && c.n ? `${c.n}, one of your Pawns, is gone for good` : 'One of your Pawns is gone for good'; })()}}[k];
+  return {k, n, boon:O.boon, cost:O.cost, cash:5 * n, pay:3 * n, swaps:sw, tac:2 * n, armor:n + 1, pct:10 * n, bt:k === 'blood' ? bt : null, lasting:k === 'blood'};
 }
 /* v235: the Hunger no longer bargains before every Stage Battle. Each eligible Stage Battle it comes with a 1-in-4
    chance, never two Stage Battles in a row, and at the latest after 6 quiet ones. The roll comes from the campaign and
@@ -6146,22 +6164,25 @@ function hungerAsk(go){
   RUN.pactKey = hungerKey(); if(!hungerComes()){ save(); return go(); }   // v235: decided once for this Stage Battle
   const o = hungerOffer(); save();
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
-    <p>Each World Crown you carry makes the Hunger stronger. It offers a bargain for this battle.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
-    <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>
+    <p>The Hunger rarely comes. Each World Crown you carry makes its bargain bigger, and its price real.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
+    <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>${o.lasting ? '<p class="hg-so hg-last">This bargain lasts beyond this battle.</p>' : ''}
     ${edictOn('hungry') ? '<p class="hg-so">Hungry Crowns: refusing costs $2.</p>' : ''}<div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse${edictOn('hungry') ? ' · $2' : ''}</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
-    if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay); hungerNote('fed'); }
+    if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay);
+      if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) RUN.roster.splice(pi, 1); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }   // v236: for good
+      hungerNote('fed'); }
     else { hungerNote('refused'); if(edictOn('hungry')) RUN.money = Math.max(0, RUN.money - 2); }   // v226: Hungry Crowns
     save(); go(); coach('hunger'); };   // v227: once, after the first bargain
   m.querySelector('#hgYes').onclick = () => pick(true); m.querySelector('#hgNo').onclick = () => pick(false);
 }
 function hungerApply(){   // at the start of the Stage Battle the bargain was made for
   const o = RUN.pactPending; delete RUN.pactPending; if(!o || !B) return;
-  B.pact = {k:o.k, n:o.n, cash:o.k === 'greed' ? o.cash : 0, boon:o.boon, cost:o.cost};
-  if(o.k === 'power'){ const t = tacState(); for(let i = 0; i < o.n; i++){ if(t.n < TAC_MAX) t.n++; else B.swaps++; } B.target = Math.max(10, Math.round(B.target * (1 + 0.08 * o.n) / 10) * 10); }
-  if(o.k === 'greed') B.swaps = Math.max(0, B.swaps - 1);
+  B.pact = {k:o.k, n:o.n, cash:o.k === 'greed' ? (o.cash || 5 * o.n) : 0, fury:o.k === 'fury' ? 2 * o.n : 0, boon:o.boon, cost:o.cost};
+  const strongest = side => B.board.map((q, i) => ({q, i})).filter(x => x.q && x.q.side === side && x.q.t !== 'K').sort((a, b) => TYPE[b.q.t].val - TYPE[a.q.t].val);
+  if(o.k === 'power'){ const t = tacState(); for(let i = 0; i < (o.tac || 2 * o.n); i++){ if(t.n < TAC_MAX) t.n++; else B.swaps++; } B.target = Math.max(10, Math.round(B.target * (1 + (o.pct || 10 * o.n) / 100) / 10) * 10); }
+  if(o.k === 'greed'){ const x = strongest('me')[0]; if(x) B.board[x.i] = null; }   // v236: sits out this battle (still in your army)
   if(o.k === 'reach') B.swaps += o.swaps;
-  if(o.k === 'fury') B.board.map((q, i) => ({q, i})).filter(x => x.q && x.q.side === 'en' && x.q.t !== 'K').sort((a, b) => TYPE[b.q.t].val - TYPE[a.q.t].val).slice(0, o.n).forEach(x => { x.q.sh = (x.q.sh || 0) + 1; });
+  if(o.k === 'fury') strongest('en').slice(0, o.armor || o.n + 1).forEach(x => { x.q.sh = (x.q.sh || 0) + 1; });
   logPos(`The Hunger's bargain: ${o.boon}. ${o.cost}.`, -1, -1, 'fx');
 }
 function startBlind(){ try{ laClear(); }catch(e){}
