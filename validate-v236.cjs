@@ -28,7 +28,7 @@ const pawns=()=>E("RUN.roster.filter(r=>parseR(r).t==='P').length");
 const o=JSON.parse(E("(()=>{const o=hungerOffer();o.k='blood';o.bt=hungerBloodType();o.lasting=true;return JSON.stringify(o)})()"));
 E(`(()=>{const pi=hungerPawnAt();if(pi>=0)RUN.roster.splice(pi,1);RUN.lv['${o.bt}']=Math.min(LV_MAX,effLv('${o.bt}')+1);normLv(RUN);return 0})()`);
 assert.equal(pawns(),1);assert.equal(E("effLv('Q')"),4);
-assert(src.includes("if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) RUN.roster.splice(pi, 1); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }"));
+assert(src.includes("if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) hungerTake(RUN.roster.splice(pi, 1)[0]); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }"));
 E("RUN.lv.Q=LV_MAX");assert.equal(E('hungerBloodType()'),'N','the next strongest when the Queen is maxed');
 // battle effects
 const fight=(o,x='')=>E(`(()=>{B={board:Array(64).fill(null),swaps:2,target:1000,log:[],tac:null};tacState().n=0;

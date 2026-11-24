@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=239"></script>
-<script src="piece-designs.js?v=239"></script>
-<script src="character-style.js?v=239"></script>
-<script src="campaign-opponents.js?v=239"></script>
-<script src="campaign-dialogue.js?v=239"></script>
-<link rel="stylesheet" href="character-style.css?v=239">
+<script src="gameplay-polish.js?v=240"></script>
+<script src="piece-designs.js?v=240"></script>
+<script src="character-style.js?v=240"></script>
+<script src="campaign-opponents.js?v=240"></script>
+<script src="campaign-dialogue.js?v=240"></script>
+<link rel="stylesheet" href="character-style.css?v=240">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=239">
-<link rel="stylesheet" href="ruler-style.css?v=239">
-<link rel="stylesheet" href="gameplay-polish.css?v=239">
+<link rel="stylesheet" href="city-board.css?v=240">
+<link rel="stylesheet" href="ruler-style.css?v=240">
+<link rel="stylesheet" href="gameplay-polish.css?v=240">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3667,7 +3667,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 239;
+const GAME_VERSION = 240;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6161,8 +6161,14 @@ const HUNGER_REACT = {
 function hungerLean(){ const h = hungerTally(); return h.fed > h.refused ? 'fed' : h.refused > h.fed ? 'refused' : null; }
 function hungerReact(name){ const R = HUNGER_REACT[name], k = hungerLean(); return R && k ? R[k] : ''; }
 const hungerRecordHTML = () => { const h = hungerTally(); if(!(h.fed + h.refused)) return '';   // v224: Journey shows how you have answered it
-  const k = hungerLean(); return `<div class="jhunger"><span><small>The Hunger</small><b>Fed ${h.fed} · Refused ${h.refused}</b></span><em>${k === 'fed' ? 'It is getting a taste for you.' : k === 'refused' ? 'It has not owned you yet.' : 'It is still deciding about you.'}</em></div>`; };
+  const k = hungerLean(); return `<div class="jhunger"><span><small>The Hunger</small><b>Fed ${h.fed} · Refused ${h.refused}</b></span><em>${k === 'fed' ? 'It is getting a taste for you.' : k === 'refused' ? 'It has not owned you yet.' : 'It is still deciding about you.'}</em>${hungerTaken().length ? `<em class="jtaken">Taken by the Hunger: ${namesList(hungerTaken(), 6)}</em>` : ''}</div>`; };
 function hungerTally(){ const ep = ACH.campaign_epoch || 0, h = ACH.hunger; return h && h.ep === ep ? h : {ep, fed:0, refused:0}; }
+/* v240: the Pawns taken by Blood bargains are remembered by name for the campaign (ACH.hunger.taken): the Journey lists
+   them and the endings speak of them. */
+function hungerTake(r){ const h = hungerTally(), c = r ? laParse(r) : null; h.taken = [...(h.taken || []), c && c.n ? c.n : 'a Pawn']; ACH.hunger = h; saveAch(); }
+const hungerTaken = () => hungerTally().taken || [];
+function namesList(a, max = 4){ if(!a.length) return ''; if(a.length > max) return `${a.slice(0, max - 1).join(', ')} and ${a.length - max + 1} others`;
+  return a.length === 1 ? a[0] : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
 function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
@@ -6206,7 +6212,7 @@ function hungerAsk(go){
     ${edictOn('hungry') ? '<p class="hg-so">Hungry Crowns: refusing costs $2.</p>' : ''}<div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse${edictOn('hungry') ? ' · $2' : ''}</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
     if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay);
-      if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) RUN.roster.splice(pi, 1); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }   // v236: for good
+      if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) hungerTake(RUN.roster.splice(pi, 1)[0]); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }   // v236: for good
       hungerNote('fed'); }
     else { hungerNote('refused'); if(edictOn('hungry')) RUN.money = Math.max(0, RUN.money - 2); }   // v226: Hungry Crowns
     save(); go(); coach('hunger'); };   // v227: once, after the first bargain
@@ -10196,6 +10202,7 @@ async function endingTrue(E, o){
     await E.say('THE CROWN IS BROKEN.', 2400, 'lower', 'caps big');
     await E.say('The Hunger dies with it.', 2600, 'lower', 'story');   // v219
     { const H = hungerTally(); if(H.refused) await E.say(`You refused it ${H.refused} time${H.refused > 1 ? 's' : ''}. It never owned you.`, 2800, 'lower', 'story'); }   // v223
+    { const T = hungerTaken(); if(T.length) await E.say(`${namesList(T)} ${T.length > 1 ? 'are' : 'is'} still gone. Some prices stay paid.`, 3000, 'lower', 'story'); }   // v240
     await E.wait(400);
     await E.say('THE THRONE IS EMPTY.', 3000, 'lower', 'caps big red');
     await E.wait(400);
@@ -10355,6 +10362,7 @@ async function endingStandard(E, o){
     await E.wait(1200);
     await E.say('The Hunger finishes what the crowns began.', 2800, 'bottom', 'story red');   // v219
     { const H = hungerTally(); if(H.fed) await E.say(`You fed it ${H.fed} time${H.fed > 1 ? 's' : ''}. It remembered every one.`, 2800, 'bottom', 'story red'); }   // v223
+    { const T = hungerTaken(); if(T.length) await E.say(`${namesList(T)} never came home. It kept them.`, 3000, 'bottom', 'story red'); }   // v240
     ov.classList.add('t3'); snd.fracture(0); snd.fracture(.6); snd.fracture(1.3);   // the crown darkens and cracks
     await E.say('The throne takes your name first. Then your face.', 2800, 'bottom', 'story red');
     ov.querySelectorAll('.en-frag').forEach(f => { if(!calm) f.style.transform = f.style.getPropertyValue('--fx'); });

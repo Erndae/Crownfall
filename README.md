@@ -511,3 +511,8 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - **Easy's enemy gets weaker the further you go:** −150 in Crown City and the Iron Kingdom, −200 in the Olympian Court, −250 on the Road, −300 at the Fallen Throne (was −150 everywhere).
 - Rerun on Normal, those boss fights: 12–31% → 19–62%; Blitz 0–50% → 25–75%. Easy, all fights: 47–85% → 57–87%.
 - Tests: `validate-v239.cjs`; v231 check updated; `BALANCE-AUDIT.md` regenerated.
+
+## v240 — the Hunger's taken Pawns are remembered, and a playtest tool
+- **Taken by the Hunger:** every Pawn a Blood bargain takes is remembered by name for the campaign. The Journey's Hunger box lists them ("Taken by the Hunger: Tess and Gage"), and the endings speak of them: the crowned ending says "Tess and Gage never came home. It kept them."; the ending where the crown is broken says "Tess and Gage are still gone. Some prices stay paid." A new campaign starts clean.
+- **Playtest tool:** `node tools/playtest.cjs` plays real fights headless (the game's AI on your side against the real enemy AI) and prints win rates per Land, difficulty, player strength and fight type. Options: `--lands`, `--diffs`, `--me` (900 casual, 1400 solid), `--seeds`, `--level`, `--circuits`, `--stages`, `--out`. Example: `node tools/playtest.cjs --lands=greek --diffs=normal --seeds=2`. It doesn't use Tactics, swaps, cards or the Hunger, so compare results between builds rather than reading them as absolute. Not part of CI (it takes minutes).
+- Tests: `validate-v240.cjs`.

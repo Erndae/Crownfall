@@ -516,3 +516,6 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .dcd.today{border-color:#fff}
 .dcd.sel{box-shadow:0 0 0 2px #9fd3ff inset}
 .dcal-d{margin:4px 0 0;font-size:13px;min-height:2.6em}
+/* v240 Pawns taken by the Hunger */
+.jhunger{flex-wrap:wrap}
+.jhunger .jtaken{flex-basis:100%;text-align:left;font-style:normal;color:#f0b7bd;border-top:1px solid rgba(217,80,95,.3);padding-top:6px}
