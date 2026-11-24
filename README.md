@@ -495,3 +495,11 @@ Since v235 the Hunger comes rarely, so each bargain is bigger (n = World Crowns 
 - Painted opponents (the Iron Kingdom onward, 43 of them) showed their old drawn face underneath the painting, and it was visible for a moment while the painting sheet loaded. A painted opponent now shows only its painting; Crown City's opponents, who have no painting, keep their drawn faces.
 - The three painting sheets are loaded and decoded ahead of time: this Land's sheet a second after start-up and at each fight, the others when the browser is idle (skipped on data-saving or very slow connections).
 - Tests: `validate-v237.cjs`; v192 check updated.
+
+## v238 — playtest balance: Blitz and the Iron Kingdom
+From an 816-fight playtest (the game's AI playing your side at two strengths, all three difficulties):
+- **Blitz fights get 2 grace moves on every difficulty** (Easy keeps its own 2 on top; Hard stays one fewer than Normal). Grace moves are left out of the target, so it doesn't rise with them. Easy's 2 no longer raise its own target either.
+- **The Iron Kingdom eases in.** Crown City's targets are scaled down per Circuit (Rooftop ×0.60, Harbor ×0.84, Midnight ×0.70), and the Iron Kingdom went straight back to full size (its Rooftop boss asked 2,230 against Crown City's 1,340). It is now a halfway step: Rooftop ×0.77, Harbor ×0.92, Midnight ×0.84, and its Blitz fight ×0.80. Later Lands are unchanged.
+- Rerun, Normal: Blitz fights won 12–25% → 38%; Iron Kingdom fights 59–68% → 68–75%; its Circuit boss battles 0–17% → 8–50%. (The AI doesn't use Tactics, swaps, cards or the Hunger, so real players do better; the changes are what matter.)
+- Example, the Iron Kingdom's Blitz on Normal: 12 moves for 970 points → 14 moves for 770.
+- Tests: `validate-v238.cjs`; v210 check updated; `BALANCE-AUDIT.md` regenerated.

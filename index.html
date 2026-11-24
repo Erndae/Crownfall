@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=237"></script>
-<script src="piece-designs.js?v=237"></script>
-<script src="character-style.js?v=237"></script>
-<script src="campaign-opponents.js?v=237"></script>
-<script src="campaign-dialogue.js?v=237"></script>
-<link rel="stylesheet" href="character-style.css?v=237">
+<script src="gameplay-polish.js?v=238"></script>
+<script src="piece-designs.js?v=238"></script>
+<script src="character-style.js?v=238"></script>
+<script src="campaign-opponents.js?v=238"></script>
+<script src="campaign-dialogue.js?v=238"></script>
+<link rel="stylesheet" href="character-style.css?v=238">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=237">
-<link rel="stylesheet" href="ruler-style.css?v=237">
-<link rel="stylesheet" href="gameplay-polish.css?v=237">
+<link rel="stylesheet" href="city-board.css?v=238">
+<link rel="stylesheet" href="ruler-style.css?v=238">
+<link rel="stylesheet" href="gameplay-polish.css?v=238">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3664,7 +3664,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 237;
+const GAME_VERSION = 238;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3759,12 +3759,18 @@ const betaRatio = () => Math.min(1, ((RUN.roster || []).filter(Boolean).length) 
 const betaSizeF = () => Math.max(0.6, betaRatio());   // beta: 9 pieces → ×0.6, 15+ → ×1
 const betaBlitzF = () => Math.max(0.35, Math.pow(betaRatio(), 2.5));   // beta Blitz: 9 → ×0.35, 11 → ×0.46, 13 → ×0.70, 15+ → ×1
 const CC_TARGET = {downtown:1, rooftop:0.60, harbor:0.84, midnight:0.70, ruler:1};   // beta 2 (see the build notes)
+/* v238 playtest: after Crown City's calibration the Iron Kingdom jumped straight back to full targets (its Rooftop boss
+   asked 2,230 against Crown City's 1,340). The Iron Kingdom is now a halfway step: each Circuit's target × the square root
+   of Crown City's factor (Rooftop ×0.77, Harbor ×0.92, Midnight ×0.84), and its Blitz fight ×0.80. Later Lands unchanged. */
+const IK_BLITZ_EASE = 0.80;
+const ikEase = lim => land() !== 'medieval' ? 1 : lim ? IK_BLITZ_EASE : Math.sqrt(CC_TARGET[RUN.circuit] || 1);
 function targetParts(i){
   const prog = normalTarget(i), cap = capacityTarget(i), fresh = armyLands() < 1 ? freshCap(i) : null;
   const lim = i === 2 ? moveLimitFor(parFor(true), bossAt(RUN.ante), true) : null, blitz = lim ? campaignPPM() * lim * 0.45 : null;   // what this army can score inside the move limit
   let t = Math.min(prog, cap); if(fresh != null) t = Math.min(t, fresh); if(blitz != null) t = Math.min(t, blitz);
   t *= lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF();   // beta: army-size factor (beta 2: Blitz after Crown City uses ratio^1.5, was ratio^2.5)
   if(!lim && land() === 'street') t *= CC_TARGET[RUN.circuit] || 1;   // beta 2: Crown City share calibration
+  t *= ikEase(lim);   // v238: the Iron Kingdom eases in
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante))) t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
@@ -6083,8 +6089,13 @@ function moveLimitFor(par, bossKey, baseOnly){
     if(n != null) lim = lim == null ? n : Math.min(lim, n); }
   if(lim == null) return null;
   const extra = !baseOnly && RUN && RUN.land === 'street' ? (CITY_BLITZ[bossRuleName(id)] || 0) : 0;
-  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra - Math.min(3, ngLevel() + Math.max(0, -DX('blitz'))) + Math.max(0, DX('blitz')) - (edictOn('fuse') ? 1 : 0));   // v231 difficulty (v232: Hard's cut and New Game+'s together stop at 3; the 60% floor stays)   // v226: Short Fuse   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
+  const grace = !baseOnly ? BLITZ_GRACE + Math.max(0, DX('blitz')) : 0;   // v238: 2 grace moves on every difficulty, plus Easy's own 2 (none of them raise the target)
+  return Math.max(Math.ceil(lim * 0.6), lim + blitzBonus() + extra + grace - Math.min(3, ngLevel() + Math.max(0, -DX('blitz'))) - (edictOn('fuse') ? 1 : 0));   // v231 difficulty (v232: Hard's cut and New Game+'s together stop at 3; the 60% floor stays)   // v226: Short Fuse   // v210: New Game+ tightens Blitz by 1 per cycle (never below 60% of par)
 }
+/* v238 playtest: Blitz fights were the clear spike (12-25% of fights won on Normal, 0-12% on Hard, against 62-75% on Easy).
+   Every difficulty now gets 2 grace moves, and Easy keeps its own 2 on top. Grace moves (and Easy's) are left out of the
+   target, so the target doesn't rise with them. */
+const BLITZ_GRACE = 2;
 const blitzOn = () => !!(B && B.moveLimit);
 /* v132 opponent identity (presentation only): tier = normal | rival | boss | ruler | crownless, plus one of five
    reusable treatments chosen from the signature army or the boss rule. Nothing in the rules reads these. */
