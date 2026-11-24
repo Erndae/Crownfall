@@ -16,9 +16,9 @@ Arithmetic scenario checks using the production target functions, 3 representati
 |---|---:|---:|---:|
 | street | 170–10,320 | 220–17,240 | 470–32,590 |
 | medieval | 190–14,440 | 2,920–25,920 | 6,450–49,000 |
-| greek | 240–10,320 | 3,650–19,790 | 7,060–37,410 |
-| fantasy | 240–10,320 | 3,650–21,070 | 7,060–39,830 |
-| throne | 290–14,660 | 3,650–31,290 | 7,060–59,140 |
+| greek | 190–10,320 | 2,920–19,790 | 6,450–37,410 |
+| fantasy | 190–10,320 | 2,920–21,070 | 6,450–39,830 |
+| throne | 230–14,660 | 2,920–31,290 | 6,450–59,140 |
 
 ## Practical follow-up
 
@@ -30,13 +30,13 @@ Worst-case demand = target ÷ (army points per move × moves available; Blitz us
 
 | | Normal | Easy | Hard |
 |---|---:|---:|---:|
-| First campaign · Blitz | 0.39 | 0.25 | 0.46 |
+| First campaign · Blitz | 0.35 | 0.21 | 0.42 |
 | First campaign · other fights | 1.96 | 1.47 | 2.35 |
-| New Game+ 1 · Blitz | 0.42 | 0.27 | 0.49 |
+| New Game+ 1 · Blitz | 0.38 | 0.22 | 0.44 |
 | New Game+ 1 · other fights | 2.35 | 1.76 | 2.82 |
-| New Game+ 2 · Blitz | 0.45 | 0.29 | 0.49 |
+| New Game+ 2 · Blitz | 0.41 | 0.24 | 0.49 |
 | New Game+ 2 · other fights | 2.74 | 2.06 | 3.14 |
-| New Game+ 3 · Blitz | 0.49 | 0.30 | 0.49 |
+| New Game+ 3 · Blitz | 0.49 | 0.27 | 0.49 |
 | New Game+ 3 · other fights | 3.14 | 2.35 | 3.14 |
 
 Hard targets stop rising at the New Game+ ceiling (+60%, Blitz +30%); past that, Hard stays harder through its sharper AI and 2 lives (its one-fewer Blitz move counts toward the New Game+ 3-move cut).

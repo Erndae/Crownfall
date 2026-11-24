@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=238"></script>
-<script src="piece-designs.js?v=238"></script>
-<script src="character-style.js?v=238"></script>
-<script src="campaign-opponents.js?v=238"></script>
-<script src="campaign-dialogue.js?v=238"></script>
-<link rel="stylesheet" href="character-style.css?v=238">
+<script src="gameplay-polish.js?v=239"></script>
+<script src="piece-designs.js?v=239"></script>
+<script src="character-style.js?v=239"></script>
+<script src="campaign-opponents.js?v=239"></script>
+<script src="campaign-dialogue.js?v=239"></script>
+<link rel="stylesheet" href="character-style.css?v=239">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=238">
-<link rel="stylesheet" href="ruler-style.css?v=238">
-<link rel="stylesheet" href="gameplay-polish.css?v=238">
+<link rel="stylesheet" href="city-board.css?v=239">
+<link rel="stylesheet" href="ruler-style.css?v=239">
+<link rel="stylesheet" href="gameplay-polish.css?v=239">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3129,6 +3129,9 @@ const CDIFF = {
 const cdiff = () => (CDIFF[ACH.cdiff] && !MATCH && !(RUN && RUN.gauntlet)) ? ACH.cdiff : 'normal';
 const DX = k => (CDIFF[cdiff()] || {})[k] || 0;
 const easyOn = () => cdiff() === 'easy';
+// v239: Easy's enemy gets weaker the further you go (its −150 was still very strong late: 47% of Fallen Throne fights won)
+const EASY_RATING = {street:-150, medieval:-150, greek:-200, fantasy:-250, throne:-300};
+const easyRating = () => EASY_RATING[RUN && land()] ?? CDIFF.easy.rating;
 function diffPick(then){
   const card = (id, name, desc) => `<button class="ed-card" data-d="${id}"><b>${name}</b><span>${desc}</span></button>`;
   const m = modal(`<div class="edicts dpickc"><small>For this whole campaign</small><h2>Choose difficulty</h2>
@@ -3664,7 +3667,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 238;
+const GAME_VERSION = 239;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3764,13 +3767,20 @@ const CC_TARGET = {downtown:1, rooftop:0.60, harbor:0.84, midnight:0.70, ruler:1
    of Crown City's factor (Rooftop ×0.77, Harbor ×0.92, Midnight ×0.84), and its Blitz fight ×0.80. Later Lands unchanged. */
 const IK_BLITZ_EASE = 0.80;
 const ikEase = lim => land() !== 'medieval' ? 1 : lim ? IK_BLITZ_EASE : Math.sqrt(CC_TARGET[RUN.circuit] || 1);
+/* v239 playtest of the last three Lands: the Rooftop and Midnight Circuit bosses were walls in the Olympian Court, the Road
+   and the Fallen Throne (0-25% of fights won on Normal), and Blitz stayed the hardest fight type (12-25%). There, the
+   Rooftop and Midnight Stage-4 fights ask ×0.85 and the enemy plays one Circuit step (75 rating) weaker; and every Blitz
+   fight after Crown City asks ×0.80 (the Iron Kingdom had it already). */
+const LATE_LANDS = ['greek', 'fantasy', 'throne'], LATE_BOSS_EASE = 0.85, LATE_BOSS_AI = -75;
+const lateBoss = () => !!RUN && LATE_LANDS.includes(land()) && (RUN.circuit === 'rooftop' || RUN.circuit === 'midnight') && RUN.ante === 4;
+const lateEase = lim => lim ? (LATE_LANDS.includes(land()) ? IK_BLITZ_EASE : 1) : lateBoss() ? LATE_BOSS_EASE : 1;
 function targetParts(i){
   const prog = normalTarget(i), cap = capacityTarget(i), fresh = armyLands() < 1 ? freshCap(i) : null;
   const lim = i === 2 ? moveLimitFor(parFor(true), bossAt(RUN.ante), true) : null, blitz = lim ? campaignPPM() * lim * 0.45 : null;   // what this army can score inside the move limit
   let t = Math.min(prog, cap); if(fresh != null) t = Math.min(t, fresh); if(blitz != null) t = Math.min(t, blitz);
   t *= lim ? (land() === 'street' ? betaBlitzF() : Math.pow(betaRatio(), 1.5)) : betaSizeF();   // beta: army-size factor (beta 2: Blitz after Crown City uses ratio^1.5, was ratio^2.5)
   if(!lim && land() === 'street') t *= CC_TARGET[RUN.circuit] || 1;   // beta 2: Crown City share calibration
-  t *= ikEase(lim);   // v238: the Iron Kingdom eases in
+  t *= ikEase(lim) * lateEase(lim);   // v238: the Iron Kingdom eases in · v239: the late Lands' walls
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante))) t *= CITY_BLITZ_TARGET[bossRuleName(bossAt(RUN.ante))] || 1;   // v124: Crown City's Blitz bosses
   if(i === 2 && RUN.land === 'street' && !introRuleFree(bossAt(RUN.ante)) && RUN.circuit === 'downtown' && bossRuleName(bossAt(RUN.ante)) === 'Speedy Rico') t *= RICO_DOWNTOWN_TARGET;   // v126
   const bf = buildFactor(); t *= bf;                                       // v177: scoring Relics and powers
@@ -4325,7 +4335,7 @@ function aiRating(){
   if(MATCH) return matchDiff().rating;
   if(RUN.gauntlet) return gRating();   // v151
   const lad = AI_LADDER[land()] || AI_LADDER.street, st = RUN.circuit === 'ruler' ? 0 : STAGE_AI[clamp(RUN.ante, 1, 4) - 1];
-  return Math.min(AI_MAX, lad[aiSlot().ci] + st + DX('rating'));   // v231 difficulty
+  return Math.max(400, Math.min(AI_MAX, lad[aiSlot().ci] + st + (cdiff() === 'easy' ? easyRating() : DX('rating')) + (lateBoss() ? LATE_BOSS_AI : 0)));   // v231 difficulty · v239 late bosses
 }
 function armySize(){
   if(RUN && RUN.gauntlet) return gEnemyN();   // v151

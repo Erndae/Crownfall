@@ -16,7 +16,7 @@ const fight=d=>JSON.parse(E(`(()=>{MATCH=null;B=null;ACH.edicts=[];ACH.cdiff=${d
 const n=fight(null),e=fight('easy'),h=fight('hard');
 assert(Math.abs(e.t-n.t*0.75)<=10,`Easy target ×0.75 (${n.t} → ${e.t})`);assert(Math.abs(h.t-n.t*1.2)<=10,`Hard target ×1.2 (${n.t} → ${h.t})`);
 assert.equal(e.a,n.a,'Easy: same army size');assert.equal(h.a,n.a,'Hard: same army size');
-assert.equal(e.r,n.r-150);assert.equal(h.r,Math.min(n.r+150,E('AI_MAX')));
+assert.equal(e.r,n.r-200,'v239: Easy is −200 in the Olympian Court');assert.equal(h.r,Math.min(n.r+150,E('AI_MAX')));
 assert.equal(n.l,3);assert.equal(e.l,5);assert.equal(h.l,2);assert.equal(e.m,n.m+2);assert.equal(h.m,n.m-1);
 // Blitz: Easy +2, Hard −1 (never below 60% of par)
 const blitz=d=>E(`(()=>{ACH.cdiff=${d?`'${d}'`:'undefined'};const id=BOSSES.find(b=>b.moveLimit&&typeof b.moveLimit.par==='number').id;RUN.land='medieval';return moveLimitFor(parFor(),id)})()`);

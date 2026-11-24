@@ -503,3 +503,11 @@ From an 816-fight playtest (the game's AI playing your side at two strengths, al
 - Rerun, Normal: Blitz fights won 12–25% → 38%; Iron Kingdom fights 59–68% → 68–75%; its Circuit boss battles 0–17% → 8–50%. (The AI doesn't use Tactics, swaps, cards or the Hunger, so real players do better; the changes are what matter.)
 - Example, the Iron Kingdom's Blitz on Normal: 12 moves for 970 points → 14 moves for 770.
 - Tests: `validate-v238.cjs`; v210 check updated; `BALANCE-AUDIT.md` regenerated.
+
+## v239 — playtest balance for the last three Lands
+From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Throne:
+- **Rooftop and Midnight Circuit bosses** (the Stage-4 fights) in those three Lands ask ×0.85 and the enemy plays one Circuit step (75 rating) weaker. They had been won 0–25% of the time on Normal.
+- **Blitz ×0.80 in every Land after Crown City** (the Iron Kingdom had it since v238).
+- **Easy's enemy gets weaker the further you go:** −150 in Crown City and the Iron Kingdom, −200 in the Olympian Court, −250 on the Road, −300 at the Fallen Throne (was −150 everywhere).
+- Rerun on Normal, those boss fights: 12–31% → 19–62%; Blitz 0–50% → 25–75%. Easy, all fights: 47–85% → 57–87%.
+- Tests: `validate-v239.cjs`; v231 check updated; `BALANCE-AUDIT.md` regenerated.
