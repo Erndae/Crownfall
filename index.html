@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=240"></script>
-<script src="piece-designs.js?v=240"></script>
-<script src="character-style.js?v=240"></script>
-<script src="campaign-opponents.js?v=240"></script>
-<script src="campaign-dialogue.js?v=240"></script>
-<link rel="stylesheet" href="character-style.css?v=240">
+<script src="gameplay-polish.js?v=241"></script>
+<script src="piece-designs.js?v=241"></script>
+<script src="character-style.js?v=241"></script>
+<script src="campaign-opponents.js?v=241"></script>
+<script src="campaign-dialogue.js?v=241"></script>
+<link rel="stylesheet" href="character-style.css?v=241">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=240">
-<link rel="stylesheet" href="ruler-style.css?v=240">
-<link rel="stylesheet" href="gameplay-polish.css?v=240">
+<link rel="stylesheet" href="city-board.css?v=241">
+<link rel="stylesheet" href="ruler-style.css?v=241">
+<link rel="stylesheet" href="gameplay-polish.css?v=241">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3409,13 +3409,13 @@ function landsScreen(after){
       <div class="jrul">${rulerFace(l, 'talk') || crownSVG(l, 'hard', true)}<span><small>Ruler</small><b>${R.name}</b></span><span class="jcount">${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits`}${pipsJ}</span></div>
       ${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : ''}
       <div class="jone">${slot(l)}</div></section>`; };
-  const m = modal(`<div class="jtop"><div><small>${runnerTitle()}${CDIFF[ACH.cdiff] ? ' · ' + CDIFF[ACH.cdiff].name : ''}</small><h2>Journey</h2></div><button class="btn ghost backbtn" id="pdone">Done</button></div>
+  const m = modal(`<div class="jtop"><div><small>${runnerTitle()}${CDIFF[ACH.cdiff] ? ' · ' + CDIFF[ACH.cdiff].name : ''}</small><h2>Journey</h2>${hardMarkHTML('jhard')}</div><button class="btn ghost backbtn" id="pdone">Done</button></div>
     <div class="jworld${W >= WORLD_TOTAL ? ' all' : ''}"><span><small>World Crowns</small><b>${W} <i>/ ${WORLD_TOTAL}</i></b></span><span class="jbar"><i style="width:${W / WORLD_TOTAL * 100}%"></i></span>${W >= WORLD_TOTAL ? '<em class="jopen">4 / 4 · Fallen Throne unlocked</em>' : ''}</div>
     ${treasuryTotal() > 0 ? `<div class="jtreasury"><span><small>Royal Treasury</small><b>$${treasuryTotal().toLocaleString('en-US')}</b></span><em>${treasuryRank() || 'No rank yet'}${treasuryNext() ? ` · next at $${treasuryNext()[0]}: ${treasuryNext()[1]}` : ''}${bestCampaign() ? `<br>Best campaign $${bestCampaign().toLocaleString('en-US')}` : ''}</em></div>` : ''}
     ${hungerRecordHTML()}${edictsHTML()}
     <div class="jpath"><svg class="jcracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${cracks}</svg>
       ${PACKS.map((x, i) => (i ? link(i - 1) : '') + chapter(x, i)).join('')}</div>`, '#pdone', after);
-  m.classList.add('journey');
+  m.classList.add('journey'); if(hardWon()) m.classList.add('hardwon');   // v241
   m.querySelectorAll('[data-crown]').forEach(c => c.onclick = e => { e.stopPropagation(); const l = c.dataset.crown;
     if(!landWon(l)){ showTip(l === 'throne' || !landOpen(l) ? '<b>Not yet earned</b>' : `<b>${landCrownName(l)}</b><br>Not yet earned · defeat ${RULERS[l].name} to claim it`); return; }
     const art = crownArt(l, WORLD_TIER(l));
@@ -3667,7 +3667,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 240;
+const GAME_VERSION = 241;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5059,6 +5059,10 @@ function purseSpill(){
   return x;
 }
 function campaignScore(){ const n = Math.round((hoardNow() + Math.max(0, Math.floor(+(RUN && RUN.money) || 0))) * edictScoreMult());   /* v226: Edicts raise it */ const best = n > bestCampaign(); if(best) ACH.best_campaign = n; ACH.last_campaign = n; ACH.campaign_best_new = best ? 1 : 0; saveAch(); return n; }
+/* v241: once you finish a campaign on Hard (the Heavy Is the Head achievement), the title's Campaign card carries a gold
+   crown mark with your name, and the Journey gets a gold frame and the same mark. Kept for good (it is an achievement). */
+const hardWon = () => !!ACH.sa_d_hard;
+const hardMarkHTML = (cls = '') => hardWon() ? `<span class="hardmark${cls ? ' ' + cls : ''}" title="Finished a campaign on Hard"><i aria-hidden="true">♛</i>${bearerName() ? `${bearerName()} · ` : ''}Beaten on Hard</span>` : '';
 function runnerTitle(){ const n = worldCrowns(); return n >= 4 ? 'Bearer of the Four Crowns' : n >= 2 ? 'The Crownrunner' : n >= 1 ? 'Crownrunner' : 'Unknown challenger'; }
 // v219: what each crown whispers (the Lands are taken in order, so the whisper grows as you go)
 const CROWN_WHISPER = {street:'Win.', medieval:'More.', greek:'Make them kneel.', fantasy:'Come home.', throne:'You are home.'};
@@ -5598,6 +5602,7 @@ function title(){
       ${gs ? `<button class="btn gbtn" id="gcont">Continue Daily Run<small>${gs.date === dailyToday() ? 'Today' : dailyLabel(gs.date)} · Wave ${gs.wave} of ${DAILY_WAVES} · ${gs.lives} ${gs.lives === 1 ? 'life' : 'lives'}</small></button>` : ''}
       <div class="gbtns"><button class="btn ${gs ? 'ghost' : 'gbtn'}" id="gnew">${gs ? 'New run' : dailyRec().days[dailyToday()] ? 'Play again' : 'Play today’s run'}</button><button class="btn ghost" id="grec">Records</button></div>
     </div>
+    ${inC && hardWon() ? `<p class="titlehard">${hardMarkHTML()}</p>` : ''}
     ${inC && worldCrowns() ? `<p class="savebadge runnertag" style="color:#ffd23d;font-family:var(--tag);font-size:15px">${runnerTitle()}</p>` : ''}
     <div class="titlenav"><button class="btn ghost landsbtn" id="lands">${inC ? `${crownRow(PACK)} Journey · ${worldCrowns()}/${WORLD_TOTAL}` : 'Campaign Journey'}</button>
     <button class="btn ghost" id="achb">${inC ? `Achievements ${Object.keys(ACH).filter(k => ACHS.some(a => a.id === k)).length}/${ACHS.length}` : 'Achievements'}</button><button class="btn ghost" id="how">How to play</button>

@@ -516,3 +516,8 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - **Taken by the Hunger:** every Pawn a Blood bargain takes is remembered by name for the campaign. The Journey's Hunger box lists them ("Taken by the Hunger: Tess and Gage"), and the endings speak of them: the crowned ending says "Tess and Gage never came home. It kept them."; the ending where the crown is broken says "Tess and Gage are still gone. Some prices stay paid." A new campaign starts clean.
 - **Playtest tool:** `node tools/playtest.cjs` plays real fights headless (the game's AI on your side against the real enemy AI) and prints win rates per Land, difficulty, player strength and fight type. Options: `--lands`, `--diffs`, `--me` (900 casual, 1400 solid), `--seeds`, `--level`, `--circuits`, `--stages`, `--out`. Example: `node tools/playtest.cjs --lands=greek --diffs=normal --seeds=2`. It doesn't use Tactics, swaps, cards or the Hunger, so compare results between builds rather than reading them as absolute. Not part of CI (it takes minutes).
 - Tests: `validate-v240.cjs`.
+
+## v241 — Beaten on Hard
+- Once you finish a campaign on Hard (the Heavy Is the Head achievement), a gold crown mark with your name ("♛ Ernesto · Beaten on Hard") shows on the title screen above your runner title and under the Journey's heading, and the Journey gets a gold frame. It stays for good, whatever difficulty you play next.
+- Hard playtest of all five Lands (680 fights, `tools/playtest.cjs`): Hard stays 9–25 points below Normal in every Land after v239's easing, so it isn't soft. Its hardest spots are Blitz in the Iron Kingdom and the Olympian Court and the early Rulers; left as they are, since Hard is meant to be hard.
+- Tests: `validate-v241.cjs`.
