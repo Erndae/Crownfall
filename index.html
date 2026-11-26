@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=242"></script>
-<script src="piece-designs.js?v=242"></script>
-<script src="character-style.js?v=242"></script>
-<script src="campaign-opponents.js?v=242"></script>
-<script src="campaign-dialogue.js?v=242"></script>
-<link rel="stylesheet" href="character-style.css?v=242">
+<script src="gameplay-polish.js?v=243"></script>
+<script src="piece-designs.js?v=243"></script>
+<script src="character-style.js?v=243"></script>
+<script src="campaign-opponents.js?v=243"></script>
+<script src="campaign-dialogue.js?v=243"></script>
+<link rel="stylesheet" href="character-style.css?v=243">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=242">
-<link rel="stylesheet" href="ruler-style.css?v=242">
-<link rel="stylesheet" href="gameplay-polish.css?v=242">
+<link rel="stylesheet" href="city-board.css?v=243">
+<link rel="stylesheet" href="ruler-style.css?v=243">
+<link rel="stylesheet" href="gameplay-polish.css?v=243">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2749,7 +2749,13 @@ const sfx = {
   bad:  () => { tone({f:110, f2:80, type:'sawtooth', dur:0.22, vol:0.09}); tone({f:116, f2:84, type:'sawtooth', dur:0.22, vol:0.07}); },
   check:() => kit.siren(),
   ambush:() => { kit.horn(0, 0.22); kit.horn(0.26, 0.22); kit.horn(0.52, 0.5); kit.kick(0); kit.kick(0.26); kit.kick(0.52); },
+  // v243: the Hunger arrives: a low falling drone under a breath, then a slow heartbeat
+  hunger:() => { tone({f:58, f2:41, type:'sawtooth', dur:1.7, vol:0.07}); tone({f:87, f2:62, type:'sine', dur:1.9, vol:0.12}); tone({f:174, f2:123, type:'triangle', dur:1.2, vol:0.025, at:0.15});
+    kit.hiss(0, 1.1, 0.07); kit.kick(0.55, 0.5); kit.kick(0.8, 0.35); kit.kick(1.55, 0.45); kit.kick(1.8, 0.3); },
 };
+// v243: the screen darkens to red at the edges for a moment when the Hunger arrives (a gentle fade with reduced motion)
+function hungerFx(){ try{ document.body.classList.remove('hunger-fx'); void document.body.offsetWidth; document.body.classList.add('hunger-fx');
+  setTimeout(() => document.body.classList.remove('hunger-fx'), 2200); }catch(e){} }
 const T = ms => calm ? 30 : fast ? ms*0.45 : ms;
 
 /* ---------- board packs ---------- */
@@ -3668,7 +3674,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 242;
+const GAME_VERSION = 243;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6211,7 +6217,7 @@ function hungerComes(){ const h = hungerTally(), gap = h.gap == null ? 1 : h.gap
 function hungerAsk(go){
   if(!hungerDue()) return go();
   RUN.pactKey = hungerKey(); if(!hungerComes()){ save(); return go(); }   // v235: decided once for this Stage Battle
-  const o = hungerOffer(); save();
+  const o = hungerOffer(); save(); sfx.hunger(); hungerFx();   // v243
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
     <p>The Hunger rarely comes. Each World Crown you carry makes its bargain bigger, and its price real.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
     <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>${o.lasting ? '<p class="hg-so hg-last">This bargain lasts beyond this battle.</p>' : ''}
@@ -8687,7 +8693,7 @@ function renderCards(){
   if(RUN.cards && RUN.cards.length) coach('card');
 }
 function openCard(k){
-  if(busy) return;
+  if(busy || !RUN || !B || B.done || !RUN.cards || RUN.cards[k] == null) return;   // v243: a card tapped during the victory show (or after the run closed) does nothing
   if(pending === k){ pending = null; renderCards(); drawBoard(); $('#hand').textContent = 'Card put away'; return; }
   const c = C(RUN.cards[k]);
   const m = modal(`<p class="muted">${UI.card}</p><h2 style="color:${c.col}">${c.name}</h2><p>${c.desc}</p>

@@ -533,3 +533,10 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .recap .kv b{text-align:right;min-width:0;overflow-wrap:anywhere}
 .recap-hunger{margin:0;padding:8px 10px;border-radius:10px;border:1px solid rgba(217,80,95,.35);background:rgba(217,80,95,.08);font-size:13.5px;line-height:1.45}
 .recap-hunger b{color:#f0b7bd;margin-right:4px}
+/* v243 the Hunger arrives */
+body.hunger-fx::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 38%,rgba(90,0,12,.55) 78%,rgba(30,0,4,.85) 100%);animation:hungerFx 2.2s ease-out both}
+@keyframes hungerFx{0%{opacity:0}18%{opacity:1}34%{opacity:.7}50%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){body.hunger-fx::after{animation:hungerFxCalm 2.2s ease-out both}@keyframes hungerFxCalm{0%{opacity:0}25%{opacity:.8}100%{opacity:0}}}
+.modal .hunger{animation:hungerIn .7s ease-out both}
+@keyframes hungerIn{0%{opacity:0;transform:scale(.97);filter:blur(2px)}100%{opacity:1;transform:none;filter:none}}
+@media (prefers-reduced-motion:reduce){.modal .hunger{animation:none}}

@@ -526,3 +526,10 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - After 3 or more days away from the campaign, Continue Campaign first shows a short recap: where you are (Land and stage), your World Crowns by name, the difficulty and New Game+ cycle (if not Normal / first cycle), your army (pieces, lives, $), your Edicts, and how you've answered the Hunger, with the Pawns it took. One tap on Continue goes on as before. It shows once per visit and never spoils the story.
 - "Away" is measured from the campaign's last save on this device (or a newer cloud save).
 - Tests: `validate-v242.cjs`.
+
+## v243 — the Hunger's arrival, and a full-game health check
+- **The Hunger arrives with its own sound:** a low, falling drone under a breath, then a slow heartbeat. The screen's edges darken to red for about two seconds and the offer fades in. Only when a bargain is actually offered; with reduced motion it's a gentle fade.
+- **Health check:** a full campaign was driven in the browser from New Campaign to the Crownless King (all 85 battles, every screen advanced by its own buttons, the Hunger answered both ways), then both endings, then New Game+.
+  - Found and fixed: tapping a Playbook card during the short victory show after a won fight threw an error. Card taps now do nothing once a fight is won.
+  - Everything else played through without errors: Lands, stores, events, crown ceremonies, the Fallen Throne, the crowned ending, the broken-crown ending (offered from the second finish on, as designed) and the New Game+ start (Edict, difficulty, army).
+- Tests: `validate-v243.cjs`.
