@@ -540,3 +540,29 @@ body.hunger-fx::after{content:"";position:fixed;inset:0;z-index:9998;pointer-eve
 .modal .hunger{animation:hungerIn .7s ease-out both}
 @keyframes hungerIn{0%{opacity:0;transform:scale(.97);filter:blur(2px)}100%{opacity:1;transform:none;filter:none}}
 @media (prefers-reduced-motion:reduce){.modal .hunger{animation:none}}
+
+/* Painted relics use the same square hit areas as the original inventory tokens. */
+body[data-pack="street"] { --relic-atlas:url("assets/relics/street.webp") }
+body[data-pack="medieval"] { --relic-atlas:url("assets/relics/medieval.webp") }
+body[data-pack="greek"] { --relic-atlas:url("assets/relics/greek.webp") }
+body[data-pack="fantasy"] { --relic-atlas:url("assets/relics/fantasy.webp") }
+body[data-pack="throne"] { --relic-atlas:url("assets/relics/throne.webp") }
+#app .relic:has(> .relic-art) {
+  border:0!important; background:transparent!important; box-shadow:none!important;
+  filter:none; padding:0!important;
+}
+.relic-art {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:var(--relic-atlas); background-size:500% 600%; background-repeat:no-repeat;
+  filter:drop-shadow(0 1px 1px #080606);
+}
+#app .relic:has(> .relic-art)::before { z-index:1 }
+#app .relic:has(> .relic-art) .fx { z-index:1; background:#18130f; box-shadow:0 0 0 1px #98784e }
+#app .relic:has(> .relic-art):focus-visible { outline:2px solid #fff1bb; outline-offset:2px }
+/* Crown City mounts each street emblem on the land's cast-iron manhole cover. */
+body[data-pack="street"] #app .relic:has(> .relic-art) {
+  border:2px solid #615b55!important;
+  background:repeating-linear-gradient(45deg,#363536 0 2px,#243426 2px 5px)!important;
+  box-shadow:inset 0 0 0 2px #181719,0 2px 3px #151015!important;
+}
+body[data-pack="street"] .relic-art { inset:9% }

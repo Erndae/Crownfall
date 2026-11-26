@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=243"></script>
-<script src="piece-designs.js?v=243"></script>
-<script src="character-style.js?v=243"></script>
-<script src="campaign-opponents.js?v=243"></script>
-<script src="campaign-dialogue.js?v=243"></script>
-<link rel="stylesheet" href="character-style.css?v=243">
+<script src="gameplay-polish.js?v=244"></script>
+<script src="piece-designs.js?v=244"></script>
+<script src="character-style.js?v=244"></script>
+<script src="campaign-opponents.js?v=244"></script>
+<script src="campaign-dialogue.js?v=244"></script>
+<link rel="stylesheet" href="character-style.css?v=244">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,9 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=243">
-<link rel="stylesheet" href="ruler-style.css?v=243">
-<link rel="stylesheet" href="gameplay-polish.css?v=243">
+<link rel="stylesheet" href="city-board.css?v=244">
+<link rel="stylesheet" href="ruler-style.css?v=244">
+<link rel="stylesheet" href="gameplay-polish.css?v=244">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2654,7 +2654,20 @@ const RGLYPH = {
   trap:'<path d="M3 18h18M5 18l2-7 2 7M10 18l2-9 2 9M15 18l2-7 2 7"/><circle cx="12" cy="5" r="1.4"/>',
   chain:'<path d="M10 14a4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 5.6l-1.4 1.4M14 10a4 4 0 0 1 0 5.6l-2.8 2.8a4 4 0 0 1-5.6-5.6l1.4-1.4"/>',
 };
+// Fixed atlas positions keyed by relic ID so inventory order and saved runs do not affect the artwork.
+const RELIC_ART_ORDER = [
+  'cavalry','pawnstorm','diagonal','rooklift','royalguard',
+  'fork','longshot','momentum','opening','tempo',
+  'shuffle','piggy','hoarder','regicide','harass',
+  'underdog','laststand','trophy','promo','gold',
+  'martyr','nerve','sweep','aegis','chain','trap'
+];
 function relicIcon(r){
+  const slot = RELIC_ART_ORDER.indexOf(r.id);
+  if(slot >= 0 && PACKS.some(pack => pack.id === document.body.dataset.pack)){
+    const x = (slot % 5) * 25, y = Math.floor(slot / 5) * 20;
+    return `<span class="relic-art" aria-hidden="true" style="background-position:${x}% ${y}%"></span>`;
+  }
   if(r.icon) return `<svg class="rg" viewBox="0 0 40 40" aria-hidden="true"><g fill="currentColor" stroke="none">${SHAPE[r.icon].replace('class="cut"','style="stroke:var(--tile-bg,#ddd);fill:none" stroke-width="2"').replace('class="eye"','style="fill:var(--tile-bg,#ddd)"')}<rect x="9" y="30.5" width="22" height="5" rx="2"/></g></svg>`;
   return `<svg class="rg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${RGLYPH[r.id] || ''}</svg>`;
 }
@@ -3674,7 +3687,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 243;
+const GAME_VERSION = 244;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
