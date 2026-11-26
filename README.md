@@ -521,3 +521,8 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Once you finish a campaign on Hard (the Heavy Is the Head achievement), a gold crown mark with your name ("♛ Ernesto · Beaten on Hard") shows on the title screen above your runner title and under the Journey's heading, and the Journey gets a gold frame. It stays for good, whatever difficulty you play next.
 - Hard playtest of all five Lands (680 fights, `tools/playtest.cjs`): Hard stays 9–25 points below Normal in every Land after v239's easing, so it isn't soft. Its hardest spots are Blitz in the Iron Kingdom and the Olympian Court and the early Rulers; left as they are, since Hard is meant to be hard.
 - Tests: `validate-v241.cjs`.
+
+## v242 — "Previously…" when you come back
+- After 3 or more days away from the campaign, Continue Campaign first shows a short recap: where you are (Land and stage), your World Crowns by name, the difficulty and New Game+ cycle (if not Normal / first cycle), your army (pieces, lives, $), your Edicts, and how you've answered the Hunger, with the Pawns it took. One tap on Continue goes on as before. It shows once per visit and never spoils the story.
+- "Away" is measured from the campaign's last save on this device (or a newer cloud save).
+- Tests: `validate-v242.cjs`.

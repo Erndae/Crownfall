@@ -525,3 +525,11 @@ body[data-art="1"]:not([data-pack="street"])::after{background:linear-gradient(1
 .hardmark.jhard{margin-top:4px}
 .modal.journey.hardwon>.box{box-shadow:0 0 0 2px #e0b84a,0 0 28px rgba(255,200,80,.22)}
 .titlehard{margin:2px 0 0;display:flex;justify-content:center}.titlehard .hardmark{margin-top:0;align-self:auto}
+/* v242 Previously… recap */
+.recap{display:flex;flex-direction:column;gap:10px}
+.recap>small{color:var(--muted,#b9b1c9);font-size:12.5px}
+.recap h2{margin:0}
+.recap-where{margin:0;font-family:var(--display);letter-spacing:.03em;color:#ffd9a8}
+.recap .kv b{text-align:right;min-width:0;overflow-wrap:anywhere}
+.recap-hunger{margin:0;padding:8px 10px;border-radius:10px;border:1px solid rgba(217,80,95,.35);background:rgba(217,80,95,.08);font-size:13.5px;line-height:1.45}
+.recap-hunger b{color:#f0b7bd;margin-right:4px}
