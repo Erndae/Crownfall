@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=246"></script>
-<script src="piece-designs.js?v=246"></script>
-<script src="character-style.js?v=246"></script>
-<script src="campaign-opponents.js?v=246"></script>
-<script src="campaign-dialogue.js?v=246"></script>
-<link rel="stylesheet" href="character-style.css?v=246">
+<script src="gameplay-polish.js?v=248"></script>
+<script src="piece-designs.js?v=248"></script>
+<script src="character-style.js?v=248"></script>
+<script src="campaign-opponents.js?v=248"></script>
+<script src="campaign-dialogue.js?v=248"></script>
+<link rel="stylesheet" href="character-style.css?v=248">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=246">
-<link rel="stylesheet" href="ruler-style.css?v=246">
-<link rel="stylesheet" href="gameplay-polish.css?v=246">
-<link rel="stylesheet" href="storybook.css?v=246">
+<link rel="stylesheet" href="city-board.css?v=248">
+<link rel="stylesheet" href="ruler-style.css?v=248">
+<link rel="stylesheet" href="gameplay-polish.css?v=248">
+<link rel="stylesheet" href="storybook.css?v=248">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3688,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 246;
+const GAME_VERSION = 248;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -6339,7 +6339,7 @@ function playBlind(resumed){
       <button class="cbox chips" id="expC"><small>Material</small><span id="cc">0</span></button><span class="x">×</span><button class="cbox mult" id="expM"><small>Brilliance</small><span id="cm">×0</span><em class="combo" id="combo"></em></button>
     </div>
     <button type="button" class="pbar goal-button" id="goalInfo" aria-label="Win conditions and move preview settings"><i id="pbar" style="width:${Math.min(100,B.score/B.target*100)}%"></i><span class="ptgt" id="goalLabel">${goalText()}</span></button>
-    <div class="handrow"><span class="hand" id="hand">Tap a piece, then a target</span><span class="mood" id="mood"><i></i><span id="moodTxt">Enemy waiting</span></span></div>
+    <div class="handrow"><span id="chariotCall" role="status" hidden></span><span class="hand" id="hand">Tap a piece, then a target</span><span class="mood" id="mood"><i></i><span id="moodTxt">Enemy waiting</span></span></div>
     ${MATCH ? '' : relicRow()}
     <div class="boardArea"><div class="boardWrap" id="bw"><div class="bdecor" id="bdecor"></div><div class="board" id="board"></div><div class="fxl" id="fxl"></div></div></div>
     <div class="pinfo" id="pinfo"></div>
@@ -7258,6 +7258,13 @@ function drawBoard(){
   if(movePreview && (!B || B.board!==movePreview.board || sel!==movePreview.from || busy || pending!==null || swapMode || trapMode || gambitMode)){movePreview=null;pieceInfo(null);}
   const el = $('#board'); if(!el) return;
   boardSides(el);
+  const charge = !busy && signatureReady() ? B.chariot : null;
+  const signature = charge && OLYMPIAN_MOVES[charge.boss || 'Heracles'];
+  const callout = document.getElementById('chariotCall');
+  if(callout){
+    callout.hidden = !charge;
+    callout.textContent = charge ? `${signature.label} · ${sqName(charge.from)} → ${sqName(charge.to)}` : '';
+  }
   const displayBoard=movePreview?.position||B.board;
   const threats = new Set(attacksOn(displayBoard, 'en'));
   const legal = !movePreview&&sel !== null ? legalMoves(sel) : [];
@@ -7276,6 +7283,10 @@ function drawBoard(){
     if(p && p.side === 'me' && threats.has(i)) cls.push('threat');
     if(p && p.t === 'K' && inCheck(displayBoard, p.side)) cls.push('threat', 'chk');
     let inner = p && !(REINF_HIDE && REINF_HIDE.has(i)) ? pieceSVG(p.t, p.side, p.e) : '';
+    if(charge && onSignaturePath(charge,signature,i)){
+      cls.push('chariot-lane');
+      if(i === charge.to) inner += `<span class="chariot-wheel" aria-label="${signature.label} target" role="img">${signature.mark}</span>`;
+    }
     if(p?.side === 'en' && B.guardIds?.includes(p.id)) inner += '<span class="guard-mark" role="img" aria-label="Marked defender: remove to unlock score victory" title="Marked defender">⛨</span>';
     if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.banner || []).includes(i)) inner += '<span class="banner-mark" role="img" aria-label="Royal banner: your piece gains 1 Tactic and 1 Armor; enemy entry costs you 1 Tactic. Pawns cannot raise it"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#2a2208" stroke="#0d0d0d" stroke-width="2"/><path d="M14 30V10" stroke="#f3e6c0" stroke-width="2.4" stroke-linecap="round"/><path d="M15 11H28L24.5 15.5L28 20H15Z" fill="#ffd23d" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg></span>';
@@ -8177,6 +8188,7 @@ async function enemyPhaseRun(to){
     if(loneKing()){ busy = false; return loneKingDefeat(); }   // before reinforcements, Blitz or another turn
   }
   B.enPhase = null;
+  delete B.chariot;
   B.enemyOwes = false;                                                      // the reply is complete
   B.board.forEach(q => { if(q && q.mark) delete q.mark; });
   B.ep = (B.ep || []).filter(e => e.by !== 'me');                          // the enemy's en passant chances end with its response   // the whole reply is over: a new turn for Crown abilities; Focus Fire marks expire
@@ -8198,6 +8210,7 @@ async function enemyPhaseRun(to){
   if(B.guardIds && !guardCaptureFailed && scoreGoalReady()){ busy = false; return winBlind(); }
   // reinforcements
   if(!B.board.some(p => p && p.side === 'en' && p.t !== 'K')) await reinforce();   // (at most REINF_MAX waves; then the King must be checkmated)
+  announceSignature();
   save();
   if(blitzOn() && B.moves <= 0){ busy = false; return gameOver(`Out of moves. Blitz rule: you scored ${B.score.toLocaleString()} of ${B.target.toLocaleString()}.`); }   // only an explicit move limit can end a round
   if(B.ckFinal && !B.ckStall && (B.ckMoves || 0) >= CK_STALL_MOVES && isCrownless()) await throneCrumbles();
@@ -8426,7 +8439,60 @@ function defendScore(best, cands, deadline){
   return best;
 }
 
+const OLYMPIAN_MOVES = {
+  'Heracles': {piece:'R', label:'Chariot', mark:'☸', call:'Make way for the chariot!', counter:'Move the target or block the file.'},
+  'Atalanta the Swift': {piece:'N', label:'Laurel Leap', mark:'♞', call:'Try to outrun this!', counter:'Move the target or take the knight. It can leap over blockers.'},
+  'Hector of Troy': {piece:'P', label:'Shield Wall', mark:'⛨', call:'Shields together. Spears forward!', counter:'Move the target or separate the attacking pawn from its neighboring pawns.'},
+  'King Aeëtes': {piece:'B', label:'Fleece Guard', mark:'◆', call:'The Fleece stays in my court!', counter:'Block the diagonal, move the target, or take the bishop.'}
+};
+function inSignatureFormation(piece,from,to){
+  if(piece === 'R') return from % 8 === to % 8;
+  if(piece !== 'P') return true;
+  return [from-1,from+1].some(i => (i >> 3) === (from >> 3) && B.board[i]?.side === 'en' && B.board[i].t === 'P');
+}
+function onSignaturePath(c,signature,i){
+  if(i === c.from || i === c.to) return true;
+  if(signature.piece !== 'R' && signature.piece !== 'B') return false;
+  if(i <= Math.min(c.from,c.to) || i >= Math.max(c.from,c.to)) return false;
+  const rows = (c.to >> 3) - (c.from >> 3), cols = c.to % 8 - c.from % 8;
+  return ((i >> 3) - (c.from >> 3)) * cols === (i % 8 - c.from % 8) * rows;
+}
+function announceSignature(){
+  if(B.chariotCalled || MATCH || MODE !== 'campaign' || RUN.gauntlet || RUN.blind !== 2 ||
+     land() !== 'greek' || bossAt(RUN.ante) !== 'mini') return;
+  const boss = miniName(), signature = OLYMPIAN_MOVES[boss];
+  if(!signature) return;
+  let choice = null;
+  B.board.forEach((attacker, from) => {
+    if(attacker?.side !== 'en' || attacker.t !== signature.piece) return;
+    for(const to of legalFor(B.board, from)){
+      const target = B.board[to];
+      if(!inSignatureFormation(signature.piece,from,to) || target?.side !== 'me' || target.t === 'K') continue;
+      if(!choice || TYPE[target.t].val > TYPE[B.board[choice.to].t].val)
+        choice = {boss, from, to, attacker:attacker.id, target:target.id};
+    }
+  });
+  if(!choice) return;
+  B.chariotCalled = true;
+  B.chariot = choice;
+  const detail = `${TYPE[signature.piece].name} on ${sqName(choice.from)} threatens ${sqName(choice.to)}. ${signature.counter}`;
+  logPos(`${boss}: “${signature.call}” ${detail}`,choice.from,choice.to,'fx');
+  showTip(`<b>${signature.call}</b><br>${detail}`);
+}
+function signatureReady(){
+  const c = B.chariot;
+  if(!c || B.noCap > 0 || B.blunder > 0 || B.skip > 0) return false;
+  const attacker = B.board[c.from], target = B.board[c.to];
+  const signature = OLYMPIAN_MOVES[c.boss || 'Heracles'];
+  return !!signature && attacker?.side === 'en' && attacker.t === signature.piece && attacker.id === (c.attacker ?? c.rook) &&
+    inSignatureFormation(signature.piece,c.from,c.to) &&
+    target?.side === 'me' && target.id === c.target && legalFor(B.board,c.from).includes(c.to);
+}
 function enemyPlan(sub){
+  if(sub === 0 && signatureReady()){
+    const {from,to} = B.chariot;
+    return {from,to,think:0,trap:Math.random()};
+  }
   const defenseStart = performance.now(), defenseActive = scoringDefenseOn() && !(B.blunder > 0);
   let best = null, think = 0;
   const cands = [];
