@@ -11,7 +11,8 @@ const bridge=`
 const realPlayScore = playScore;
 window.__polishTest={
  setup(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
- bonusFixture(){
+ bonusFixture(charged=false){
+    B.board[42].charge=charged;
     RUN.relics=['cavalry'];
     playBlind(true);
   },
@@ -82,6 +83,18 @@ capture.onpointerup();
 capture.onclick({detail:1});
 assert.equal(api.state().score,0,'Holding a target does not play the move');
 $('#tip').remove();
+api.setup();
+api.bonusFixture(true);
+api.pause();
+$('#confirmMoves').click();
+$('#back').click();
+await api.tap(42);
+assert.match($('#board [data-i="25"]').dataset.captureBonus,/\+720 points/);
+await api.tap(25);
+assert.match($('#pinfo .preview-effects').textContent,/Horsepower \+4 Brilliance · Charge ×1.5 Brilliance/);
+assert.equal(api.state().score,0);
+await $('#commitPreview').onclick();
+assert.equal(api.state().score,720);
 api.setup();
 api.record(250);
 const beats=[];

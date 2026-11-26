@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=245"></script>
-<script src="piece-designs.js?v=245"></script>
-<script src="character-style.js?v=245"></script>
-<script src="campaign-opponents.js?v=245"></script>
-<script src="campaign-dialogue.js?v=245"></script>
-<link rel="stylesheet" href="character-style.css?v=245">
+<script src="gameplay-polish.js?v=246"></script>
+<script src="piece-designs.js?v=246"></script>
+<script src="character-style.js?v=246"></script>
+<script src="campaign-opponents.js?v=246"></script>
+<script src="campaign-dialogue.js?v=246"></script>
+<link rel="stylesheet" href="character-style.css?v=246">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=245">
-<link rel="stylesheet" href="ruler-style.css?v=245">
-<link rel="stylesheet" href="gameplay-polish.css?v=245">
-<link rel="stylesheet" href="storybook.css?v=245">
+<link rel="stylesheet" href="city-board.css?v=246">
+<link rel="stylesheet" href="ruler-style.css?v=246">
+<link rel="stylesheet" href="gameplay-polish.css?v=246">
+<link rel="stylesheet" href="storybook.css?v=246">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3688,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 245;
+const GAME_VERSION = 246;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5291,6 +5291,17 @@ function scoreCapture(from, to, pt){
   mult = Math.round(mult*10)/10;
   const label = victim ? `${T0.name} takes ${TYPE[v].name}${check ? ' + Check' : ''}` : `${T0.name} gives Check`;
   return {steps, chips, mult, total: Math.round(chips*mult), promo, check, label, fork};
+}
+
+function projectedMoveScore(from, to, promotion){
+  const res = scoreCapture(from, to, promotion);
+  if(res && B.board[from].charge && (B.board[to] || epVictim(B.board, from, to))){
+    res.steps.push({src:'charge', x:1.5});
+    res.mult = +(res.mult * 1.5).toFixed(2);
+    res.total = Math.round(res.total * 1.5);
+    res.label = 'Charge! ' + res.label;
+  }
+  return res;
 }
 
 /* ---------- screens ---------- */
@@ -7184,16 +7195,18 @@ function bannerHTML(short=false){if(!B?.banner?.length)return '';return short?`<
 function bountyHTML(short=false){if(!B?.bounty)return bannerHTML(short);return short?`<p class="hazard-brief">Bounty: one enemy piece wears a <b>$</b> tag. Capture it for <b>double score</b> and +$${B.bounty.pay}. Each time it captures one of yours, you lose 1 swap.</p>`:`<div class="hazard-explain"><b>Bounty · $${B.bounty.pay}</b>The enemy piece with the $ tag has a price on it. Capturing it scores <b>double</b> and pays +$${B.bounty.pay}. Every time it captures one of your pieces, you lose 1 swap (if you have one).</div>`;}
 function lightsHTML(short=false){if(!B?.lights?.length)return vantageHTML(short);return short?`<p class="hazard-brief">${B.lights.length} green lights: reach one for +1 move. If an enemy gets there first, you lose 1 move. Each works once.</p>`:`<div class="hazard-explain"><b>${B.lights.length} green lights</b>Move a piece onto a green light and get 1 move back on the Blitz clock. If an enemy piece lands there first, you lose 1 move instead (never your last one). Each light works once; no piece is removed.</div>`;}
 function hazardHTML(short=false){if(!B?.crates?.length)return lightsHTML(short);return short?`<p class="hazard-brief">${B.crates.length} supply crates: break one open with any piece <b>except a pawn</b> for supplies. If an enemy piece gets there first, it gains Armor.</p>`:`<div class="hazard-explain"><b>${B.crates.length} supply crates</b>Move any of your pieces except a pawn onto a crate to break it open: the first gives +1 Tactic, the second $${crateCash()}, the third +1 swap. If an enemy piece (not a pawn) reaches one first, it loots it and gains 1 Armor. Each crate opens once.</div>`;}
-function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a cyan outlined capture square to see which scoring bonuses it triggers.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
+function battleInfo(){if(!B)return;const m=modal(`<h2>Win this fight</h2><p><b>${finalPhase()&&!B.ckFinal?'Final phase: checkmate the enemy King.':`Checkmate the enemy King, or reach ${B.target.toLocaleString()} points.`}</b></p><p>Score ${B.score.toLocaleString()} / ${B.target.toLocaleString()} · ${Math.max(0,B.target-B.score).toLocaleString()} still needed.</p><p>A capture that first reaches the target must survive the enemy’s reply. Checkmate wins immediately.${B.ckFinal?' In the Fallen Throne’s final phase, its hold turn must finish too.':''}</p><p>Hold a capture square to see its projected score and bonuses.</p>${B.moveLimit?`<p>Blitz: ${Math.max(0,B.moves)} moves remaining.</p>`:''}${encounterHTML()}${hazardHTML()}<button class="btn" id="goalClose">Back to fight</button>`,'#goalClose');}
 function previewMove(from,to){
   if(!B||busy||!legalMoves(from).includes(to))return;
-  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=scoreCapture(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t!=='P',bnty=bountyOn(B.board[to]),bann=(B.banner||[]).includes(to)&&p&&p.t!=='P';
-  let points=sc?.total||0;if(victim&&p.charge)points=Math.round(points*1.5);
+  const p=B.board[from],victim=B.board[to]||epVictim(B.board,from,to),after=applyMove(B.board,from,to),sc=projectedMoveScore(from,to),risk=attacksOn(after,'en').includes(to),crate=(B.crates||[]).includes(to),light=(B.lights||[]).includes(to),vant=(B.vantage||[]).includes(to)&&p&&p.t!=='P',bnty=bountyOn(B.board[to]),bann=(B.banner||[]).includes(to)&&p&&p.t!=='P';
+  const points=sc?.total||0;
+  const bonuses=victim ? captureBonusText(sc) : '';
+  const promotion=isPromo(B.board,from,to) ? ' · Queen promotion estimate' : '';
   movePreview={from,to,board:B.board,position:after};drawBoard();
   const el=$('#pinfo');if(!el)return;pieceInfo(null);el.style.setProperty('--confirm-height',Math.max(52,el.getBoundingClientRect().height)+'px');el.className='pinfo move-preview';
   const scoreText=sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
-  const detail=`${scoreText}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate&&p&&p.t!=='P'?' · supply crate':''}${light?' · green light: +1 move':''}${vant?' · vantage point: +1 Tactic':''}${bnty?` · bounty: double score, +$${B.bounty.pay}`:''}${bann?' · banner: +1 Tactic':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
-  el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate&&p&&p.t!=='P'?' · supplies':''}${!victim&&RULE('tax')?' · −$1':''}</span><span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
+  const detail=`${scoreText}${promotion}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate&&p&&p.t!=='P'?' · supply crate':''}${light?' · green light: +1 move':''}${vant?' · vantage point: +1 Tactic':''}${bnty?` · bounty: double score, +$${B.bounty.pay}`:''}${bann?' · banner: +1 Tactic':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
+  el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate&&p&&p.t!=='P'?' · supplies':''}${!victim&&RULE('tax')?' · −$1':''}</span>${bonuses||promotion ? `<small class="preview-effects">${CrownfallPolish.escape([bonuses,promotion.slice(3)].filter(Boolean).join(' · '))}</small>` : ''}<span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
   el.querySelector('#commitPreview').onclick=commitMovePreview;
   el.querySelector('#cancelPreview').onclick=cancelMovePreview;
 }
@@ -7205,11 +7218,10 @@ async function commitMovePreview(){
 }
 function lossHTML(review){const esc=CrownfallPolish.escape;return `<div class="loss-review"><b>${esc(review.title)}</b><p>${esc(review.tip)}</p>${review.note?`<p class="last-turn">Last exchange: ${esc(review.note)}</p>`:''}</div>`;}
 function lossBoardHTML(log){const sn=log?.at(-1);if(!sn?.s)return '';let html='';for(let i=0;i<64;i++){const ch=sn.s[i],me=ch&&ch===ch.toUpperCase();html+=`<div class="sq ${(Math.floor(i/8)+i%8)%2?'d':'l'}${i===sn.t?' lastte':''}">${ch&&ch!=='.'?pieceSVG(ch.toUpperCase(),me?'me':'en'):''}</div>`;}return `<details><summary>Review final position</summary><div class="board loss-final">${html}</div></details>`;}
-function captureBonusText(score, charged){
+function captureBonusText(score){
   const sources = new Set(['ench','gear','circuit','card','relic','combo','charge']);
   const names = {circuit:'Rooftop bonus', combo:'Capture streak', charge:'Charge'};
   const steps = (score?.steps || []).filter(step => sources.has(step.src));
-  if(charged) steps.push({src:'charge',x:1.5});
   return steps.map(step => {
     const parts = [];
     if(step.c) parts.push(`+${step.c} Material`);
@@ -7230,7 +7242,7 @@ function bindCaptureHold(square, bonus, move){
     hold = setTimeout(() => {
       if(busy || !square.isConnected) return;
       inspected = true;
-      showTip(`<b>Capture bonuses</b><br>${CrownfallPolish.escape(bonus)}`);
+      showTip(`<b>Capture preview</b><br>${CrownfallPolish.escape(bonus)}`);
     }, 420);
   };
   square.onpointermove = e => { if(Math.hypot(e.clientX-x,e.clientY-y)>10) cancel(); };
@@ -7279,11 +7291,13 @@ function drawBoard(){
     let captureBonus = '';
     if(legal.includes(i)){
       const nb = applyMove(B.board, sel, i); const risk = attacksOn(nb, 'en').includes(i);
-      const sc = scoreCapture(sel, i);
+      const sc = projectedMoveScore(sel, i);
       inner += p || epVictim(B.board, sel, i) ? `<span class="ring ${risk?'risk':''}"></span>${p ? '' : '<span class="eptag">En passant</span>'}` : `<span class="dot ${risk?'risk':''}"></span>`;
       if(!busy && !swapMode && !trapMode && !gambitMode && pending === null && (p?.side === 'en' || epVictim(B.board, sel, i))){
-        captureBonus = captureBonusText(sc, B.board[sel]?.charge);
+        captureBonus = captureBonusText(sc);
         if(captureBonus) inner += '<span class="capture-bonus-mark" aria-hidden="true"></span>';
+        const assumption = isPromo(B.board,sel,i) ? ' (Queen promotion estimate)' : '';
+        captureBonus = [`+${sc.total.toLocaleString()} points${assumption}`, captureBonus].filter(Boolean).join(' · ');
       }
       if(sc) inner += `<span class="pv">+${sc.total.toLocaleString()}</span>`;
       if(risk)inner += '<span class="preview-warning" aria-label="Attacked destination">!</span>';
@@ -7301,6 +7315,7 @@ function drawBoard(){
   coachBoard();
   const tb = $('#tipbar');
   if(tb){ if(swapMode) tb.innerHTML = swapA === null ? '<b>Swap:</b> tap the first of your pieces.' : '<b>Swap:</b> now tap the piece to trade places with.';
+    else if(sel !== null && el.querySelector('[data-capture-bonus]')) tb.textContent = 'Hold a capture to preview points and bonuses.';
     else if(sel !== null) tb.innerHTML = 'Gold = safe. <b style="color:var(--mult)">Red</b> = an enemy can take you there.';
     else tb.innerHTML = 'Tap one of your pieces to see its moves and scores.'; }
 }
@@ -7834,9 +7849,9 @@ async function doMove(from, to, pt){
   const laCk = !MATCH && inCheck(B.board, 'me'), laThr = MATCH ? null : new Set(attacksOn(B.board, 'en'));   // v147 (chatter only)
   const strike = B.cmdMove === 'strike'; B.cmdMove = null; delete B.decreeNow;   // Strike: an extra capture that doesn't use your move (or Momentum's)
   const bonusMove = !!B.initPhase || strike; if(!strike){ B.initPhase = false; B.initFrom = null; } B.scout = null; B.wisdom = null; tacState();
-  const res = scoreCapture(from, to, pt);
+  const res = projectedMoveScore(from, to, pt);
   if(window.__ptel){ const pt0 = B.ptel || (B.ptel = {mv:{}, cap:{}}); pt0.mv[mover.t] = (pt0.mv[mover.t] || 0) + 1; if(victim) pt0.cap[mover.t] = (pt0.cap[mover.t] || 0) + 1; }   // v134 test telemetry
-  if(res && victim && mover.charge){ res.steps.push({x:1.5, src:'charge'}); res.mult = +(res.mult * 1.5).toFixed(2); res.total = Math.round(res.total * 1.5); res.label = 'Charge! ' + res.label; }   // Charge: +50% after Material × Brilliance
+
   if(mover.charge) delete mover.charge;
   drawBoard();
   await animateMove(from, to, victim ? 'lunge' : 'normal');
