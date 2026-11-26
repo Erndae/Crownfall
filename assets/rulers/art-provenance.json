@@ -39,5 +39,5 @@
     }
   ],
   "constraints": "No human faces; clearly recognisable animal species with humanoid bodies, clothing and hands. Isolated portrait with transparent alpha. No text, frame or watermark.",
-  "production": "Generated with built-in image_gen; originals retained in generated_images, project copies resized to 640x960 and encoded WebP without creative edits."
+  "production": "The existing ruler designs were redrawn in matte storybook gouache for v245 using the original five portraits as references. The new lineup is exec-d8ce62f5-c575-4933-b803-55f73494126e.png. Each portrait is a transparent WebP."
 }

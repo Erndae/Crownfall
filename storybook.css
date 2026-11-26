@@ -1,0 +1,148 @@
+/* One printed palette across play, with local pigments and landscapes for each Land. */
+body[data-pack] {
+  --paper: #f4e7cf;
+  --paper-ink: #30251e;
+  --book-ink: #253248;
+  --book-shadow: #141d2b;
+  --book-accent: #b55038;
+  --book-gold: #edc477;
+  --book-rule: #987e5e;
+  --book-scene: url("crown-city.webp");
+  --board-pale: #cfc4aa;
+  --board-deep: #67727a;
+  --display: Georgia, "Times New Roman", serif;
+  --tag: Georgia, "Times New Roman", serif;
+  --body: system-ui, -apple-system, sans-serif;
+  font-family: var(--body);
+}
+body[data-pack="medieval"] {
+  --book-ink:#2f3039; --book-accent:#903c3c; --book-scene:url("iron-kingdom.webp");
+  --board-pale:#d5c3a1; --board-deep:#807267;
+}
+body[data-pack="greek"] {
+  --book-ink:#23354a; --book-accent:#994832; --book-scene:url("olympian-court.webp");
+  --board-pale:#e2d4b5; --board-deep:#72858a;
+}
+body[data-pack="fantasy"] {
+  --book-ink:#35304a; --book-accent:#775276; --book-scene:url("shattered-realm.webp");
+  --board-pale:#d0c2cf; --board-deep:#7c708e;
+}
+body[data-pack="throne"] {
+  --book-ink:#312e36; --book-accent:#8f3d44; --book-scene:url("fallen-throne.webp");
+  --board-pale:#cfc3ac; --board-deep:#71666c;
+}
+body[data-pack="gauntlet"],body[data-pack="arena"] {
+  --book-ink:#332b32; --book-accent:#934845; --book-scene:url("assets/splash/royal-courtyard.webp");
+}
+body[data-pack] :is(h2,h3,.mchead b,.shoptitle h2,.pblind b,.ssec,.mycard b,.lab b,.bcard b,.evtitle,.qt,.en-line,.lw-head b) {
+  font-family:var(--display); font-weight:700; letter-spacing:.01em;
+}
+body[data-pack] :is(.btn,.lw-skip) {
+  border-radius:5px; font-family:var(--display); font-weight:700;
+  box-shadow:0 2px 0 #151a23; text-shadow:none;
+}
+body[data-pack] .btn:not(.ghost,.blue,.red,.on,.gmc,.trapbtn,.gbtn):not(:disabled) {
+  background:var(--book-gold); color:#262634; border-color:#795f3f;
+}
+body[data-pack] .btn.ghost { background:var(--book-ink); border-color:var(--book-rule); color:#f6ead3; }
+body[data-pack] :is(.btn,button):focus-visible {outline:3px solid #55cfd7;outline-offset:2px}
+body[data-pack] :is(.modecard,.circ,.diff,.fpick,.modal .box,.tip,.coach,.quote,.offer,.pstats,.pblind,.pscore) {
+  background-color:var(--book-ink); border-color:var(--book-rule); border-radius:6px;
+}
+body[data-pack] :is(.modal .box,.tip,.coach,.modecard) {
+  background-image:linear-gradient(120deg,#ffffff08,transparent 60%);
+  color:#fbefd8; box-shadow:0 3px 0 var(--book-shadow);
+}
+body[data-pack] .modecard.mc-camp {
+  background:linear-gradient(90deg,var(--book-ink) 12%,color-mix(in srgb,var(--book-ink) 82%,transparent) 65%,#202736b3),var(--book-scene) center 46%/cover;
+}
+body[data-pack] :is(.gstats,.army,.apc,.pinfo,.pstats>div,.tacbtn) {background-color:var(--book-shadow)}
+body[data-pack] .apc {background:#ffffff0c;border-radius:3px}
+body[data-pack] .apc:nth-child(even) {background:#ffffff16}
+body[data-pack] :is(.modal .box,.coach,.tip,.modecard,.phud,.pscore) {--dim:#d4cabb;--muted:#d4cabb}
+body[data-pack] .shopscr {
+  background:var(--paper); color:var(--paper-ink); padding-inline:12px;
+  --dim:#635649; --text:var(--paper-ink);
+}
+body[data-pack] .shopscr .shophead {
+  background:var(--book-ink); color:var(--paper); margin-inline:-12px;
+  border-bottom:2px solid var(--book-rule); gap:4px;
+}
+.shopscr .shophead::before {
+  content:"";display:block;height:clamp(25px,5.7svh,58px);margin:-8px -14px 2px;
+  background:var(--book-scene) center 38%/cover;
+}
+body[data-pack] .shopscr .shophead .muted {color:#e8dcc5}
+body[data-pack] .shopscr .shoptitle h2 {color:#fff0d3;line-height:1.04;text-shadow:none}
+body[data-pack] .shopscr .shopcash .money {color:var(--book-gold);font-family:var(--display)}
+body[data-pack] .shopscr .shopfoot {
+  background:var(--book-ink);margin-inline:-12px;border-color:var(--book-rule);
+}
+body[data-pack] .shopscr .shopfoot #next {background:var(--book-gold);color:var(--book-shadow)}
+body[data-pack] .shopscr :is(.invlab,.invlab b,.cardrow .lab,.armystrip .lab,.armystrip .lab b,.ssec) {
+  color:var(--paper-ink);font-family:var(--display);font-weight:700;
+}
+body[data-pack] .shopscr :is(.invlab em,.armystrip .lab em) {color:var(--book-accent);font-family:var(--body)}
+body[data-pack] #app:not(.play) .shopscr .relic .rn {
+  color:var(--paper-ink)!important;text-shadow:none;font-family:var(--display);font-weight:700!important;
+}
+body[data-pack] .shopscr .army {border:1px solid var(--book-rule);background:var(--book-ink);padding:5px;border-radius:5px}
+body[data-pack] .shopscr .ssec {border-top:1px solid #b7a487;padding-top:8px}
+body[data-pack] .shopscr .ssec::before {background:var(--book-accent)}
+body[data-pack] .shopscr .armycap {background:transparent;color:#4d433a;border-color:#817866}
+body[data-pack] .shopscr>p {color:#54483d}
+body[data-pack] .shopscr :is(.shopgrid,.offer,.trainpanel,.mycard) {
+  --text:#fbefd8;--dim:#dbd0bc;color:#fbefd8;
+}
+body[data-pack] .shopscr .offer {background:var(--book-ink);box-shadow:0 2px 0 #b2a28c}
+body[data-pack] .shopscr .offer :is(p,.muted) {color:#e2d8ca}
+body[data-pack] .shopscr .mycard {
+  position:relative;isolation:isolate;overflow:hidden;border-radius:6px;
+  border:1px solid color-mix(in srgb,var(--cc,#bfa16d) 65%,#947852);
+  background:var(--book-ink);box-shadow:0 2px 0 #ad997c;
+}
+body[data-pack] .shopscr .mycard.empty {background:#e6d9c1;color:#594d3d;opacity:1;border:1px dashed #a38b70}
+body[data-pack] .shopscr .mycard.empty small {color:inherit}
+body[data-pack] .shopscr .mycard[data-card-id="banker"] {background:var(--book-accent)}
+.story-card-art {
+  display:block;flex:none;width:40px;aspect-ratio:1;background:url("assets/card-illustrations.webp") no-repeat;
+  background-size:600% 400%;pointer-events:none;
+}
+.mycard .story-card-art {position:absolute;inset:3% 2% auto auto;width:37%;z-index:-1;opacity:.72;aspect-ratio:1}
+body[data-pack] .mycard:not(.empty) :is(b,small,span) {text-shadow:0 1px 2px #121925}
+body[data-pack] .mycard:not(.empty) b {color:#fff0d8;font-weight:700}
+body[data-pack] .mycard:not(.empty) span {color:#f2e9d8}
+body[data-pack] .gmc {position:relative;isolation:isolate;overflow:hidden}
+.gmc .story-card-art {position:absolute;right:3%;top:2%;height:92%;width:auto;z-index:-1;opacity:.25}
+.offer.cardo .story-card-art,.box>.story-card-art {float:right;margin:0 0 3px 8px}
+body[data-pack] #app.play :is(.pblind,.pstats,.pscore,.pinfo) {
+  background:var(--book-ink);color:#f4e8d3;border-color:var(--book-rule);
+}
+body[data-pack] #board {--light:var(--board-pale);--dark:var(--board-deep)}
+body[data-pack] #board .sq:is(.l,.d):not(.sel,.lastf,.lastt,.lastte,.check) {
+  background-image:none!important;
+}
+body[data-pack] #board .sq.l:not(.sel,.lastf,.lastt,.lastte,.check){background-color:var(--board-pale)!important}
+body[data-pack] #board .sq.d:not(.sel,.lastf,.lastt,.lastte,.check){background-color:var(--board-deep)!important}
+body[data-pack] .army .pc,body[data-pack] .piece {--mef:#f3dfb8;--mes:#253044}
+body[data-pack] .boardWrap {border-color:var(--book-rule)}
+body[data-pack] :is(.lw-head,.landintro,.en-cap,.recintro,.bcard,.landhero) {--display:Georgia,"Times New Roman",serif}
+body[data-pack] :is(.lw-fig img,.rface img,.ca-portrait,.en-scene,.ending video) {
+  filter:saturate(.86) contrast(.94) sepia(.09);
+}
+@media (max-height:700px) {
+  .shopscr .shophead::before{height:24px}
+}
+.story-card-art.wager-art {background:none;fill:#f1d5a1}
+body[data-pack] .shopscr .recnote {color:var(--paper-ink)}
+body[data-pack] #app:has(> .shopscr) {background:var(--paper)}
+body[data-pack] .shopscr .mycard:not(.empty) {box-shadow:0 2px 0 #a79477!important}
+body[data-pack] .shopscr .mycard b {max-width:84%;line-height:1.05}
+body[data-pack] .shopscr .army {box-shadow:none}
+body[data-pack] .shopscr .ssec::after {background:#d2bea0;height:1px}
+body[data-pack] .shopscr .shopfoot .btn {box-shadow:0 2px 0 #111b2c;border-width:1px}
+body[data-pack] .shopscr .shophead .backbtn {box-shadow:none;background:#efe3ca;color:#2c2a2a;border:1px solid #907858}
+body[data-pack] #app.play .cbox.chips {background:#365b72}
+body[data-pack] #app.play .cbox.mult {background:#834638}
+body[data-pack] :is(.btn.blue,.btn.gbtn):not(:disabled) {background:#365b72;color:#fff2dc}
+body[data-pack] .btn.red:not(:disabled) {background:#813c39;color:#fff2dc}

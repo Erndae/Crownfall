@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=244"></script>
-<script src="piece-designs.js?v=244"></script>
-<script src="character-style.js?v=244"></script>
-<script src="campaign-opponents.js?v=244"></script>
-<script src="campaign-dialogue.js?v=244"></script>
-<link rel="stylesheet" href="character-style.css?v=244">
+<script src="gameplay-polish.js?v=245"></script>
+<script src="piece-designs.js?v=245"></script>
+<script src="character-style.js?v=245"></script>
+<script src="campaign-opponents.js?v=245"></script>
+<script src="campaign-dialogue.js?v=245"></script>
+<link rel="stylesheet" href="character-style.css?v=245">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,9 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=244">
-<link rel="stylesheet" href="ruler-style.css?v=244">
-<link rel="stylesheet" href="gameplay-polish.css?v=244">
+<link rel="stylesheet" href="city-board.css?v=245">
+<link rel="stylesheet" href="ruler-style.css?v=245">
+<link rel="stylesheet" href="gameplay-polish.css?v=245">
+<link rel="stylesheet" href="storybook.css?v=245">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3687,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 244;
+const GAME_VERSION = 245;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -8697,7 +8698,7 @@ function renderCards(){
   let h = '';
   for(let k=0;k<2;k++){ const id = RUN.cards[k];
     if(!id){ h += `<button class="btn ghost gmc empty" disabled>No card</button>`; continue; }
-    const c = C(id); h += `<button class="btn gmc ${pending===k?'on':''}" data-card="${k}" style="--cc:${c.col}"><small>${UI.cardShort}</small><span class="gmn">${cardLabel(c)}</span></button>`; }
+    const c = C(id); h += `<button class="btn gmc ${pending===k?'on':''}" data-card="${k}" style="--cc:${c.col}">${cardIllustration(id)}<small>${UI.cardShort}</small><span class="gmn">${cardLabel(c)}</span></button>`; }
   box.innerHTML = h;
   // v201: a long name wraps to two lines and shrinks until it fits its button, in any Land's lettering, instead of being cut at both ends
   try{ box.querySelectorAll('.gmn').forEach(n => { const b = n.parentElement; let f = 12.5; n.style.fontSize = f + 'px';
@@ -8709,7 +8710,7 @@ function openCard(k){
   if(busy || !RUN || !B || B.done || !RUN.cards || RUN.cards[k] == null) return;   // v243: a card tapped during the victory show (or after the run closed) does nothing
   if(pending === k){ pending = null; renderCards(); drawBoard(); $('#hand').textContent = 'Card put away'; return; }
   const c = C(RUN.cards[k]);
-  const m = modal(`<p class="muted">${UI.card}</p><h2 style="color:${c.col}">${c.name}</h2><p>${c.desc}</p>
+  const m = modal(`<p class="muted">${UI.card}</p>${cardIllustration(c.id)}<h2 style="color:${c.col}">${c.name}</h2><p>${c.desc}</p>
     <button class="btn" id="use">${c.target ? 'Use: pick a target' : 'Use now'}</button><button class="btn ghost" id="keep">Keep it for later</button>`, '#keep');
   m.querySelector('#use').onclick = () => { m.remove(); useCard(k); };
 }
@@ -10830,16 +10831,35 @@ function bindArmy(root, canRelease){
     };
   });
 }
+// Atlas cells are stable across translated Land names and saved card order.
+const CARD_ART_ORDER = [
+  'blunder','strategist','sacrificer','attacker','fortress','shuffler',
+  'wizard','alchemist','mentor','banker','sprinter','hustler',
+  'blitzer','bodyguard','defector','decree','stampede','forkcard',
+  'recruiter','pawnbroker','loanshark','appraiser'
+];
+const WAGER_CARD_MARKS = {
+  streak:'<path d="M7 23L24 6l3-1-1 4-17 17zm8 4L32 10l3-1-1 4-17 17z"/>',
+  kingcap:'<path d="M18 3h4v4h5v4h-5v4h-4v-4h-5V7h5zm-9 14 6 3 5-6 5 6 6-3-4 12H13zM11 31h18v4H11z"/>',
+  pawncap:'<circle cx="13" cy="13" r="4"/><circle cx="27" cy="13" r="4"/><path d="M7 28l4-10h4l4 10zm14 0 4-10h4l4 10zM6 30h14v3H6zm14 0h14v3H20z"/>'
+};
+function cardIllustration(id){
+  if(WAGER_CARD_MARKS[id]) return `<svg viewBox="0 0 40 40" class="story-card-art wager-art" aria-hidden="true">${WAGER_CARD_MARKS[id]}</svg>`;
+  const slot = CARD_ART_ORDER.indexOf(id);
+  if(slot < 0) return '';
+  const x = (slot % 6) * 20, y = Math.floor(slot / 6) * 100 / 3;
+  return `<i class="story-card-art" aria-hidden="true" style="background-position:${x}% ${y}%"></i>`;
+}
 function cardRow(){
   RUN.cards = RUN.cards || [];
   let h = '';
   for(let k=0;k<2;k++){ const id = RUN.cards[k];
-    h += id ? `<button class="mycard" data-own="${k}" style="--cc:${C(id).col}"><small>${UI.cardShort}</small><b>${C(id).name}</b><span>Tap to view or sell</span></button>` : `<div class="mycard empty"><small>Empty slot</small></div>`; }
+    h += id ? `<button class="mycard" data-own="${k}" data-card-id="${id}" style="--cc:${C(id).col}">${cardIllustration(id)}<small>${UI.cardShort}</small><b>${C(id).name}</b><span>Tap to view or sell</span></button>` : `<div class="mycard empty"><small>Empty slot</small></div>`; }
   return `<div class="cardrow"><span class="lab">Your ${UI.card}s · ${RUN.cards.length}/2</span><div class="cards2">${h}</div></div>`;
 }
 function ownedCard(k){
   const c = C(RUN.cards[k]), sell = Math.floor(c.cost/2);
-  const m = modal(`<p class="muted">Your ${UI.card}</p><h2 style="color:${c.col}">${c.name}</h2><p>${c.desc}</p>
+  const m = modal(`<p class="muted">Your ${UI.card}</p>${cardIllustration(c.id)}<h2 style="color:${c.col}">${c.name}</h2><p>${c.desc}</p>
     ${c.id === 'banker' ? `<button class="btn" id="usebank">Use now</button>` : '<p class="muted" style="font-size:13px">Play it during a round from the buttons under the board.</p>'}
     <button class="btn ghost" id="sellc">Sell for $${sell}</button><button class="btn ghost" id="closec">Close</button>`, '#closec');
   m.querySelector('#sellc').onclick = () => { RUN.money += sell; RUN.cards.splice(k,1); sfx.coin(); save(); m.remove(); shop(); };
@@ -10949,7 +10969,7 @@ function shop(){ purseSpill();   // v209
     if(o.kind === 'relic'){ const r = R(o.id); return `<div class="offer tileo ${r.r}${W}"><span class="tagline">${r.r} ${UI.tile}</span><h3>${r.name}<span class="tileprev"><span class="relics" style="display:block"><span class="relic ${r.r}" style="display:flex;align-items:center;justify-content:center;position:relative">${relicIcon(r)}<span class="fx fx${r.fc}">${r.fx}</span></span></span></span></h3><p>${r.desc}</p><button class="btn" data-buy="${k}" ${cash(offerCost(o)) || RUN.relics.length >= 5 ? 'disabled' : ''}>$${offerCost(o)}</button></div>`; }
     if(o.kind === 'piece'){ const pc = offerCost(o); return `<div class="offer piece${W}" ${o.e ? `style="border-color:${ENCH[o.e].col}"` : o.premium ? 'style="border-color:#ffd23d"' : ''}><span class="tagline">${o.premium ? 'Rare · Queen for hire' : o.e ? UI.special : UI.recruit}</span><h3>${o.e ? `<span style="color:${ENCH[o.e].col}">${ENCH[o.e].name}</span> ` : ''}${TYPE[o.t].name}${pieceSVG(o.t,'me',o.e)}</h3><p>${o.e ? ENCH[o.e].desc : `Add a ${TYPE[o.t].name} to your army.`}</p><button class="btn" data-buy="${k}" ${cash(pc) || !betaCan(o.t) ? 'disabled' : ''}>${betaCan(o.t) ? `$${pc}` : betaTotal() >= Math.min(16, betaLand()[1]) ? 'Army full' : !paceOK() ? 'Used' : 'Type limit'}</button></div>`; }
     if(o.kind === 'forge') return `<div class="offer forge wide"><span class="tagline">${UI.forge} · shop upgrade</span><h3><span>${UI.forgeAct}</span><span class="kind perm">Permanent</span></h3><p>Pick a piece (not the King), then choose 1 of 3 enhancements. Up to ${MAX_POWERS} per piece; a full piece can <b>Reforge</b>: swap one for a new one ($${price(STORE_PRICES.forge[2])}).</p>${forgeFrom() == null ? '<button class="btn" disabled>No pieces to enhance</button>' : `<button class="btn" data-buy="${k}" ${cash(offerCost(o)) ? 'disabled' : ''}>from $${offerCost(o)} · pick a piece</button>`}</div>`;
-    if(o.kind === 'card'){ const c = C(o.id); return `<div class="offer cardo wide"><span class="tagline">${c.circuit ? `<b style="color:${c.col}">${CIR().name} exclusive</b> · ` : ''}${UI.card} · play it during a round · ${(RUN.cards||[]).length}/2 held</span><h3><span style="color:${c.col}">${c.name}</span><span class="kind once">One use</span></h3><p>${c.desc}</p><button class="btn" data-buy="${k}" ${cash(offerCost(o)) ? 'disabled' : ''}>$${offerCost(o)}${(RUN.cards||[]).length >= 2 ? ' · swap one out' : ''}</button></div>`; }
+    if(o.kind === 'card'){ const c = C(o.id); return `<div class="offer cardo wide">${cardIllustration(c.id)}<span class="tagline">${c.circuit ? `<b style="color:${c.col}">${CIR().name} exclusive</b> · ` : ''}${UI.card} · play it during a round · ${(RUN.cards||[]).length}/2 held</span><h3><span style="color:${c.col}">${c.name}</span><span class="kind once">One use</span></h3><p>${c.desc}</p><button class="btn" data-buy="${k}" ${cash(offerCost(o)) ? 'disabled' : ''}>$${offerCost(o)}${(RUN.cards||[]).length >= 2 ? ' · swap one out' : ''}</button></div>`; }
     if(o.t === 'max' || !TYPE[o.t]) return `<div class="offer train wide"><span class="tagline">${UI.training}</span><h3>Every piece type at Lv.${LV_MAX}</h3><p>Training is complete: each piece type is at its maximum level. Custom powers can still specialise your pieces.</p><button class="btn blue" disabled>MAX LEVEL</button></div>`;
     const t = o.t, L = effLv(t);
     if(L >= LV_MAX) return `<div class="offer train wide"><span class="tagline">${UI.training}</span><h3>${TYPE[t].name} ${UI.drill}${pieceSVG(t,'me')}</h3><p>${TYPE[t].name} is at <b>Lv.${LV_MAX} · MAX</b>.</p><button class="btn blue" disabled>MAX LEVEL</button></div>`;
