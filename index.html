@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=251"></script>
-<script src="piece-designs.js?v=251"></script>
-<script src="character-style.js?v=251"></script>
-<script src="campaign-opponents.js?v=251"></script>
-<script src="campaign-dialogue.js?v=251"></script>
-<link rel="stylesheet" href="character-style.css?v=251">
+<script src="gameplay-polish.js?v=252"></script>
+<script src="piece-designs.js?v=252"></script>
+<script src="character-style.js?v=252"></script>
+<script src="campaign-opponents.js?v=252"></script>
+<script src="campaign-dialogue.js?v=252"></script>
+<link rel="stylesheet" href="character-style.css?v=252">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=251">
-<link rel="stylesheet" href="ruler-style.css?v=251">
-<link rel="stylesheet" href="gameplay-polish.css?v=251">
-<link rel="stylesheet" href="storybook.css?v=251">
+<link rel="stylesheet" href="city-board.css?v=252">
+<link rel="stylesheet" href="ruler-style.css?v=252">
+<link rel="stylesheet" href="gameplay-polish.css?v=252">
+<link rel="stylesheet" href="storybook.css?v=252">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3688,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 251;
+const GAME_VERSION = 252;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5317,9 +5317,17 @@ function projectedMoveScore(from, to, promotion){
     res.label = 'Charge! ' + res.label;
   }
   const counter = B.chariotCounter;
-  if(res && counter && counter.reply === B.enTurns && B.board[from]?.side === 'me' && (counter.kind === 'leap' || B.board[from].t === 'R') &&
-     B.board[from].id === counter.blocker && B.board[to]?.side === 'en' && B.board[to].t === (counter.kind === 'leap' ? 'N' : 'R') && B.board[to].id === counter.attacker){
-    res.steps.push({src:'counter', name:counter.kind === 'leap' ? 'Turn the Tables' : 'Chariot Counter', x:2});
+  const delayed = counter && counter.reply === B.enTurns && B.board[from]?.side === 'me' && (counter.kind === 'leap' || B.board[from].t === 'R') &&
+     B.board[from].id === counter.blocker && B.board[to]?.side === 'en' && B.board[to].t === (counter.kind === 'leap' ? 'N' : 'R') && B.board[to].id === counter.attacker;
+  const wall = B.chariot;
+  let bonus = delayed ? (counter.kind === 'leap' ? 'Turn the Tables' : 'Chariot Counter') : '';
+  if(res && wall?.boss === 'Hector of Troy' && from !== wall.to && signatureReady()){
+    const supports = shieldSupports(wall.from);
+    const victim = B.board[to] || epVictim(B.board,from,to);
+    if(supports.length === 1 && victim === B.board[supports[0]]) bonus = 'Break the Line';
+  }
+  if(res && bonus){
+    res.steps.push({src:'counter', name:bonus, x:2});
     res.mult *= 2;
     res.total *= 2;
   }
@@ -7891,6 +7899,7 @@ async function doMove(from, to, pt){
   await animateMove(from, to, victim ? 'lunge' : 'normal');
   if(victim){ const pw = TYPE[victim.t].val >= 90 ? 2 : TYPE[victim.t].val >= 30 ? 1 : 0; shatter(B.board[to] ? to : (from & ~7) | (to & 7), victim.t, 'en', pw); if(!calm) await sleep(T(120)); }
   B.board = applyMove(B.board, from, to, pt); epAfter('me', from, to, mover.t === 'P');
+  if(res?.steps.some(step => step.name === 'Break the Line')) delete B.chariot;
   if(counter) B.chariotCounter = counter;
   else delete B.chariotCounter;
   armorBreakOnCheck('me');   // v154 (was: the Beta 4 warning)
@@ -8467,13 +8476,16 @@ function defendScore(best, cands, deadline){
 const OLYMPIAN_MOVES = {
   'Heracles': {piece:'R', label:'Chariot', mark:'☸', call:'Make way for the chariot!', counter:'Move the target or block the file. Block with a rook, then take the attacking rook with it on your next move for ×2 points.'},
   'Atalanta the Swift': {piece:'N', label:'Laurel Leap', mark:'♞', call:'Try to outrun this!', counter:'Dodge the knight and threaten it with the marked piece. Take that knight with the same piece on your next move for ×2 points.'},
-  'Hector of Troy': {piece:'P', label:'Shield Wall', mark:'⛨', call:'Shields together. Spears forward!', counter:'Move the target or separate the attacking pawn from its neighboring pawns.'},
+  'Hector of Troy': {piece:'P', label:'Shield Wall', mark:'⛨', call:'Shields together. Spears forward!', counter:'Move the marked piece to safety, or leave it in place and capture the attacker’s only neighboring pawn for ×2 points.'},
   'King Aeëtes': {piece:'B', label:'Fleece Guard', mark:'◆', call:'The Fleece stays in my court!', counter:'Block the diagonal, move the target, or take the bishop.'}
 };
+function shieldSupports(from){
+  return [from-1,from+1].filter(i => (i >> 3) === (from >> 3) && B.board[i]?.side === 'en' && B.board[i].t === 'P');
+}
 function inSignatureFormation(piece,from,to){
   if(piece === 'R') return from % 8 === to % 8;
   if(piece !== 'P') return true;
-  return [from-1,from+1].some(i => (i >> 3) === (from >> 3) && B.board[i]?.side === 'en' && B.board[i].t === 'P');
+  return shieldSupports(from).length > 0;
 }
 function onSignaturePath(c,signature,i){
   if(i === c.from || i === c.to) return true;
@@ -8481,6 +8493,17 @@ function onSignaturePath(c,signature,i){
   if(i <= Math.min(c.from,c.to) || i >= Math.max(c.from,c.to)) return false;
   const rows = (c.to >> 3) - (c.from >> 3), cols = c.to % 8 - c.from % 8;
   return ((i >> 3) - (c.from >> 3)) * cols === (i % 8 - c.from % 8) * rows;
+}
+function hasWallChoice(from,to){
+  const supports = shieldSupports(from);
+  if(supports.length !== 1) return false;
+  const support = B.board[supports[0]];
+  const canBreak = B.board.some((p,i) => p?.side === 'me' && i !== to &&
+    legalMoves(i).some(t => (B.board[t] || epVictim(B.board,i,t)) === support));
+  return canBreak && legalMoves(to).some(t => {
+    const after = applyMove(B.board,to,t);
+    return !attacksOn(after,'en').includes(t);
+  });
 }
 function signatureTarget(boss,signature){
   const blocks = [];
@@ -8494,7 +8517,7 @@ function signatureTarget(boss,signature){
     for(const to of legalFor(B.board, from)){
       const target = B.board[to];
       if(!inSignatureFormation(signature.piece,from,to) || target?.side !== 'me' || target.t === 'K') continue;
-      const blockable = blocks.some(rook => rook.from !== to && rook.moves.some(square =>
+      const blockable = boss === 'Hector of Troy' ? hasWallChoice(from,to) : blocks.some(rook => rook.from !== to && rook.moves.some(square =>
         square % 8 === from % 8 && square > Math.min(from,to) && square < Math.max(from,to)));
       const value = TYPE[target.t].val;
       if((blockable && !hasBlock) || (blockable === hasBlock && value > bestValue)){
@@ -8520,7 +8543,14 @@ function announceSignature(){
   }
   B.chariotCalled = true;
   B.chariot = choice;
-  const detail = `${TYPE[signature.piece].name} on ${sqName(choice.from)} threatens ${sqName(choice.to)}. ${signature.counter}`;
+  let advice = signature.counter;
+  if(boss === 'Hector of Troy'){
+    const supports = shieldSupports(choice.from);
+    advice = supports.length === 1
+      ? `Move the marked piece, or leave it in place and take the pawn on ${sqName(supports[0])} for ×2. Your marked piece stays exposed.`
+      : 'Two pawns support the attacker. Move the marked piece or disrupt the attack.';
+  }
+  const detail = `${TYPE[signature.piece].name} on ${sqName(choice.from)} threatens ${sqName(choice.to)}. ${advice}`;
   logPos(`${boss}: “${signature.call}” ${detail}`,choice.from,choice.to,'fx');
   showTip(`<b>${signature.call}</b><br>${detail}`);
 }
@@ -8577,6 +8607,17 @@ function enemyPlan(sub){
       const next = defensePosition(B,from,to,'en');
       if(defenseIn(next, () => !attacksOn(next.board,'me').includes(to) &&
          signatureTarget('Heracles',OLYMPIAN_MOVES.Heracles).hasBlock)){
+        best = {from,to};
+        break;
+      }
+    }
+  }
+  if(defenseActive && sub === 0 && !B.chariotCalled && !B.pendingWin && !B.board[best.to] &&
+     land() === 'greek' && RUN.blind === 2 && bossAt(RUN.ante) === 'mini' && miniName() === 'Hector of Troy' && !inCheck(B.board,'en')){
+    const options = [[best.from,best.to], ...cands.filter(([f,t]) => B.board[f].t === 'P' && !B.board[t])];
+    for(const [from,to] of options){
+      const next = defensePosition(B,from,to,'en');
+      if(defenseIn(next, () => signatureTarget('Hector of Troy',OLYMPIAN_MOVES['Hector of Troy']).hasBlock)){
         best = {from,to};
         break;
       }

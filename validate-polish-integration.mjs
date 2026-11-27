@@ -11,6 +11,16 @@ const bridge=`
 const realPlayScore = playScore;
 window.__polishTest={
  setup(){soundOn=false;musicOn=false;MATCH=null;setPack('street');newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
+ wallFixture(two=false){
+   setPack('greek'); RUN.land='greek'; RUN.circuit='harbor'; RUN.ante=4; RUN.blind=2; RUN.bosses[3]='mini';
+   B.board=Array(64).fill(null);
+   for(const [i,t,side] of [[17,'P','en'],[16,'P','en'],[7,'K','en'],[26,'B','me'],[32,'R','me'],[63,'K','me']])
+     B.board[i]={id:i+1,t,side};
+   if(two) B.board[18]={side:'en',t:'P',id:19};
+   B.target=100000; announceSignature(); drawBoard();
+   return scoreCapture(32,16).total;
+ },
+ wallReady(){return signatureReady();},
  counterFixture(leap=false){
    setPack('greek'); RUN.circuit=leap?'downtown':'rooftop'; RUN.blind=2; RUN.ante=4; RUN.bosses[3]='mini'; RUN.relics=[];
    B.board=Array(64).fill(null);
@@ -56,6 +66,12 @@ window.__polishTest={
 for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi))if(!/src=/.test(m[1])){let s=m[2];if(s.includes('const GAME_VERSION')){const at=s.lastIndexOf('})();');s=s.slice(0,at)+bridge+s.slice(at);}window.eval(s);}
 window.setTimeout=()=>0;
 const api=window.__polishTest,$=s=>window.document.querySelector(s);
+api.setup();const wallBase=api.wallFixture();
+await api.tap(32);
+assert.match($('#board [data-i="16"]').dataset.captureBonus,/Break the Line ×2/);
+await api.tap(16);assert.equal(api.state().score,2*wallBase);assert.equal(api.wallReady(),false);
+api.setup();api.wallFixture(true);await api.tap(32);
+assert.doesNotMatch($('#board [data-i="16"]').dataset.captureBonus,/Break the Line/);
 api.setup();api.counterFixture(true);
 await api.tap(17);await api.tap(16);await api.tap(16);
 const leapTarget=$('#board [data-i="0"]');
