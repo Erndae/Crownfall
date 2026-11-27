@@ -45,3 +45,13 @@ for(const [circuit,kind,to,pathLength] of [['downtown','N',17,2],['harbor','P',9
   if(kind==='B') run("B.board[9]={side:'me',t:'P',id:7}");
   assert.equal(run('signatureReady()'),false,circuit);
 }
+setup();
+run(`B.board[2]={side:'en',t:'R',id:6}; B.board[10]={side:'me',t:'Q',id:7};
+     B.board[25]={side:'me',t:'R',id:8}; announceSignature()`);
+assert.equal(run('B.chariot.to'),40,'Prefer a blockable file over a more valuable adjacent target');
+setup();
+run(`B.board[40]=null; B.board[8]={side:'me',t:'N',id:3}; B.board[25]={side:'me',t:'R',id:8};
+     B.enTurns=5; announceSignature(); B.enTurns=6; announceSignature()`);
+assert.equal(run('!!B.chariot'),false,'Wait briefly when a block is impossible');
+run('B.enTurns=7; announceSignature()');
+assert.equal(run('B.chariot.to'),8,'Use an ordinary target after the wait');

@@ -10,7 +10,17 @@ for(const file of ['gameplay-polish.js','piece-designs.js','character-style.js',
 const bridge=`
 const realPlayScore = playScore;
 window.__polishTest={
- setup(){soundOn=false;musicOn=false;MATCH=null;PACK='street';newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
+ setup(){soundOn=false;musicOn=false;MATCH=null;setPack('street');newRun('downtown');RUN.ante=2;RUN.blind=2;RUN.money=40;RUN.lives=3;window.__noRoll=true;startBlind();B.board=Array(64).fill(null);B.board[60]={t:'K',side:'me',id:1};B.board[42]={t:'N',side:'me',id:2};B.board[48]={t:'P',side:'me',id:3};B.board[4]={t:'K',side:'en',id:4};B.board[25]={t:'R',side:'en',id:5};B.board[16]={t:'P',side:'en',id:6};B.target=1000;B.score=0;B.crates=[];B.initPhase=false;B.roll={state:'done',first:'me'};B.log=[{s:posKey(B.board),k:'fx',f:-1,t:-1,n:'Start'}];playBlind(true);animateMove=async()=>{};playScore=async r=>{B.score+=r.total;};endTurn=async()=>{busy=false;sel=null;save();drawBoard();};},
+ counterFixture(leap=false){
+   setPack('greek'); RUN.circuit=leap?'downtown':'rooftop'; RUN.blind=2; RUN.ante=4; RUN.bosses[3]='mini'; RUN.relics=[];
+   B.board=Array(64).fill(null);
+   for(const [i,t,side] of [[0,'R','en'],[7,'K','en'],[14,'P','en'],[40,'B','me'],[25,'R','me'],[63,'K','me']])
+     B.board[i]={id:i+1,t,side};
+   if(leap){B.board[0].t='N'; B.board[17]=B.board[25]; B.board[25]=null;}
+   RUN.land='greek'; B.enTurns=1; B.target=100000; announceSignature(); if(!B.chariot) throw Error('Expected Heracles to announce the rook attack'); drawBoard();
+   endTurn=async()=>{B.enTurns++; if(B.chariot){B.board=applyMove(B.board,14,22);delete B.chariot;} busy=false;sel=null;drawBoard();};
+ },
+ counterScore(from=24){return {base:scoreCapture(from,0).total, projected:projectedMoveScore(from,0).total};},
  bonusFixture(charged=false){
     B.board[42].charge=charged;
     RUN.relics=['cavalry'];
@@ -46,6 +56,29 @@ window.__polishTest={
 for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi))if(!/src=/.test(m[1])){let s=m[2];if(s.includes('const GAME_VERSION')){const at=s.lastIndexOf('})();');s=s.slice(0,at)+bridge+s.slice(at);}window.eval(s);}
 window.setTimeout=()=>0;
 const api=window.__polishTest,$=s=>window.document.querySelector(s);
+api.setup();api.counterFixture(true);
+await api.tap(17);await api.tap(16);await api.tap(16);
+const leapTarget=$('#board [data-i="0"]');
+assert.match(leapTarget.dataset.captureBonus,/Turn the Tables ×2/);
+const leapPoints=Number(leapTarget.querySelector('.pv').textContent.replace(/[^0-9]/g,''));
+assert.equal(leapPoints,2*api.counterScore(16).base);
+await api.tap(0);assert.equal(api.state().score,leapPoints);
+api.setup();api.counterFixture(true);
+await api.tap(17);await api.tap(16);
+await api.tap(63);await api.tap(62);
+assert.equal(api.counterScore(16).projected,api.counterScore(16).base);
+api.setup();api.counterFixture();
+await api.tap(25);await api.tap(24);
+await api.tap(24);
+const projection=api.counterScore();
+assert.equal(projection.projected,2*projection.base);
+assert.match($('#board [data-i="0"]').dataset.captureBonus,/Chariot Counter ×2/);
+await api.tap(0);
+assert.equal(api.state().score,projection.projected);
+api.setup();api.counterFixture();
+await api.tap(25);await api.tap(24);
+await api.tap(63);await api.tap(62);
+assert.equal(api.counterScore().projected,api.counterScore().base);
 api.setup();assert.match($('#goalLabel').textContent,/Checkmate or 1,000/);
 assert.equal(api.state().confirm,false,'Confirmation defaults off');await api.tap(42);await api.tap(25);assert.equal(api.state().score,160,'Default moves commit immediately');api.setup();api.pause();assert.equal($('#confirmMoves').getAttribute('aria-checked'),'false');$('#confirmMoves').click();assert.equal(api.state().confirm,true);$('#back').click();api.setup();assert.equal(api.state().confirm,true,'Explicit preference survives battle setup');
 const before=api.state();await api.tap(42);await api.tap(25);assert(api.state().preview);assert.equal(api.state().squares,before.squares);assert.equal(api.state().money,before.money);assert.equal(api.state().score,0);assert.match($('#pinfo').textContent,/\+160 points/);assert.match($('#pinfo').textContent,/attacked/);assert.equal($('#board .sq[data-i="42"] svg'),null);assert($('#board .sq[data-i="25"] svg'));assert.equal($('#commitPreview').getAttribute('aria-label'),'Confirm move');
