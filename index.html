@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=253"></script>
-<script src="piece-designs.js?v=253"></script>
-<script src="character-style.js?v=253"></script>
-<script src="campaign-opponents.js?v=253"></script>
-<script src="campaign-dialogue.js?v=253"></script>
-<link rel="stylesheet" href="character-style.css?v=253">
+<script src="gameplay-polish.js?v=254"></script>
+<script src="piece-designs.js?v=254"></script>
+<script src="character-style.js?v=254"></script>
+<script src="campaign-opponents.js?v=254"></script>
+<script src="campaign-dialogue.js?v=254"></script>
+<link rel="stylesheet" href="character-style.css?v=254">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=253">
-<link rel="stylesheet" href="ruler-style.css?v=253">
-<link rel="stylesheet" href="gameplay-polish.css?v=253">
-<link rel="stylesheet" href="storybook.css?v=253">
+<link rel="stylesheet" href="city-board.css?v=254">
+<link rel="stylesheet" href="ruler-style.css?v=254">
+<link rel="stylesheet" href="gameplay-polish.css?v=254">
+<link rel="stylesheet" href="storybook.css?v=254">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3688,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 253;
+const GAME_VERSION = 254;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4931,7 +4931,7 @@ function specialMoves(side){
 }
 /* King vs Armor (v114): a King may attack an Armored piece. One layer breaks, the piece stays, and the King is knocked
    back to an adjacent square that is empty and safe (not attacked once the layer is gone). No safe square: the attack
-   can't happen (so it is never an escape from check). Only player pieces ever carry Armor, so this is the enemy King's rule. */
+   can't happen (so it is never an escape from check). v254: both Kings (enemy pieces can carry Armor too). */
 function kbSquares(b, k, t){
   const K0 = b[k], v = b[t]; if(!K0 || !v) return [];
   const nb = b.slice(); nb[t] = {...v, sh:v.sh - 1}; nb[k] = null;
@@ -5308,7 +5308,14 @@ function counterAfterMove(from,to,promotion){
   return {blocker:B.board[from].id, attacker:B.board[call.from].id, reply:(B.enTurns || 0)+1};
 }
 
+/* v254 ENEMY ARMOR: enemy pieces can carry Armor (the Hunger's Fury bargain, looted supply crates, Edicts), but your own
+   attacks used to capture them as if it weren't there. Now an attack on an Armored enemy works like the enemy's attacks on
+   yours: one layer breaks, nothing is captured or scored, your piece stays where it was (your King is knocked back to a
+   safe square) and the turn passes. Armor still doesn't protect a piece that is giving check. */
+function armorBlockSq(from, to){ if(!B) return -1; const v = B.board[to] || epVictim(B.board, from, to); if(!v || v.side !== 'en') return -1;
+  const sq = B.board[to] ? to : (from & ~7) | (to & 7); return armorHolds(B.board, sq) ? sq : -1; }
 function projectedMoveScore(from, to, promotion){
+  if(armorBlockSq(from, to) >= 0) return null;   // v254: a blocked attack scores nothing
   const res = scoreCapture(from, to, promotion);
   if(res && B.board[from].charge && (B.board[to] || epVictim(B.board, from, to))){
     res.steps.push({src:'charge', x:1.5});
@@ -7234,9 +7241,10 @@ function previewMove(from,to){
   const promotion=isPromo(B.board,from,to) ? ' · Queen promotion estimate' : '';
   movePreview={from,to,board:B.board,position:after};drawBoard();
   const el=$('#pinfo');if(!el)return;pieceInfo(null);el.style.setProperty('--confirm-height',Math.max(52,el.getBoundingClientRect().height)+'px');el.className='pinfo move-preview';
-  const scoreText=sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
+  const blocked=armorBlockSq(from,to)>=0;   // v254
+  const scoreText=blocked?'Enemy Armor blocks this attack · no capture, one layer breaks':sc?.rep?'Repeated check · no points':points?`Estimated +${points.toLocaleString()} points`:'Quiet move · no points';
   const detail=`${scoreText}${promotion}. ${risk?'Enemy attacks this destination':'No enemy attacks this destination'}${crate&&p&&p.t!=='P'?' · supply crate':''}${light?' · green light: +1 move':''}${vant?' · vantage point: +1 Tactic':''}${bnty?` · bounty: double score, +$${B.bounty.pay}`:''}${bann?' · banner: +1 Tactic':''}${!victim&&RULE('tax')?' · quiet move costs $1':''}${victim&&B.score+points>=B.target?' · Target capture must survive the reply.':''}`;
-  el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate&&p&&p.t!=='P'?' · supplies':''}${!victim&&RULE('tax')?' · −$1':''}</span>${bonuses||promotion ? `<small class="preview-effects">${CrownfallPolish.escape([bonuses,promotion.slice(3)].filter(Boolean).join(' · '))}</small>` : ''}<span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
+  el.innerHTML=`<div class="preview-copy" aria-live="polite" title="${CrownfallPolish.escape(detail)}"><b>${sqName(from)} → ${sqName(to)}</b><span>${blocked?'Armor blocks · −1 layer':points?'+'+points.toLocaleString()+' points':'Confirm move'}${risk?' · attacked':''}${crate&&p&&p.t!=='P'?' · supplies':''}${!victim&&RULE('tax')?' · −$1':''}</span>${bonuses||promotion ? `<small class="preview-effects">${CrownfallPolish.escape([bonuses,promotion.slice(3)].filter(Boolean).join(' · '))}</small>` : ''}<span class="sr-only">${CrownfallPolish.escape(detail)}</span></div><button type="button" class="move-confirm" id="cancelPreview" aria-label="Cancel move" title="Cancel move">✕</button><button type="button" class="move-confirm accept" id="commitPreview" aria-label="Confirm move" title="Confirm move">✓</button>`;
   el.querySelector('#commitPreview').onclick=commitMovePreview;
   el.querySelector('#cancelPreview').onclick=cancelMovePreview;
 }
@@ -7890,6 +7898,7 @@ async function doMove(from, to, pt){
   const laCk = !MATCH && inCheck(B.board, 'me'), laThr = MATCH ? null : new Set(attacksOn(B.board, 'en'));   // v147 (chatter only)
   const strike = B.cmdMove === 'strike'; B.cmdMove = null; delete B.decreeNow;   // Strike: an extra capture that doesn't use your move (or Momentum's)
   const bonusMove = !!B.initPhase || strike; if(!strike){ B.initPhase = false; B.initFrom = null; } B.scout = null; B.wisdom = null; tacState();
+  { const asq = armorBlockSq(from, to); if(asq >= 0) return armorBounce(from, to, asq, mover, victim, bonusMove, strike); }   // v254
   const res = projectedMoveScore(from, to, pt);
   const counter = counterAfterMove(from,to,pt);
   if(window.__ptel){ const pt0 = B.ptel || (B.ptel = {mv:{}, cap:{}}); pt0.mv[mover.t] = (pt0.mv[mover.t] || 0) + 1; if(victim) pt0.cap[mover.t] = (pt0.cap[mover.t] || 0) + 1; }   // v134 test telemetry
@@ -7963,6 +7972,30 @@ async function doMove(from, to, pt){
   if(loneKing()){ busy = false; return loneKingDefeat(); }
   if(strike && !B.pendingWin){ busy = false; save(); drawBoard(); $('#hand').innerHTML = '<span class="money">Strike</span> Still your move'; return; }   // (a winning capture still waits for the enemy's reply)
   return endTurn(to);
+}
+// v254: your attack on an Armored enemy piece bounces off (see armorBlockSq)
+async function armorBounce(from, to, asq, mover, victim, bonusMove, strike){
+  let kb = null;
+  if(mover.t === 'K'){ const sq = kbSquares(B.board, from, asq); if(!sq.length){ busy = false; drawBoard(); return; } kb = sq[0];
+    let best = null; for(const q of sq){ const nb = B.board.slice(); nb[asq] = {...nb[asq], sh:nb[asq].sh - 1}; nb[q] = nb[from]; nb[from] = null;
+      const v = -CFAI.evalGame(nb, AI_MAX); if(!best || v > best.v) best = {q, v}; } kb = best.q; }   // the safest square for you (the engine's view, flipped)
+  drawBoard();
+  const a = document.querySelector(`.sq[data-i="${from}"] .pc`), sa = document.querySelector(`.sq[data-i="${from}"]`), sb = document.querySelector(`.sq[data-i="${asq}"]`);
+  if(a && sa && sb && !calm){ try{ const ra = sa.getBoundingClientRect(), rb = sb.getBoundingClientRect(), dx = (rb.left-ra.left)*0.7, dy = (rb.top-ra.top)*0.7;
+    a.style.zIndex = 6; await a.animate([{transform:'translate(0,0)'},{transform:`translate(${dx}px,${dy}px) scale(1.2)`, offset:.45},{transform:`translate(${dx*0.4}px,${dy*0.4}px) rotate(-18deg)`, offset:.7},{transform:'translate(0,0)'}], {duration:T(520), easing:'ease-out'}).finished.catch(() => {}); }catch(e){} }
+  const nb = B.board.slice(); nb[asq] = {...victim, sh:victim.sh - 1}; if(kb != null){ nb[kb] = nb[from]; nb[from] = null; } B.board = nb;
+  const left = B.board[asq].sh;
+  kit.clap(0, 0.4); tone({f:880, f2:1320, type:'triangle', dur:0.18, vol:0.1});
+  pop(asq, left ? `Armor holds! ${left} left` : 'Armor broken!', 'fxg');
+  $('#hand').textContent = kb != null ? `The enemy ${TYPE[victim.t].name}'s Armor knocks your King back` : `The enemy ${TYPE[victim.t].name}'s Armor blocks your ${TYPE[mover.t].name}${left ? ` (${left} left)` : ', Armor broken'}`;
+  logPos(`You: ${TYPE[mover.t].name} attacks the Armored ${TYPE[victim.t].name} on ${sqName(asq)}, ${left ? 'one layer breaks' : 'its Armor breaks'}${kb != null ? `, King knocked back to ${sqName(kb)}` : ''}`, from, kb != null ? kb : from, 'me');
+  if(!strike) B.enemyOwes = true;
+  if(B.moveCount == null) B.moveCount = Math.max(0, (B.movesStart || 0) - B.moves);
+  if(!bonusMove) B.moves--; B.moveCount++; if(B.ckFinal) B.ckMoves = (B.ckMoves || 0) + 1;
+  B.seen = B.seen || {}; B.seen[posKey(B.board)] = 1; B.streak = 0;
+  drawBoard(); showCombo(); updateHud(); await sleep(T(300));
+  if(strike){ busy = false; save(); drawBoard(); $('#hand').innerHTML = '<span class="money">Strike</span> Still your move'; return; }
+  return endTurn(kb != null ? kb : from);
 }
 /* ---------- TACTIC (player only) ----------
    0-3 charges per fight (B.tac.n), earned by secured clean captures, secured checks (not from a repeated position or the

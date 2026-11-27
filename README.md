@@ -533,3 +533,9 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
   - Found and fixed: tapping a Playbook card during the short victory show after a won fight threw an error. Card taps now do nothing once a fight is won.
   - Everything else played through without errors: Lands, stores, events, crown ceremonies, the Fallen Throne, the crowned ending, the broken-crown ending (offered from the second finish on, as designed) and the New Game+ start (Edict, difficulty, army).
 - Tests: `validate-v243.cjs`.
+
+## v254 — enemy Armor works
+- Enemy pieces can carry Armor (the Hunger's Fury bargain, looted supply crates, Edicts), but your own attacks captured them as if it weren't there. Now an attack on an Armored enemy works like the enemy's attacks on yours: one layer breaks, nothing is captured or scored, your piece stays where it was, and the turn passes. Your King is knocked back to a safe square instead. The next attack, once the Armor is gone, captures normally.
+- The move preview says "Armor blocks · −1 layer" instead of promising points.
+- Unchanged: Armor doesn't protect a piece that is giving check, and your own pieces' Armor works as before.
+- Tests: `validate-v254.cjs`.
