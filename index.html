@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=254"></script>
-<script src="piece-designs.js?v=254"></script>
-<script src="character-style.js?v=254"></script>
-<script src="campaign-opponents.js?v=254"></script>
-<script src="campaign-dialogue.js?v=254"></script>
-<link rel="stylesheet" href="character-style.css?v=254">
+<script src="gameplay-polish.js?v=255"></script>
+<script src="piece-designs.js?v=255"></script>
+<script src="character-style.js?v=255"></script>
+<script src="campaign-opponents.js?v=255"></script>
+<script src="campaign-dialogue.js?v=255"></script>
+<link rel="stylesheet" href="character-style.css?v=255">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=254">
-<link rel="stylesheet" href="ruler-style.css?v=254">
-<link rel="stylesheet" href="gameplay-polish.css?v=254">
-<link rel="stylesheet" href="storybook.css?v=254">
+<link rel="stylesheet" href="city-board.css?v=255">
+<link rel="stylesheet" href="ruler-style.css?v=255">
+<link rel="stylesheet" href="gameplay-polish.css?v=255">
+<link rel="stylesheet" href="storybook.css?v=255">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3688,7 +3688,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 254;
+const GAME_VERSION = 255;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -4006,10 +4006,14 @@ const CFAI = (() => {
     for(let i = 0; i < 64; i++){ const x = s[i]; if(!x || (x & ME) !== want || !(x & 96) || (x & 7) === K) continue;
       if(hits(s, i, k)){ if(und) und.push(i, x); s[i] = x & ~96; n++; } }
     return n; }
-  function gen(s, me, ctx, capsOnly){
+  function onlyEscape(s, ctx, t){   // the enemy side's only way out of this check is capturing the piece on t
+    const c = s.slice();
+    for(const m of gen(c, false, ctx, false, true)){ if(((m >> 6) & 63) === t || (m >> 14 & 1)) continue; if(!inCheck(make(c, m), false)) return false; }
+    return true; }
+  function gen(s, me, ctx, capsOnly, strict){
     const out = [], want = me ? ME : 0;
-    // v121: Armor never protects a piece that is giving check: it can be captured normally (legality still applies)
-    const kOwn = me ? -1 : kingSq(s, false), armorHolds = t => !(kOwn >= 0 && hits(s, t, kOwn));
+    // v255: a checking Armored piece keeps its Armor unless capturing it is the only way out of check (strict: Armor always holds)
+    const kOwn = me ? -1 : kingSq(s, false), onlyWay = {}, armorHolds = t => strict || !(kOwn >= 0 && hits(s, t, kOwn)) || !(onlyWay[t] ??= onlyEscape(s, ctx, t));
     const add = (f, t) => {
       const v = s[t];
       if(v){ if((v & ME) === want) return false;                            // own piece
@@ -4045,7 +4049,6 @@ const CFAI = (() => {
     ns[t] = x; ns[f] = 0;
     if(m >> 13 & 1) ns[t] = (x & ~7) | Q;                                    // promotion
     if(v && (v & THN) && !(x & ME)) ns[t] = 0;                              // Thorns: the capturer falls too
-    if(x & ME) armBreak(ns, true);                                          // v155: a checking Armored piece loses its Armor
     return ns;
   }
   function legal(s, me, ctx, capsOnly){
@@ -4167,7 +4170,7 @@ const CFAI = (() => {
     const chkd = me => attacked(s, kings[me ? 1 : 0], !me);
     const uE = new Int16Array(128);
     // v155: Armor broken by a check is part of the move (and comes back on undo)
-    let armOn = false; for(let i = 0; i < 64; i++) if((s[i] & ME) && (s[i] & 96)) armOn = true;
+    const armOn = false;   // v255: giving check no longer breaks Armor
     const uB = []; for(let p = 0; p < 128; p++) uB.push([]);
     function mk(m, ply){ mk0(m, ply); const u = uB[ply]; u.length = 0; if(armOn && (uM[ply] & ME)) armBreak(s, true, kings[0], u); }
     function um(m, ply){ const u = uB[ply]; for(let n = u.length - 2; n >= 0; n -= 2) s[u[n]] = u[n + 1]; u.length = 0; um0(m, ply); }
@@ -4947,12 +4950,22 @@ function kbPick(k, t){
     const v = CFAI.evalGame(nb, AI_MAX); if(!best || v > best.v) best = {q, v}; }
   return best.q;
 }
-/* Armored checker (v121): Armor protects a piece from captures, EXCEPT while that piece is giving check to the
-   opposing King. Then a legal capture of it is an ordinary capture (any defender, the King included if the square is
+/* Armored checker (v121, v255): Armor protects a piece from captures, EXCEPT while that piece is giving check to the
+   opposing King AND capturing it is that side's only way out of check (v255; before, any checking piece lost it). Then a legal capture of it is an ordinary capture (any defender, the King included if the square is
    safe): the piece and all its Armor are removed, no bounce, no knockback. The checker is read from the board itself
    (so discovered checks and double checks count the pieces really attacking the King), for either side. */
 const checksKing = (b, t) => { const v = b[t]; if(!v) return false; const k = kingIdx(b, v.side === 'me' ? 'en' : 'me'); return k >= 0 && attackSquares(b, t).includes(k); };
-const armorHolds = (b, t) => { const v = b[t]; return !!(v && v.sh > 0 && v.t !== 'K' && !checksKing(b, t)); };
+/* v255 ARMOR AND CHECK (replaces v121/v154): an Armored piece keeps its Armor while it gives check. The checked side
+   must get out another way (move the King, block, or capture a different checker); only when capturing this piece is
+   the ONLY way out of check does that capture go through (Armor can never force an unanswerable check). */
+function armorOnlyEscape(b, t){   // true when capturing the piece on t is the defender's only way out of check
+  const v = b[t]; if(!v) return false; const d = v.side === 'me' ? 'en' : 'me';
+  for(let i = 0; i < 64; i++){ const p = b[i]; if(!p || p.side !== d) continue;
+    for(const q of movesFor(b, i, false)){ if(q === t) continue; const w = b[q];
+      if(w && (w.t === 'K' || (w.side !== d && w.sh > 0))) continue;          // no capturing Kings; a bounce off Armor moves nothing
+      if(!inCheck(applyMove(b, i, q), d)) return false; } }
+  return true; }
+const armorHolds = (b, t) => { const v = b[t]; return !!(v && v.sh > 0 && v.t !== 'K' && !(checksKing(b, t) && armorOnlyEscape(b, t))); };
 function legalFor(b, i){ const p = b[i]; if(!p) return [];
   const m = movesFor(b, i, false); if(B && b === B.board){ if(p.t === 'K') m.push(...castleMoves(b, i)); if(p.t === 'P') m.push(...epMoves(b, i)); }
   return m.filter(t => {
@@ -5311,7 +5324,7 @@ function counterAfterMove(from,to,promotion){
 /* v254 ENEMY ARMOR: enemy pieces can carry Armor (the Hunger's Fury bargain, looted supply crates, Edicts), but your own
    attacks used to capture them as if it weren't there. Now an attack on an Armored enemy works like the enemy's attacks on
    yours: one layer breaks, nothing is captured or scored, your piece stays where it was (your King is knocked back to a
-   safe square) and the turn passes. Armor still doesn't protect a piece that is giving check. */
+   safe square) and the turn passes. A checking enemy keeps its Armor unless capturing it is your only way out (v255). */
 function armorBlockSq(from, to){ if(!B) return -1; const v = B.board[to] || epVictim(B.board, from, to); if(!v || v.side !== 'en') return -1;
   const sq = B.board[to] ? to : (from & ~7) | (to & 7); return armorHolds(B.board, sq) ? sq : -1; }
 function projectedMoveScore(from, to, promotion){
@@ -6638,6 +6651,7 @@ async function dicePanel(){
    so from then on it can be captured like any piece (Kings included: no knock-back without Armor). Everywhere else
    Armor works as before. (armorHolds() still ignores Armor on a piece that is giving check, as a safety net.) */
 function armorBreakOnCheck(side){
+  return 0;   // v255: giving check no longer breaks Armor (see armorHolds). Kept so older call sites stay harmless.
   try{ if(!B || !B.board) return 0; let n = 0;
     B.board.forEach((q, i) => { if(q && q.side === side && q.t !== 'K' && q.sh > 0 && checksKing(B.board, i)){ q.sh = 0; n++;
       (window.__armorBreak = window.__armorBreak || []).push({side, t:q.t, i});
@@ -6647,7 +6661,7 @@ function armorBreakOnCheck(side){
     return n; }catch(e){ return 0; }
 }
 // beta 4: every armored piece of yours that is now giving check gets a short on-board warning (its Armor can't block)
-function armorOffWarn(){ try{ B.board.forEach((q, i) => { if(q && q.side === 'me' && q.t !== 'K' && q.sh > 0 && checksKing(B.board, i)) setTimeout(() => pop(i, 'Giving check · Armor off', 'fxx'), 380); }); }catch(e){} }
+function armorOffWarn(){ try{ B.board.forEach((q, i) => { if(q && q.side === 'me' && q.t !== 'K' && q.sh > 0 && checksKing(B.board, i) && !armorHolds(B.board, i)) setTimeout(() => pop(i, 'Only way out · Armor can’t hold', 'fxx'), 380); }); }catch(e){} }
 /* =================== THE DAILY RUN'S ENGINE (built as the v152 Gauntlet; v232 removed the endless mode's Arena Tokens,
    Armory, equipment and records) ===================
    3 Lives; a lost fight costs one and the wave is fought again; the last one ends the run (no checkpoints). A STALEMATE
@@ -7326,7 +7340,7 @@ function drawBoard(){
       if(i === charge.to) inner += `<span class="chariot-wheel" aria-label="${signature.label} target" role="img">${signature.mark}</span>`;
     }
     if(p?.side === 'en' && B.guardIds?.includes(p.id)) inner += '<span class="guard-mark" role="img" aria-label="Marked defender: remove to unlock score victory" title="Marked defender">⛨</span>';
-    if(p && p.sh > 0){ const off = p.side === 'me' && p.t !== 'K' && checksKing(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Armor is off while this piece is giving check"' : ''}>${p.sh}</span>`; }   // beta 4
+    if(p && p.sh > 0){ const off = p.t !== 'K' && checksKing(displayBoard, i) && !armorHolds(displayBoard, i); inner += `<span class="shd${off ? ' off' : ''}"${off ? ' title="Capturing this piece is the only way out of check, so its Armor can’t hold"' : ''}>${p.sh}</span>`; }   // beta 4
     if((B.banner || []).includes(i)) inner += '<span class="banner-mark" role="img" aria-label="Royal banner: your piece gains 1 Tactic and 1 Armor; enemy entry costs you 1 Tactic. Pawns cannot raise it"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#2a2208" stroke="#0d0d0d" stroke-width="2"/><path d="M14 30V10" stroke="#f3e6c0" stroke-width="2.4" stroke-linecap="round"/><path d="M15 11H28L24.5 15.5L28 20H15Z" fill="#ffd23d" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg></span>';
     if((B.vantage || []).includes(i)) inner += '<span class="vantage-mark" role="img" aria-label="Vantage point: any of your pieces except a pawn gains 1 Tactic; an enemy piece there first costs you 1 swap"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="#0c2a2a" stroke="#0d0d0d" stroke-width="2"/><path d="M12 26L11 15L16 19L20 12L24 19L29 15L28 26Z" fill="#19e3c9" stroke="#06201d" stroke-width="1.6" stroke-linejoin="round"/></svg></span>';
     if(bountyOn(p)) inner += '<span class="bounty-mark" role="img" aria-label="Bounty: capture it for double score and cash; its captures cost you 1 swap">$</span>';
@@ -7416,7 +7430,7 @@ function boardMarks(){
   if(B.bounty && B.board.some(p => bountyOn(p))) out.push({k:'bounty', name:`Bounty · $${B.bounty.pay}`, text:`The enemy piece with the $ tag. Capturing it scores <b>double</b> and pays <b>+$${B.bounty.pay}</b>. Every time it captures one of your pieces, you <b>lose 1 swap</b>.`});
   if(g) out.push({k:'guard', name:`Marked defender${g > 1 ? 's' : ''} · ${g} left`, text:'Enemy pieces with a shield mark. <b>Capture them all</b>, then reach the score target to win. Checkmate still wins at once.'});
   if(n('trapSq')) out.push({k:'trap', name:`Your ${R('trap').name}`, text:'Hidden by you. The first enemy piece to land there (not the King) is either <b>destroyed</b> for 3× its value or <b>turns to your side</b> for the round.'});
-  if(B.board.some(p => p && p.sh > 0)) out.push({k:'armor', name:'Armor', text:'A shield with a number on a piece. It <b>blocks that many captures</b> against the piece. Your own Armor is off while that piece is giving check.'});
+  if(B.board.some(p => p && p.sh > 0)) out.push({k:'armor', name:'Armor', text:'A shield with a number on a piece. It <b>blocks that many captures</b> against the piece. A piece giving check keeps its Armor, unless capturing it is the only way out of check.'});
   return out;
 }
 const boardMarkAt = i => { if(!B) return ''; const k = (B.lights || []).includes(i) ? 'light' : (B.vantage || []).includes(i) ? 'vantage' : (B.banner || []).includes(i) ? 'banner' : (B.crates || []).includes(i) ? 'crate' : (B.trapSq || []).includes(i) ? 'trap' : ''; const m = k && boardMarks().find(x => x.k === k);
@@ -8435,8 +8449,7 @@ function defensePosition(state, from, to, side, pt){
       }
       epAfter(side,from,to,p.t === 'P');
     }
-    // Armor is public and breaks when its wearer gives check, just as in committed moves.
-    B.board.forEach((q,i) => { if(q?.sh > 0 && q.side === side && checksKing(B.board,i)) q.sh = 0; });
+    // v255: Armor stays on a checking piece (armorHolds decides when a capture must go through), as in committed moves.
     B.ep = (B.ep || []).filter(e => e.by === side);
     if(side === 'en') B.noCap = Math.max(0,(B.noCap || 0)-1);
     return next;
@@ -8764,9 +8777,9 @@ async function enemyExec(plan, sub){
       if(kingHit){ sfx.check(); if(Math.random() < 0.7) say('check'); } });
   }
   await enSafe('check msg', () => { if(lost && inCheck(B.board, 'me')) $('#hand').textContent += ' · Check!'; });
-  if(armorCheck) await enSafe('armor check msg', () => { $('#hand').textContent = `${inCheck(B.board, 'me') ? 'Check! · ' : ''}Armor can't block while giving check · your ${TYPE[lost.t].name} was taken`; pop(to, 'No Armor while giving check', 'fxx'); });   // beta 4
-  if(armorCheck) await enSafe('armor check tip', () => { logPos(`Armor breaks under check: your ${TYPE[lost.t].name} was giving check, so its Armor could not stop the capture`, from, to, 'fx');
-    if(!coachSeen().armorcheck){ coachMark('armorcheck'); showTip('<b>ARMOR BREAKS UNDER CHECK</b><br>Armor cannot protect a piece while it is checking the King.'); } });
+  if(armorCheck) await enSafe('armor check msg', () => { $('#hand').textContent = `${inCheck(B.board, 'me') ? 'Check! · ' : ''}Capturing it was the only way out of check · your ${TYPE[lost.t].name} was taken`; pop(to, 'Only way out · Armor can’t hold', 'fxx'); });   // beta 4
+  if(armorCheck) await enSafe('armor check tip', () => { logPos(`Your ${TYPE[lost.t].name} was giving check and capturing it was the only way out, so its Armor could not stop the capture`, from, to, 'fx');
+    if(!coachSeen().armorcheck){ coachMark('armorcheck'); showTip('<b>ARMOR AND CHECK</b><br>A checking piece keeps its Armor, but when capturing it is the only way out of check, the capture goes through.'); } });
   return true;
 }
 // a single enemy move outside the normal reply (Swap, Castle Ambush): same safety, same order
@@ -8894,7 +8907,7 @@ function pieceInfo(p){
     el.className = 'pinfo'; el.style.setProperty('--pc', e ? e.col : 'var(--line)');
     const lc = MATCH ? null : laOfRi(p.ri);
     el.innerHTML = `<span class="pi">${pieceSVG(p.t,'me',p.e)}</span><div class="pt"><b${lc ? ' class="laname"' : ''}>${lc ? `${lc.n} · ` : ''}${T0.name} <span class="lvtag">Lv.${lv}</span>${lc ? ` <span class="lvtag lap">${LA_P[lc.p]}</span>` : ''}</b>
-      <span class="cs">${p.sh > 0 ? (p.side === 'me' && p.t !== 'K' && B && B.board.indexOf(p) >= 0 && checksKing(B.board, B.board.indexOf(p)) ? `<b class="fxx">Armor off while giving check</b> · ` : `<b class="fxg">Armored · blocks ${p.sh}</b> · `) : ''}Captures score <b class="fxc">${ch}</b> × <b class="fxm">${mu}</b>${p.t === 'K' ? ' · can’t be captured' : ''}</span>
+      <span class="cs">${p.sh > 0 ? (p.side === 'me' && p.t !== 'K' && B && B.board.indexOf(p) >= 0 && checksKing(B.board, B.board.indexOf(p)) && !armorHolds(B.board, B.board.indexOf(p)) ? `<b class="fxx">Only way out of check · Armor can’t hold</b> · ` : `<b class="fxg">Armored · blocks ${p.sh}</b> · `) : ''}Captures score <b class="fxc">${ch}</b> × <b class="fxm">${mu}</b>${p.t === 'K' ? ' · can’t be captured' : ''}</span>
       ${lc && !L.length ? `<span class="ab lacar">${lc.b} battles · ${lc.c} captures · ${lc.ko} KOs · tap name for profile</span>` : `<span class="ab ${L.length ? 'pws' : ''}">${ab}</span>`}</div>`;
     const lnm = el.querySelector('.laname'); if(lnm && lc) lnm.onclick = e => { e.stopPropagation(); laProfile(lc, p.t); };   // v150: the character's profile
     const pws = el.querySelector('.pws'); if(pws) pws.onclick = e => { e.stopPropagation(); showTip(`<b>${T0.name} · enhancements</b>` + L.map(x => `<br><span style="color:${ENCH[x].col}">${eGlyph(x)} <b>${ENCH[x].name}</b></span> ${ENCH[x].desc}`).join('')); };   // v137: tap for the full text

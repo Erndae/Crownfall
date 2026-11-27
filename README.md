@@ -539,3 +539,10 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - The move preview says "Armor blocks · −1 layer" instead of promising points.
 - Unchanged: Armor doesn't protect a piece that is giving check, and your own pieces' Armor works as before.
 - Tests: `validate-v254.cjs`.
+
+## v255 — Armor and check, reworked
+- **A piece giving check keeps its Armor** (before, any Armored piece that gave check lost all its Armor on the spot). The checked side has to get out another way: move the King, block, or capture a different checker.
+- **Only when capturing the checker is the only way out of check** does that capture go through, Armor and all. So Armor can never force a checkmate that can't be answered.
+- Same rule for both sides, and the enemy AI's own search follows it (it never plans an illegal bounce while in check, and it finds the capture when that's its only way out).
+- Text updated: the board's Armor badge, piece info, the Help key, and the one-time tip now explain "only way out of check".
+- Tests: `validate-v255.cjs`; the v254 check updated to the new rule.

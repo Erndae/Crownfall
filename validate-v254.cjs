@@ -13,7 +13,7 @@ assert.equal(E('legalFor(B.board,36).includes(19)'),true,'the attack is still al
 E('B.board[19].sh=0');assert.equal(E('armorBlockSq(36,19)'),-1,'no Armor left: a normal capture');
 // Armor is off while the piece gives check: an ordinary capture
 setup("b[19]=null;b[20]={t:'R',side:'en',sh:2};b[60]=null;b[52]={t:'K',side:'me',id:1};b[36]=null;b[38]={t:'B',side:'me',id:2}");
-assert.equal(E('checksKing(B.board,20)'),true);assert.equal(E('armorBlockSq(38,20)'),-1,'a checking piece can be captured');
+assert.equal(E('checksKing(B.board,20)'),true);assert.equal(E('armorBlockSq(38,20)'),20,'v255: a checking piece keeps its Armor while the King has another way out');
 // your own pieces' Armor is untouched by this (only enemy targets)
 setup("b[19]={t:'R',side:'me',sh:1,id:5}");assert.equal(E('armorBlockSq(36,19)'),-1);
 assert(src.includes("{ const asq = armorBlockSq(from, to); if(asq >= 0) return armorBounce(from, to, asq, mover, victim, bonusMove, strike); }   // v254"));
