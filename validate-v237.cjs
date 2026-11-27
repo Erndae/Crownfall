@@ -9,8 +9,8 @@ for(const n of painted){const h=E(`oppFace(${JSON.stringify(n)})`);assert(!h.inc
 // opponents without a painting (Crown City) still get their drawn face
 const drawn=E("oppFace('Speedy Rico')");assert(drawn.includes('<svg')&&!drawn.includes('op-paint'));
 // sheets: every painted name maps to a real file, and each Land's sheet is preloaded
-for(const sh of ['iron-kingdom','olympian-court','road-opponents'])assert(fs.existsSync(__dirname+`/assets/opponents/${sh}.webp`));
-assert.deepEqual(JSON.parse(E("JSON.stringify(OPP_SHEET)")),{medieval:'iron-kingdom',greek:'olympian-court',fantasy:'road-opponents',throne:'road-opponents'});
+for(const sh of ['iron-kingdom','olympian-court','road-opponents','shattered-realm','fallen-throne'])assert(fs.existsSync(__dirname+`/assets/opponents/${sh}.webp`));
+assert.deepEqual(JSON.parse(E("JSON.stringify(OPP_SHEET)")),{medieval:'iron-kingdom',greek:'olympian-court',fantasy:'shattered-realm',throne:'fallen-throne'});
 E("oppFace('Warden Osric')");assert.equal(E("!!oppSheetImgs['iron-kingdom']"),true,'showing a painted face preloads its sheet');
 assert(src.includes("setTimeout(preloadOppSheets, 1200);")&&src.includes("function startBlind(){ try{ laClear(); }catch(e){} preloadOppSheets();"));
 console.log(`PASS: ${painted.length} painted opponents show only their painting; drawn faces stay for the rest; sheets preloaded at start-up, at each fight and when shown; version`);

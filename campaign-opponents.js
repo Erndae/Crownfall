@@ -276,10 +276,22 @@ const sheets = {
     "Gatekeeper Phaedra", "Ferryman Orestes", "Agorakeeper Melia", "Grovewarden Lysandra",
     "Atalanta the Swift", "Heracles", "Hector of Troy", "King Aeëtes"
   ],
+  'shattered-realm': [
+    'Briar Scout Tovin', 'Galeweaver Eira', 'Cloudkeeper Sorrel', 'Cavern Seer Nyssa',
+    'Mirrorwalker Quill', 'Prismbinder Orlan', 'Featherguard Aven', 'Roostkeeper Thistle',
+    'Ridgewatch Kaelis', 'Sporekeeper Pipkin', 'Bazaar Witch Velka', 'Coinburrow Mott',
+    'Zephyra the Stormborn', 'Veyl of the Crystal Eye', 'Seraphon Skyclaw', 'Goblin King Grubnik'
+  ],
+  'fallen-throne': [
+    'Ashgate Sentinel', 'Cinder Marshal', 'Ember Watcher', 'Echo Castellan',
+    'Broken Diadem', 'Gallery Revenant', 'Stable Mourner', 'Pale Bridgekeeper',
+    'Black Cavalier', 'Tribute Bailiff', 'Vault Confessor', 'Debtor Wraith',
+    'The Ash Herald', 'The Hollow Crown', 'The Ruined Knight', 'The Tithe Lord'
+  ],
   'road-opponents': [
     "The Stone Golem", "The Unicorn Warden", "The Two-Headed Ogre", "The Dragon Hoarder",
     "The Archmage", "The Hourglass Wraith", "The Obsidian Wall", "The Stablebane",
-    "The Twin Shadows", "The Tithe Collector", "The Fallen Grandmaster"
+    "The Twin Shadows", "The Tithe Collector", "The Fallen Grandmaster", "The Timewarden"
   ]
 };
 const paintings = new Map();
