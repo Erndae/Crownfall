@@ -574,3 +574,6 @@ body[data-pack="street"] .relic-art { inset:9% }
 #chariotCall:not([hidden]) + #hand{display:none}
 .sq.chariot-lane{outline:2px dashed #efbc60;outline-offset:-3px}
 .chariot-wheel{position:absolute;bottom:1px;right:1px;z-index:4;border-radius:50%;background:#382719;color:#ffdb91;font:700 17px/1.1 Georgia,serif;pointer-events:none}
+/* v259 the Wheel */
+.edicts .ed-why{margin:0 0 4px;font-size:13.5px;line-height:1.45;color:var(--muted,#b9b1c9)}
+.nameask #nameKeep{margin-top:8px;width:100%}

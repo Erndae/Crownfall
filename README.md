@@ -559,3 +559,12 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Unchanged: the Fury bargain, Iron Rulers, Vanguard and crate Armor (all chosen by you or earned in play).
 - `tools/playtest.cjs` now respects enemy Armor (your attacks bounce) and takes `--armor=N` to arm the enemy's N strongest pieces.
 - Tests: `validate-v258.cjs`; v210 check updated.
+
+## v259 — the Wheel (New Game+ story)
+- New Game+ now has a story that follows the ending you chose. Each new cycle is a "Turning" of the Wheel (The Second Turning, The Third Turning…).
+- If you wore the crown: you became the Crownless King. A new Crownrunner sets out (you name them, or keep your name), and the King on the Fallen Throne is the one you became. The four Rulers greet the new runner with fresh lines, and the King remembers being you.
+- If you broke the crown: the crowns grew back, and the throne chose the Ruler who fed the Hunger most during your run (ties go to the later Land). That Ruler waits as the Crownless King and says so.
+- The New Game+ offer explains each rule as part of the story (the crown's iron spreads to the King's guard, every Land pays tithe). Edicts are framed as the new King's decrees or the Hunger's terms.
+- Breaking the crown again on New Game++ or later adds one closing line.
+- Saves: the Hunger now counts how much you fed it in each Land; older saves simply start counting.
+- Tests: `validate-v259.cjs`; v217, v218, v223, v226, v231 and v258 checks updated.

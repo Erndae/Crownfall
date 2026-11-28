@@ -12,7 +12,7 @@ assert(S.street.includes('just Vex'));for(const x of [...Object.values(S),...Obj
 assert(src.includes(`landsFree() ? 'Everybody wanted a crown. <b class="freemark">The Lands are free.</b>' : 'Everybody wants a crown.'}</p>`));
 assert(src.includes('${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : \'\'}'));
 assert(src.includes("(k === 1 && crownsReforged() && FREED_PASSAGE[l] ? FREED_PASSAGE[l] : x)"));   // v218: in the campaign after the true ending
-assert(src.includes("Someone gathered the shards of the Crown of Crowns.")&&src.includes("free ? 'The Lands were free' : 'The Crown of Crowns is yours'"));
+assert(src.includes("The Lands were free, but the shards went home with the four Rulers"));   // v259: the Wheel tells this now
 assert(css.includes('.titlemotto .freemark{')&&css.includes('.jfree{'));
 // unchanged before the true ending
 const P=JSON.parse(E('JSON.stringify(LAND_PASSAGE)'));assert(P.greek.lines[1].includes('soldiers do not follow')||P.greek.lines[2].includes('kneel toward the mountains'));

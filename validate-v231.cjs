@@ -33,6 +33,6 @@ assert(E("STORY_ACHS.filter(a=>a.id.startsWith('sa_d_')&&!a.hidden).length")===3
 assert(src.includes("if(!ACH.dach_mig){ ACH.dach_mig = 1;"),'old finished campaigns count as Normal');
 // the choice comes before the name, for a new campaign and for New Game+
 assert(src.includes("function startNewGame(){ delete ACH.ng_next; diffPick(() => askName(() => draftScreen())); }"));
-assert(src.includes("edictPick(() => diffPick(() => askName(() => draftScreen())));"));
+assert(src.includes("edictPick(() => diffPick(() => wheelName(() => draftScreen())));"));
 assert(src.includes("${CDIFF[ACH.cdiff] ? ' · ' + CDIFF[ACH.cdiff].name : ''}</small><h2>Journey</h2>")&&src.includes("${CDIFF[ACH.cdiff] ? CDIFF[ACH.cdiff].name + ' · ' : ''}${camp.cont}"));
 console.log('PASS: Easy/Normal/Hard chosen at a new campaign / New Game+ and kept for it; army sizes unchanged; Easy ×0.75 targets, Blitz +2, AI −150, +$2, 5 lives; Hard ×1.2, Blitz −1, AI +150, −$1, 2 lives; three finish achievements (harder earns easier); never the Daily Run');

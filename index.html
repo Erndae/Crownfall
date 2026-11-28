@@ -3078,6 +3078,24 @@ const NAME_DEFAULT = 'Crownrunner';
 const cleanName = v => String(v == null ? '' : v).replace(/[^\p{L}\p{N} '\-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 16);
 function bearerName(){ try{ const n = cleanName(CrownfallCharacter.get().name); return n.length >= 2 && n !== NAME_DEFAULT ? n : ''; }catch(e){ return ''; } }
 const nameOr = (alt = 'Crownrunner') => bearerName() || alt;
+// v259: after wearing the crown, a NEW Crownrunner: the name screen asks who carries the next crown (the old name can be kept)
+function wheelName(then){
+  const st = ACH.ng_story_next; if(!st || st.branch !== 'wore') return askName(then);
+  const old = bearerName();
+  const m = modal(`<div class="nameask"><small>${turningName(+ACH.ng_next || 1)}</small><h2>Who carries the next crown?</h2><p>${old ? `${old} sits on the Fallen Throne now. ` : ''}A new Crownrunner sets out from Crown City.</p>
+    <input id="bearerName" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="A new name" aria-label="Your new name">
+    <p class="nameerr" id="nameErr" aria-live="polite"></p>
+    <button class="btn red" id="nameGo" disabled>That’s my name</button>${old ? `<button class="btn ghost" id="nameKeep">Keep the name ${old}</button>` : ''}</div>`);
+  m.classList.add('namemodal');
+  const inp = m.querySelector('#bearerName'), go = m.querySelector('#nameGo'), err = m.querySelector('#nameErr'), keep = m.querySelector('#nameKeep');
+  const ok = () => { const v = cleanName(inp.value); const good = v.length >= 2 && v.toLowerCase() !== NAME_DEFAULT.toLowerCase(); go.disabled = !good;
+    err.textContent = inp.value.trim() && !good ? (v.length < 2 ? 'At least 2 letters.' : 'Pick a name of your own.') : ''; return good; };
+  inp.oninput = ok;
+  const done = () => { if(!ok()) return; try{ CrownfallCharacter.save({...CrownfallCharacter.get(), name:cleanName(inp.value)}); }catch(e){} m.remove(); then && then(); };
+  go.onclick = done; inp.onkeydown = e => { if(e.key === 'Enter') done(); };
+  if(keep) keep.onclick = () => { m.remove(); then && then(); };
+  setTimeout(() => { try{ inp.focus(); }catch(e){} }, 120);
+}
 function askName(then){
   if(bearerName()) return then && then();
   const m = modal(`<div class="nameask"><small>Crown City</small><h2>What do they call you?</h2><p>Everyone in the Lands will know this name. Choose well.</p>
@@ -3116,8 +3134,10 @@ function edictPick(then){
   const held = edictList(), pool = Object.keys(EDICTS).filter(id => !held.includes(id));
   if(!pool.length) return then();
   const offer = pool.sort(() => Math.random() - 0.5).slice(0, 3);
-  const m = modal(`<div class="edicts"><small>${ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)}</small><h2>Choose an Edict</h2>
-    <p>A new rule for this cycle. It stays for every cycle after, and each Edict adds <b>+15%</b> to your campaign score.</p>
+  const wst = ACH.ng_story_next && ACH.ng_story_next.branch;   // v259: the Wheel's framing
+  const m = modal(`<div class="edicts"><small>${wst ? (wst === 'broke' ? 'The Hunger’s terms' : 'The new King’s decree') : ngLabel(Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1)}</small><h2>Choose an Edict</h2>
+    ${wst ? `<p class="ed-why">${wst === 'broke' ? 'Reforging the crowns has a price. The Hunger names its terms, and every term stays for the turns after.' : 'The king you became rules the Lands now, and his laws stay for the turns after.'}</p>` : ''}
+    <p>${wst ? 'Each one adds' : 'A new rule for this cycle. It stays for every cycle after, and each Edict adds'} <b>+15%</b> to your campaign score.</p>
     ${offer.map(id => `<button class="ed-card" data-ed="${id}"><b>${EDICTS[id].name}</b><span>${EDICTS[id].desc}</span></button>`).join('')}
     ${held.length ? `<p class="muted ed-held">Already in force: ${held.map(id => EDICTS[id].name).join(', ')}</p>` : ''}</div>`);
   m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.edict_next = b.dataset.ed; saveAch(); then(); coach('edicts'); });   // v227: the tip follows once
@@ -3170,18 +3190,47 @@ function ngArmor(board){
   for(const t of types) for(const p of board){ if(c >= max) break; if(p && p.side === 'en' && p.t === t){ p.sh = (p.sh || 0) + 1; c++; } }
   return c;
 }
+/* v259 THE WHEEL: New Game+ as turns of the Wheel. The Crown of Crowns doesn't end, it turns; the Hunger grows each time.
+   Which story a turn tells depends on how the last campaign ended (decided when New Game+ begins, kept as ACH.ng_story):
+   wore  - you sat on the throne and became the Crownless King: you play a NEW Crownrunner; the King is your old self
+           ("once <old name>"); Edicts are the new King's decrees; the Rulers notice a fresh face.
+   broke - you broke the crown: the SAME runner; the throne crowned the Ruler who fed the Hunger most last time ("once
+           <Ruler>"); Edicts are the Hunger's terms for reforging.
+   Never shown before the first ending (New Game+ only opens after it). */
+const ORD = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+const turningName = n => `The ${ORD[n] || (n + 1) + 'th'} Turning`;   // cycle 1 = the Second Turning
+function lastEnding(){ const s = endingSave().seen || {}, t = +s.true || 0, w = +s.standard || 0; return t && t >= w ? 'true' : w ? 'standard' : null; }
+const WHEEL_LANDS = ['street', 'medieval', 'greek', 'fantasy'];
+function hungriestRuler(){   // the Ruler of the Land where the Hunger was fed most this campaign (the Land nearest the throne breaks ties)
+  const by = (hungerTally().byLand) || {}; let best = 'fantasy', n = -1;
+  for(const l of WHEEL_LANDS){ const v = +by[l] || 0; if(v > n || (v === n && WHEEL_LANDS.indexOf(l) > WHEEL_LANDS.indexOf(best))){ best = l; n = v; } }
+  return {land:best, name:RULERS[best].short || RULERS[best].name};
+}
+function wheelStory(){   // worked out at the end of a campaign, for the next turn
+  const broke = lastEnding() === 'true';
+  let old = ''; try{ const f = JSON.parse(localStorage.getItem(FALLEN_KEY) || 'null'); old = f && f.king ? fallenClean(f.king, 20) : ''; }catch(e){}
+  if(!old) old = bearerName() || '';
+  return broke ? {branch:'broke', ruler:hungriestRuler().name, rulerLand:hungriestRuler().land} : {branch:'wore', king:old};
+}
+const ngStory = () => (ngLevel() > 0 && ACH.ng_story && ACH.ng_story.branch) ? ACH.ng_story : null;
+function wheelLine(st){
+  return st.branch === 'broke'
+    ? `The Lands were free, but the shards went home with the four Rulers, and greed pulled them back together. The throne crowned the one who fed the Hunger most: <b>${st.ruler}</b>. You broke it once. It grew back.`
+    : `${st.king ? `<b>${st.king}</b> sat` : 'You sat'} on the Fallen Throne and became the Crownless King. A new Crownrunner sets out from Crown City. On the Fallen Throne waits the king you became.`;
+}
 function ngAsk(){
   const next = Math.max(0, Math.floor(+ACH.ngplus || 0)) + 1;
-  const free = landsFree();   // v216: after the true ending, say why the war starts again
-  const m = modal(`<div class="ngask"><small>${free ? 'The Lands were free' : 'The Crown of Crowns is yours'}</small><h2>${ngLabel(next)}</h2>
-    <p>${free ? 'Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
-    <ul><li>Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)</li><li>Enemy ${next >= 3 ? 'Queen and both Rooks' : next >= 2 ? 'Queen and one Rook' : 'Queen'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
-    ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. You choose one more.</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
+  const st = wheelStory();   // v259: the Wheel
+  const m = modal(`<div class="ngask"><small>${turningName(next)}</small><h2>${ngLabel(next)}</h2>
+    <p>${wheelLine(st)}</p>
+    <p>The Hunger is stronger every time the Wheel turns:</p>
+    <ul><li>Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)</li><li>The crown’s iron spreads to the King’s guard: enemy ${next >= 3 ? 'Queen and both Rooks start' : next >= 2 ? 'Queen and one Rook start' : 'Queen starts'} <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Every Land pays tithe to the crowns: store prices <b>+${10 * next}%</b></li></ul>
+    ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. ${st.branch === 'broke' ? 'The Hunger sets one more term.' : 'The new King adds one more decree.'}</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
-  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; saveAch(); edictPick(() => diffPick(() => askName(() => draftScreen()))); };   // v231: then the difficulty   // v226: choose an Edict first
+  m.querySelector('#ngyes').onclick = () => { m.remove(); ACH.ng_next = next; ACH.ng_story_next = st; saveAch(); edictPick(() => diffPick(() => wheelName(() => draftScreen()))); };   // v259   // v231: then the difficulty   // v226: choose an Edict first
 }
-const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'cdiff' || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
+const isCampaignKey = k => /^(crown_|conq_|clr_|kxp_|cpow_)/.test(k) || k === 'cdiff' || k === 'ng_story' || k === 'prog_v' || k === 'campaign_epoch' || k === 'kxv' || k === 'cdraft';   // v155 cdraft: this campaign's drafted starting army   // kxp_: King XP first clears
 function mergeAch(local, cloud){
   const le = +local.campaign_epoch || 0, ce = +cloud.campaign_epoch || 0, out = {};
   for(const k in cloud) if(!isCampaignKey(k)) out[k] = cloud[k];
@@ -3195,9 +3244,11 @@ const cloudIsOlderCampaign = x => (+((x && x.ACH) || {}).campaign_epoch || 0) < 
 function newCampaign(){
   ACH.ngplus = Math.max(0, Math.floor(+ACH.ng_next || 0)); delete ACH.ng_next; ACH.ng_best = Math.max(+ACH.ng_best || 0, ACH.ngplus);   // v210: New Game+ cycle, or 0 for a plain new campaign
   if(!ACH.ngplus) ACH.edicts = []; else if(EDICTS[ACH.edict_next] && !edictList().includes(ACH.edict_next)) ACH.edicts = [...edictList(), ACH.edict_next];   // v226: Edicts stack through New Game+
-  delete ACH.edict_next; const cd = CDIFF[ACH.cdiff_next] ? ACH.cdiff_next : null; delete ACH.cdiff_next;   // v231: the difficulty chosen for this campaign
+  delete ACH.edict_next; const cd = CDIFF[ACH.cdiff_next] ? ACH.cdiff_next : null; delete ACH.cdiff_next;
+  const wheel = ACH.ngplus && ACH.ng_story_next && ACH.ng_story_next.branch ? ACH.ng_story_next : null; delete ACH.ng_story_next;   // v259   // v231: the difficulty chosen for this campaign
   for(const k of Object.keys(ACH)) if(isCampaignKey(k)) delete ACH[k];      // crowns, conquered circuits, old-format progress
   if(cd) ACH.cdiff = cd;
+  if(wheel) ACH.ng_story = wheel;
   ACH.prog_v = PROG_VERSION; ACH.campaign_epoch = Date.now(); ACH.kxv = 1;   // King XP 0 → King Lv.1, 1 Command
   try{ localStorage.setItem('gambit-ach', JSON.stringify(ACH)); }catch(e){}
   setCarry(null); setRebuild(null); setCheckpoint(null);                     // carried army, old rebuild record, Circuit checkpoint
@@ -5114,6 +5165,9 @@ function repLine(pp){
 const HOLD_LINES = ['Thank you. For a second there, I couldn’t hear it.', 'Funny. I never even wanted a crown. I just couldn’t stop fighting for one.',
   'The Hunger goes quiet when I lose. Is that strange?', 'Don’t let it pull you the way it pulled me.', 'Every night it says the same thing: win. I never asked who for.',
   'My grandmother fought for these crowns. So did hers. None of us ever got to keep one.'];
+// v259: Rulers notice a fresh face after the last runner sat on the throne
+const WHEEL_RULER = {'Kingpin Vex':'Another one. The last one sat down and never stood up.', 'King Aldric the Iron-Handed':'I knelt to the last Bearer. I will not kneel twice.',
+  'Athena, Queen of Olympus':'New face, same road. I watched the last one climb it. Do you know who waits at the top?', 'Morwen the Shadow Queen':'The throne wears a new face every turn of the Wheel. Yours will do.'};
 // lines that change with the story so far
 function storyLines(o){
   if(o.name === 'Rush Hour Rex' && B && B.lights?.length) o.intro = 'Green lights are live. Reach one and you get a move back. My pieces get there first, and you lose one.';
@@ -5155,7 +5209,12 @@ function storyLines(o){
     if(o.name === 'Athena, Queen of Olympus' && worldCrowns() < 2) o.intro = `${nm}. I have read that name before. Sit. Let us see how this game ends.`;
     if(o.name === 'Morwen the Shadow Queen' && worldCrowns() !== WORLD_TOTAL - 1) o.intro = `${nm}. Your shadow told me your name before you did.`;
   }
-  if(nm && o.name === 'The Crownless King' && !fallenRecord()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : crownsReforged() ? `You broke my crown, ${nm}. They gathered the pieces. Somebody always does.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;   // v218
+  { const W = ngStory();   // v259: the Wheel names who the King was
+    if(o.name === 'The Crownless King' && W){
+      if(W.branch === 'wore' && W.king) o.intro = `Once I was ${W.king}. I said the same thing you're about to say.`;
+      if(W.branch === 'broke' && W.ruler) o.intro = `Once I was ${W.ruler}. I fed it more than anyone, and it remembered. You broke my crown, ${nm || 'Bearer'}. It grew back.`; }
+    if(W && W.branch === 'wore' && o.ruler && fresh && WHEEL_RULER[o.name]) o.intro = WHEEL_RULER[o.name]; }
+  if(nm && o.name === 'The Crownless King' && !fallenRecord() && !ngStory()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : crownsReforged() ? `You broke my crown, ${nm}. They gathered the pieces. Somebody always does.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;   // v218
   // v216: the throne's hold on the Lands. After the first World Crown, about one ordinary opponent in three sounds released
   // when they lose (the same line for the same opponent). Hints only: nobody names the throne or says what it does.
   if(fresh && !o.ruler && o.name !== 'The Hollow Crown' && o.name !== 'The Fallen Grandmaster' && worldCrowns() >= 1 && RUN.ante >= 2){
@@ -6242,7 +6301,8 @@ function hungerTake(r){ const h = hungerTally(), c = r ? laParse(r) : null; h.ta
 const hungerTaken = () => hungerTally().taken || [];
 function namesList(a, max = 4){ if(!a.length) return ''; if(a.length > max) return `${a.slice(0, max - 1).join(', ')} and ${a.length - max + 1} others`;
   return a.length === 1 ? a[0] : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
-function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
+function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; if(k === 'fed' && RUN && RUN.land){ h.byLand = h.byLand || {}; h.byLand[RUN.land] = (+h.byLand[RUN.land] || 0) + 1; }   // v259: for the Wheel
+  ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
 function hungerBloodType(){   // the strongest piece type in your army that can still level up
@@ -10471,6 +10531,7 @@ async function endingTrue(E, o){
     await E.wait(400);
     await E.say('In four Lands at once, the Rulers’ crowns go dark.', 2800, 'lower', 'story');   // v216: the Lands go free
     await E.say(landsFree() ? 'Again, nobody kneels. This time, they remember how to stand.' : 'For the first time in a hundred years, nobody kneels.', 3200, 'lower', 'story');   // v218: freed before
+    if(ngLevel() >= 2) await E.say('Somebody always gathers the pieces. Maybe this time, nobody will.', 3200, 'lower', 'story');   // v259: the third turning and beyond
     await E.black(1400);
     // 4) the one who came before
     E.film('surrender'); snd.wind(9);

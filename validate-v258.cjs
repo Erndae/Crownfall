@@ -16,7 +16,7 @@ const twin="[{t:'Q',side:'en'},{t:'Q',side:'en'},{t:'R',side:'en'},{t:'R',side:'
 E(`ACH.ngplus=1;globalThis.__b=${twin};ngArmor(globalThis.__b)`);assert.deepEqual(JSON.parse(E('JSON.stringify(__b.map(p=>p.sh||0))')),[1,0,0,0,0]);
 E(`ACH.ngplus=3;globalThis.__b=${twin};ngArmor(globalThis.__b)`);assert.deepEqual(JSON.parse(E('JSON.stringify(__b.map(p=>p.sh||0))')),[1,1,1,0,0]);
 // the New Game+ offer says so
-assert(src.includes("Enemy ${next >= 3 ? 'Queen and both Rooks' : next >= 2 ? 'Queen and one Rook' : 'Queen'} start <b>Armored</b>"));
+assert(src.includes("enemy ${next >= 3 ? 'Queen and both Rooks start' : next >= 2 ? 'Queen and one Rook start' : 'Queen starts'} <b>Armored</b>"));   // v259 wording
 // the playtest tool understands Armor
 const tool=fs.readFileSync(__dirname+'/tools/playtest.cjs','utf8');assert(tool.includes('--armor=0')&&tool.includes('armorBlockSq(m.from,m.to)'));
 E('ACH.ngplus=0');

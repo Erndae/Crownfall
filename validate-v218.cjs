@@ -18,7 +18,7 @@ assert(tr.includes("landsFree() ? 'Again, nobody kneels. This time, they remembe
 assert(src.indexOf("s.seen[type] = s.seen[type] || Date.now()")<src.indexOf('async function endingTrue')||true);
 assert(/const GAME_VERSION = (\d+);/.test(src)&&+RegExp.$1>=218&&sw.includes("'crownfall-v"+RegExp.$1+"'"));
 // New Game+ and the title tell where the new crowns came from
-assert(src.includes("Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again."));
+assert(src.includes("The throne crowned the one who fed the Hunger most"))   /* v259: the Wheel */;
 assert(!src.includes('the crowns have found their Rulers again'));
 assert(src.includes(`crownsReforged() ? 'Everybody wants a crown. <b class="freemark">The crowns were forged again.</b>'`));
 assert(src.includes("Ahead, a throne rebuilt from the pieces you left."));
