@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=255"></script>
-<script src="piece-designs.js?v=255"></script>
-<script src="character-style.js?v=255"></script>
-<script src="campaign-opponents.js?v=255"></script>
-<script src="campaign-dialogue.js?v=255"></script>
-<link rel="stylesheet" href="character-style.css?v=255">
+<script src="gameplay-polish.js?v=256"></script>
+<script src="piece-designs.js?v=256"></script>
+<script src="character-style.js?v=256"></script>
+<script src="campaign-opponents.js?v=256"></script>
+<script src="campaign-dialogue.js?v=256"></script>
+<link rel="stylesheet" href="character-style.css?v=256">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=255">
-<link rel="stylesheet" href="ruler-style.css?v=255">
-<link rel="stylesheet" href="gameplay-polish.css?v=255">
-<link rel="stylesheet" href="storybook.css?v=255">
+<link rel="stylesheet" href="city-board.css?v=256">
+<link rel="stylesheet" href="ruler-style.css?v=256">
+<link rel="stylesheet" href="gameplay-polish.css?v=256">
+<link rel="stylesheet" href="storybook.css?v=256">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3475,6 +3475,7 @@ const MUSIC = {
     'medieval': 'soundtrack/medieval.mp3',
     'medieval-battle': 'soundtrack/medieval-battle.mp3',
     'greek': 'soundtrack/greek.mp3',
+    'agora': 'soundtrack/agora-stalls.mp3',
     'greek-battle': 'soundtrack/greek-battle.mp3',
     'fantasy': 'soundtrack/fantasy.mp3',
     'fantasy-battle': 'soundtrack/fantasy-battle.mp3',
@@ -3560,7 +3561,7 @@ document.addEventListener('visibilitychange', () => {
 });
 // Which music belongs to the screen the player is on right now
 // Screens declare what they are ('menu' or 'land'); the manager remembers it for story moments that pause music.
-function sceneMusic(kind){ if(kind !== 'battle'){ delete document.body.dataset.ruler; delete document.body.dataset.ckf; } coachReady(); MM.scene = !RUN || kind === 'menu' ? 'menu' : kind === 'battle' ? battleMusic() : landMusic(); setMusicContext(MM.scene); }
+function sceneMusic(kind){ if(kind !== 'battle'){ delete document.body.dataset.ruler; delete document.body.dataset.ckf; } coachReady(); MM.scene = !RUN || kind === 'menu' ? 'menu' : kind === 'battle' ? battleMusic() : kind === 'shop' && land() === 'greek' ? 'agora' : landMusic(); setMusicContext(MM.scene); }
 function screenMusic(){ return MM.scene || 'menu'; }
 const landMusic = () => MUSIC.tracks[land()] ? land() : 'menu';
 // The Crownless King's own theme is reserved for the actual battle against him (never menus, previews or other Throne fights)
@@ -3688,7 +3689,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 255;
+const GAME_VERSION = 256;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -11178,7 +11179,7 @@ function shop(){ purseSpill();   // v209
   if(app.classList.contains('play')) leaveBoard();
   const shopPosition = shopScrollPosition();
   if(RUN && RUN.land && PACK !== RUN.land) setPack(RUN.land);   // tile names always follow the Land you are in
-  sceneMusic('land');
+  sceneMusic('shop');
   setLandBg(RUN && !RUN.gauntlet && land());
   if(!shopPosition) window.scrollTo(0, 0);
   enterLand();
