@@ -14,6 +14,7 @@
      --level=auto                 army level (auto: 1 Crown City, 2 Iron Kingdom, 3 Olympian Court, 4 later)
      --circuits=downtown,rooftop,harbor,midnight,ruler
      --stages=1,4                 Circuit stages to test (fight 0 = first fight, fight 2 = Stage Battle)
+     --ng=0,1,2,3                 New Game+ cycles to test (0 = first campaign)
      --armor=0                    give the enemy's N strongest pieces one layer of Armor (like the Hunger's Fury bargain)
      --out=results.json           also save every fight
    Example: node tools/playtest.cjs --lands=greek --diffs=normal --seeds=2   (about a minute) */
@@ -22,7 +23,7 @@ const ROOT=path.join(__dirname,'..');
 const arg=(k,d)=>{const a=process.argv.find(x=>x.startsWith(`--${k}=`));return a?a.slice(k.length+3):d;};
 const list=(k,d)=>arg(k,d).split(',').map(s=>s.trim()).filter(Boolean);
 const LANDS=list('lands','street,medieval'),DIFFS=list('diffs','easy,normal,hard'),MES=list('me','900,1400').map(Number);
-const ARMOR=+arg('armor','0'),SEEDS=+arg('seeds','4'),LEVEL=arg('level','auto'),CIRCS=list('circuits','downtown,rooftop,harbor,midnight,ruler'),STAGES=list('stages','1,4').map(Number),OUT=arg('out','');
+const NGS=list('ng','0').map(Number),ARMOR=+arg('armor','0'),SEEDS=+arg('seeds','4'),LEVEL=arg('level','auto'),CIRCS=list('circuits','downtown,rooftop,harbor,midnight,ruler'),STAGES=list('stages','1,4').map(Number),OUT=arg('out','');
 const AUTO_LV={street:1,medieval:2,greek:3,fantasy:4,throne:4};
 
 process.chdir(ROOT);
@@ -30,8 +31,8 @@ const c=require(path.join(ROOT,'test-support/game-runtime.cjs')),E=c.testEval;
 c.CrownfallCharacter={get:()=>({name:'Runner'}),art:()=>'',save:()=>true,palette:()=>({})};
 c.fetch=()=>new Promise(()=>{});c.Image=function(){this.decode=()=>Promise.resolve();};
 E('musicOn=false;soundOn=false');
-E(`globalThis.__ptFight=(cfg)=>{window.__noRoll=true;MATCH=null;ACH.cdiff=cfg.d==='normal'?undefined:cfg.d;ACH.ngplus=0;ACH.edicts=[];
-  setPack(cfg.land);newRun(cfg.c);RUN.ante=cfg.ante;RUN.blind=cfg.blind;RUN.introRuleFree=true;RUN.pactKey='x';RUN.fightTarget=null;
+E(`globalThis.__ptFight=(cfg)=>{window.__noRoll=true;MATCH=null;ACH.cdiff=cfg.d==='normal'?undefined:cfg.d;ACH.ngplus=cfg.ng||0;ACH.edicts=[];
+  setPack(cfg.land);newRun(cfg.c);RUN.ante=cfg.c==='ruler'?nStages():cfg.ante;RUN.blind=cfg.blind;RUN.introRuleFree=true;RUN.pactKey='x';RUN.fightTarget=null;
   for(const t of 'PNBRQ')RUN.lv[t]=cfg.lv;normLv(RUN);
   startBlind();
   if(cfg.armor)B.board.map((q,i)=>({q,i})).filter(x=>x.q&&x.q.side==='en'&&x.q.t!=='K').sort((a,b)=>TYPE[b.q.t].val-TYPE[a.q.t].val).slice(0,cfg.armor).forEach(x=>{x.q.sh=(x.q.sh||0)+1;});
@@ -54,7 +55,7 @@ E(`globalThis.__ptFight=(cfg)=>{window.__noRoll=true;MATCH=null;ACH.cdiff=cfg.d=
   return JSON.stringify({res,myMoves,score:B.score,target:tgt,lim,rating,armorHits});}`);
 
 const rows=[];let n=0;
-const plan=[];for(const d of DIFFS)for(const land of LANDS)for(const ci of CIRCS)for(const ante of (ci==='ruler'?[1]:STAGES))for(const blind of (ci==='ruler'?[2]:[0,2]))for(const me of MES)for(let s=0;s<SEEDS;s++)plan.push({d,land,c:ci,ante,blind,me,lv:LEVEL==='auto'?AUTO_LV[land]:+LEVEL,armor:ARMOR});
+const plan=[];for(const d of DIFFS)for(const land of LANDS)for(const ci of CIRCS)for(const ante of (ci==='ruler'?[1]:STAGES))for(const blind of (ci==='ruler'?[2]:[0,2]))for(const ng of NGS)for(const me of MES)for(let s=0;s<SEEDS;s++)plan.push({d,ng,land,c:ci,ante,blind,me,lv:LEVEL==='auto'?AUTO_LV[land]:+LEVEL,armor:ARMOR});
 for(const f of plan){let r;try{r=JSON.parse(E(`__ptFight(${JSON.stringify(f)})`));}catch(e){r={res:'error',err:String(e).slice(0,160)};}
   rows.push({...f,...r});if(++n%20===0)process.stderr.write(`\r${n}/${plan.length} fights`);}
 process.stderr.write(`\r${n}/${plan.length} fights\n`);
@@ -68,4 +69,8 @@ console.log('\nWin rate per fight            '+DIFFS.map(d=>d.padEnd(8)).join(''
 for(const land of LANDS)for(const me of MES)console.log(`${land.padEnd(9)} ${who(me).padEnd(18)} `+DIFFS.map(d=>pct(rows.filter(r=>r.land===land&&r.me===me&&r.d===d)).padEnd(8)).join(''));
 for(const d of DIFFS){console.log(`\n${d}: by fight type          other   boss    blitz   ruler`);
   for(const land of LANDS)for(const me of MES)console.log(`${land.padEnd(9)} ${who(me).padEnd(18)} `+['other','boss','blitz','ruler'].map(k=>pct(rows.filter(r=>r.land===land&&r.me===me&&r.d===d&&kind(r)===k)).padEnd(8)).join(''));}
+if(NGS.length>1){console.log('\nWin rate by New Game+ cycle   '+NGS.map(g=>(g?'NG'+'+'.repeat(Math.min(g,3)):'base').padEnd(8)).join(''));
+  for(const d of DIFFS)for(const me of MES)console.log(`${d.padEnd(9)} ${who(me).padEnd(18)} `+NGS.map(g=>pct(rows.filter(r=>r.d===d&&r.me===me&&r.ng===g)).padEnd(8)).join(''));
+  console.log('\nRulers only, by cycle          '+NGS.map(g=>(g?'NG'+'+'.repeat(Math.min(g,3)):'base').padEnd(8)).join(''));
+  for(const d of DIFFS)for(const me of MES)console.log(`${d.padEnd(9)} ${who(me).padEnd(18)} `+NGS.map(g=>pct(rows.filter(r=>r.d===d&&r.me===me&&r.ng===g&&r.c==='ruler')).padEnd(8)).join(''));}
 const errs=rows.filter(r=>r.res==='error');if(errs.length)console.log('\nFirst error:',errs[0].err);
