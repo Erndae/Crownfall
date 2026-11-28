@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=258"></script>
-<script src="piece-designs.js?v=258"></script>
-<script src="character-style.js?v=258"></script>
-<script src="campaign-opponents.js?v=258"></script>
-<script src="campaign-dialogue.js?v=258"></script>
-<link rel="stylesheet" href="character-style.css?v=258">
+<script src="gameplay-polish.js?v=259"></script>
+<script src="piece-designs.js?v=259"></script>
+<script src="character-style.js?v=259"></script>
+<script src="campaign-opponents.js?v=259"></script>
+<script src="campaign-dialogue.js?v=259"></script>
+<link rel="stylesheet" href="character-style.css?v=259">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -567,7 +567,8 @@ body[data-pack="fantasy"] .sq .coord{color:rgba(255,255,255,.5)}
 .stname{display:block;font-family:var(--tag);font-weight:400;font-size:17px;color:var(--brass);margin-top:4px;letter-spacing:.01em}
 .crowns{display:inline-flex;gap:2px;vertical-align:middle}
 .crowns .crown{width:22px;height:22px}
-.crown.locked{opacity:.55}
+img.crown{object-fit:contain}
+.crown.locked{opacity:.55;filter:grayscale(1)}
 .landsbtn{display:flex!important;align-items:center;justify-content:center;gap:8px}
 .setg.three{grid-template-columns:1fr 1fr 1fr}
 .setg.three .btn{font-size:12.5px!important;white-space:nowrap;padding-inline:3px}
@@ -599,7 +600,7 @@ body[data-pack="fantasy"] .sq .coord{color:rgba(255,255,255,.5)}
 .rulerbox span span{display:block;font-size:12.5px;color:#e9e4d9;line-height:1.3}
 .rulerbox span span b{font-family:var(--body);font-size:12.5px;font-weight:700}
 .prize{display:flex;flex-direction:column;align-items:center;gap:2px}
-.prize .crown{width:34px;height:34px;animation:crownbob 2s ease-in-out infinite}
+.prize .crown{width:72px;max-width:100%;height:48px;animation:crownbob 2s ease-in-out infinite}
 .prize small{color:#ffe14d!important}
 .ceremony{position:relative;display:grid;place-items:center;height:140px}
 .ceremony .crown{width:120px;height:120px;position:relative;z-index:1;animation:crownin 1.1s cubic-bezier(.2,1.5,.4,1) both, crownbob 2.4s ease-in-out 1.1s infinite}
@@ -2324,10 +2325,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=258">
-<link rel="stylesheet" href="ruler-style.css?v=258">
-<link rel="stylesheet" href="gameplay-polish.css?v=258">
-<link rel="stylesheet" href="storybook.css?v=258">
+<link rel="stylesheet" href="city-board.css?v=259">
+<link rel="stylesheet" href="ruler-style.css?v=259">
+<link rel="stylesheet" href="gameplay-polish.css?v=259">
+<link rel="stylesheet" href="storybook.css?v=259">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3352,32 +3353,11 @@ function migrateCheckpoint(){
 }
 function migRun(r){ if(r){ if(r.diff && !r.tier) r.tier = r.diff; delete r.diff; if(!r.match && r.circuit !== 'ruler' && r.blind !== 2) r.blind = 2; } return r; }   // (v153: one fight per Stage)   // an old game in progress finishes on its own numbers
 migrateProgress();
-function crownSVG(l, d, got){
-  const t = TIERS[d], R = RULERS[l], f = got ? t.metal : '#3a393c', st = got ? t.dark : '#5a5860', gem = got ? R.gem : '#4a4950';
-  let body;
-  if(l === 'greek'){
-    const leaves = []; for(let k=0;k<7;k++){ const a = Math.PI*(0.95 + k*0.14), x = 20 + Math.cos(a)*13, y = 24 + Math.sin(a)*13; leaves.push(`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="4.2" ry="2" transform="rotate(${(a*180/Math.PI+90).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`);
-      const a2 = Math.PI*(2.05 - k*0.14), x2 = 20 + Math.cos(a2)*13, y2 = 24 + Math.sin(a2)*13; leaves.push(`<ellipse cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" rx="4.2" ry="2" transform="rotate(${(a2*180/Math.PI-90).toFixed(0)} ${x2.toFixed(1)} ${y2.toFixed(1)})"/>`); }
-    body = `<g fill="${f}" stroke="${st}" stroke-width="1.2">${leaves.join('')}</g><circle cx="20" cy="36" r="2.4" fill="${gem}" stroke="${st}" stroke-width="1"/>`;
-  } else if(l === 'medieval'){
-    body = `<path d="M7 32 L6 15 L13 22 L20 12 L27 22 L34 15 L33 32 Z" fill="${f}" stroke="${st}" stroke-width="1.8" stroke-linejoin="round"/><rect x="6" y="30" width="28" height="5" rx="1.5" fill="${f}" stroke="${st}" stroke-width="1.8"/>
-      <circle cx="6" cy="14" r="2" fill="${f}" stroke="${st}" stroke-width="1.2"/><circle cx="34" cy="14" r="2" fill="${f}" stroke="${st}" stroke-width="1.2"/><path d="M20 3 V11 M17 6 H23" stroke="${st}" stroke-width="2.4"/><path d="M20 3.6 V10.4 M17.6 6 H22.4" stroke="${f}" stroke-width="1.2"/>
-      <circle cx="13" cy="32.5" r="1.6" fill="${gem}"/><circle cx="20" cy="32.5" r="1.8" fill="${gem}"/><circle cx="27" cy="32.5" r="1.6" fill="${gem}"/>`;
-  } else if(l === 'throne'){
-    body = `<path d="M5 32 L4 12 L11 19 L14 6 L20 15 L26 6 L29 19 L36 12 L35 32 Z" fill="${f}" stroke="${st}" stroke-width="1.8" stroke-linejoin="round"/><rect x="5" y="29" width="30" height="6" rx="1" fill="${f}" stroke="${st}" stroke-width="1.8"/>
-      <path d="M21 7 L18 15 L22 18 L17 27 L20 35" fill="none" stroke="${gem}" stroke-width="2" stroke-linejoin="round"/><circle cx="11" cy="32" r="1.6" fill="${gem}"/><circle cx="29" cy="32" r="1.6" fill="${gem}"/>
-      <circle cx="14" cy="6" r="1.8" fill="${gem}"/><circle cx="26" cy="6" r="1.8" fill="${gem}"/>`;
-  } else if(l === 'fantasy'){
-    body = `<path d="M5 33 Q8 19 20 15 Q32 19 35 33 Q27 28 20 28 Q13 28 5 33 Z" fill="${f}" stroke="${st}" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M20 16 L17 9 L20 2 L23 9 Z" fill="${gem}" stroke="${st}" stroke-width="1.2"/><path d="M11 20 L9 14 L13 17Z M29 20 L31 14 L27 17Z" fill="${f}" stroke="${st}" stroke-width="1.1"/><circle cx="20" cy="24" r="2.2" fill="${gem}" stroke="${st}" stroke-width="1"/>`;
-  } else {
-    body = `<path d="M5 32 L3 11 L11 20 L15 6 L20 17 L25 6 L29 20 L37 11 L35 32 Z" fill="${f}" stroke="${st}" stroke-width="1.8" stroke-linejoin="round"/><rect x="5" y="29" width="30" height="6" rx="1" fill="${f}" stroke="${st}" stroke-width="1.8"/>
-      <path d="M9 35 v3 M16 35 v4 M27 35 v2.5" stroke="${gem}" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="32" r="2" fill="${gem}"/><circle cx="12" cy="32" r="1.4" fill="${gem}"/><circle cx="28" cy="32" r="1.4" fill="${gem}"/>`;
-  }
-  const shine = got ? `<path d="M31 5 l1 2.4 2.4 1 -2.4 1 -1 2.4 -1 -2.4 -2.4 -1 2.4 -1Z" fill="#fff"/><path class="frac" d="M12 23 l2 2.5 -1.5 2 2 3" fill="none" stroke="${t.dark}" stroke-width=".9" opacity=".7"/>` : '';
-  return `<svg class="crown ${got ? 'got' : 'locked'}" viewBox="0 0 40 40" aria-hidden="true">${body}${shine}</svg>`;
+function landCrownImage(l, got){
+  const src = crownArt(l, WORLD_TIER(l));
+  return src ? `<img class="crown ${got ? 'got' : 'locked'}" src="${src}" alt="">` : '';
 }
-function crownRow(l){ return `<span class="crowns">${crownSVG(l, 'hard', landWon(l))}</span>`; }   // one crown per Land
+function crownRow(l){ return `<span class="crowns">${landCrownImage(l, landWon(l))}</span>`; }   // one crown per Land
 LEVELS.throne = {rounds:['Ashen Trial','Gauntlet','Throne Guard'], chips:['ASH','GAUNT','GUARD'], champ:'Throne Guard', stage:'Hall',
   stages:['Gate of Ash','Hall of Echoes','Vault of Crowns','Hall of Mirrors','The Throne Approach','The Fallen Throne'],
   bosses:{clock:'The Hourglass Wraith', wall:'The Obsidian Wall', thief:'The Stablebane', march:'The Twin Shadows', tax:'The Tithe Collector', crown:'The Fallen Grandmaster'}};
@@ -3419,7 +3399,7 @@ function landsScreen(after){
   const link = i => `<span class="jlink${W > i ? ' crk' : ''}${W >= WORLD_TOTAL ? ' all' : ''}">${W > i ? '<svg viewBox="0 0 14 22" aria-hidden="true"><path d="M7 0 L4 6 L9 11 L5 16 L7 22"/></svg>' : ''}</span>`;
   const slot = l => { const g = landWon(l), art = crownArt(l, WORLD_TIER(l)), veil = l === 'throne' && !g;
     return `<button class="jslot sig one ${g ? 'got' : ''}" data-crown="${l}" aria-label="${veil ? 'Unknown crown' : landCrownName(l)}">
-      <span class="jimg">${veil ? '<span class="jveil">?</span>' : art ? `<img class="${g ? '' : 'sil'}" src="${art}" alt="" loading="lazy">` : crownSVG(l, 'hard', g)}</span>
+      <span class="jimg">${veil ? '<span class="jveil">?</span>' : art ? `<img class="${g ? '' : 'sil'}" src="${art}" alt="" loading="lazy">` : landCrownImage(l, g)}</span>
       ${g ? '<i class="jchk">✓</i>' : ''}<small>${veil ? '???' : landCrownName(l)}</small><em>${l === 'throne' ? 'The final crown' : g ? 'World Crown' : 'World Crown · not yet earned'}</em></button>`; };
   const chapter = (x, i) => { const l = x.id, R = RULERS[l], art = LAND_ART[l], won = landWon(l), n = conqCount(l);
     if(!landOpen(l)) return `<section class="jland locked" style="--lc:${R.gem}">
@@ -3430,7 +3410,7 @@ function landsScreen(after){
     const st = won ? 'done' : 'cur', pipsJ = l === 'throne' ? '' : `<span class="jpips">${CIRCUITS.map(c => `<i class="${circuitDone(l, c.id) ? 'on' : ''}" style="--pc:${(csDef(l, c.id) || {}).c2 || 'var(--lc)'}"></i>`).join('')}<i class="r${won ? ' on' : ''}">♛</i></span>`;
     return `<section class="jland ${won ? 'done' : 'cur'} ${l === PACK ? 'on' : ''} ${l === 'throne' ? 'throne' : ''}" style="--lc:${R.gem}"><span class="jstate ${st}">${won ? 'Completed' : 'Current'}</span><i class="jstep">${LAND_NUM[l]}</i>
       <button class="jhero" data-p="${l}">${art ? `<img src="${art}" alt="" loading="${i ? 'lazy' : 'eager'}">` : ''}<span class="lh-shade"></span><b>${x.name}</b><i class="jnum">${l === 'throne' ? 'The end of the road' : `Land ${LAND_NUM[l]}`}</i></button>
-      <div class="jrul">${rulerFace(l, 'talk') || crownSVG(l, 'hard', true)}<span><small>Ruler</small><b>${R.name}</b></span><span class="jcount">${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits`}${pipsJ}</span></div>
+      <div class="jrul">${rulerFace(l, 'talk') || landCrownImage(l, true)}<span><small>Ruler</small><b>${R.name}</b></span><span class="jcount">${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits`}${pipsJ}</span></div>
       ${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : ''}
       <div class="jone">${slot(l)}</div></section>`; };
   const m = modal(`<div class="jtop"><div><small>${runnerTitle()}${CDIFF[ACH.cdiff] ? ' · ' + CDIFF[ACH.cdiff].name : ''}</small><h2>Journey</h2>${hardMarkHTML('jhard')}</div><button class="btn ghost backbtn" id="pdone">Done</button></div>
@@ -3443,7 +3423,7 @@ function landsScreen(after){
   m.querySelectorAll('[data-crown]').forEach(c => c.onclick = e => { e.stopPropagation(); const l = c.dataset.crown;
     if(!landWon(l)){ showTip(l === 'throne' || !landOpen(l) ? '<b>Not yet earned</b>' : `<b>${landCrownName(l)}</b><br>Not yet earned · defeat ${RULERS[l].name} to claim it`); return; }
     const art = crownArt(l, WORLD_TIER(l));
-    modal(`<div class="trophy${l === 'throne' ? ' throne' : ''}" style="animation:none">${art ? `<img src="${art}" alt="" style="animation:none">` : crownSVG(l, 'hard', true)}</div>
+    modal(`<div class="trophy${l === 'throne' ? ' throne' : ''}" style="animation:none">${art ? `<img src="${art}" alt="" style="animation:none">` : landCrownImage(l, true)}</div>
       <h2 class="tr-name" style="animation:none">${landCrownName(l)}</h2><p class="muted" style="text-align:center;margin:-4px 0 0">${PACKS.find(x => x.id === l).name} · ${l === 'throne' ? 'The final crown' : 'World Crown'}</p>
       <p class="crownlore">${CROWN_LORE[l][WORLD_TIER(l)]}</p>${crownWhisperHTML(l)}
       <button class="btn" id="cclose">Close</button>`, '#cclose'); });
@@ -3693,7 +3673,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 258;
+const GAME_VERSION = 259;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5226,7 +5206,7 @@ function oppFace(name, cls){
   return `<span class="spk-face oface${p ? ' painted' : ''}${f.boss ? ' boss' : ''}${cls ? ' ' + cls : ''}" style="--fa:${f.accent};--fb:${f.bg}">${p ? '' : f.svg}${art}</span>`;
 }
 function portrait(pp){
-  if(pp.ruler) return rulerFace(land(), 'talk') || `<span class="spk-face ruler">${crownSVG(land(), 'hard', true)}</span>`;
+  if(pp.ruler) return rulerFace(land(), 'talk') || `<span class="spk-face ruler">${landCrownImage(land(), true)}</span>`;
   const of = oppFace(pp.name); if(of) return of;   // v191: every named opponent has a face
   const c = CIR(); return `<span class="spk-face${pp.simple ? ' simple' : ''}" style="--fc:${pp.simple ? '#3a393c' : c.col}">${pieceSVG(pp.simple ? 'Q' : 'K','en')}</span>`;
 }
@@ -5763,7 +5743,7 @@ function circuitSelect(startLand, startCircuit){
       ${landHero(PACK)}
       <div class="conqbar" style="--lc:${R.gem}"><span><small>${lname(PACK)}</small><b>${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits conquered`}</b></span>
         <span class="conqpips">${CIRCUITS.map(c => `<i class="${circuitDone(PACK, c.id) ? 'on' : ''}${c.id === cur && !won ? ' cur' : ''}"></i>`).join('')}<i class="r ${won ? 'on' : rOpen ? 'cur' : ''}">♛</i></span></div>
-      <div class="rulerbox" style="--lc:${R.gem}">${rulerFace(PACK, 'card') || crownSVG(PACK, 'hard', true)}<span><small>Ruler of this land</small><b>${R.short || R.name}</b><span>${R.desc} ${won ? `You hold the <b>${landCrownName(PACK)}</b>.` : `Conquer all ${CIRCUITS.length} circuits, then defeat ${rulerShort(PACK)} to claim the <b>${landCrownName(PACK)}</b>.`}</span></span></div>
+      <div class="rulerbox" style="--lc:${R.gem}">${rulerFace(PACK, 'card') || landCrownImage(PACK, true)}<span><small>Ruler of this land</small><b>${R.short || R.name}</b><span>${R.desc} ${won ? `You hold the <b>${landCrownName(PACK)}</b>.` : `Conquer all ${CIRCUITS.length} circuits, then defeat ${rulerShort(PACK)} to claim the <b>${landCrownName(PACK)}</b>.`}</span></span></div>
       ${(() => { const c = getCarry(); if(!c) return `<div class="carrybox fresh"><b>${draftGet() ? 'Your starting army' : 'Fresh army'}</b><span>${draftGet() ? `${draftNames(draftGet().r.map(x => parseR(x).t))}.` : 'You start with a King, Rook, Bishop, Knight and 4 Pawns.'} Everything you build carries into your next circuit and land, as long as you don’t lose all your lives.</span></div>`;
         return `<div class="carrybox"><b>Your army carries over ${hearts(c.lives)}</b><span>${c.roster.length} pieces · ${c.relics.length} ${(c.relics.length === 1 ? UI.tile : UI.tiles).toLowerCase()} · ${(c.cards||[]).length} card${(c.cards||[]).length === 1 ? '' : 's'} · <b class="money">$${c.money}</b></span>
           <div class="army mini">${c.roster.map(parseR).sort((a,b) => ORDER.indexOf(a.t) - ORDER.indexOf(b.t)).map(x => `<span class="apc">${pieceSVG(x.t,'me',x.e)}</span>`).join('')}</div>
@@ -6140,7 +6120,7 @@ function blindSelect(){
       ${i===2 ? `<div class="bchips">${bossChips(boss.id).map(c => `<small class="bsig rule">${c}</small>`).join('')}${(() => { const a = SIG_BOSS[bossRuleName(boss.id)], t = a && ARCHE[sigBase(a)] && ARCHE[sigBase(a)].tag; return t ? `<small class="bsig">${t}</small>${DOUBLE_MARCH.has(sigBase(a)) ? '<small class="bsig dm">Double March</small>' : ''}` : ''; })()}</div>` : ''}
       ${i===2 && personaOf(boss.id) && personaOf(boss.id).style ? `<small class="bstyle">${STYLE_TXT[personaOf(boss.id).style].replace(/: (.)/, (m, c) => ' · ' + c.toUpperCase())}</small>` : ''}
       ${i===2 ? '<small class="bmore">Rules</small>' : ''}
-      ${i===2 && boss.ruler ? `<span class="prize">${crownSVG(land(), 'hard', true)}<small>${landWon(land()) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</small></span>` : ''}
+      ${i===2 && boss.ruler ? `<span class="prize">${landCrownImage(land(), true)}<small>${landWon(land()) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(land())) ? landCrownName(land()) : 'the ' + landCrownName(land())}</small></span>` : ''}
     </div>`).join('')}</div>
     <button class="btn" id="play">${RUN.blind===2 ? `Face ${bossName(boss.id)}` : `Play the ${roundName(RUN.blind)}`}</button>
     <div class="stagerow"><button class="btn ghost" id="stageShop" aria-label="Store: buy and upgrade">Store</button>
@@ -9756,7 +9736,7 @@ function rulerIntro(l){
       <b class="riname">${R.name}</b>
       <span class="rititle">${R.title}</span>
       <span class="riland">${PACKS.find(x => x.id === l).name}</span>
-      <span class="riprize">${crownArt(l, WORLD_TIER(l)) ? `<img src="${crownArt(l, WORLD_TIER(l))}" alt="">` : crownSVG(l, 'hard', true)}<small>${landWon(l) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(l)) ? landCrownName(l) : 'the ' + landCrownName(l)}</small></span>
+      <span class="riprize">${crownArt(l, WORLD_TIER(l)) ? `<img src="${crownArt(l, WORLD_TIER(l))}" alt="">` : landCrownImage(l, true)}<small>${landWon(l) ? 'Defend' : 'Win'} ${/^The /.test(landCrownName(l)) ? landCrownName(l) : 'the ' + landCrownName(l)}</small></span>
       ${line ? `<p class="riline">“${line}”</p>` : ''}
     </div>`;
   busy = true;
@@ -9865,11 +9845,11 @@ async function landConquered(l){
   const pk = PACKS.find(x => x.id === l), n = worldCrowns(), all = n >= WORLD_TOTAL, art = crownArt(l, WORLD_TIER(l));
   sfx.win(); musicDip(0.55);
   const ov = vOverlay('land', l); const T = vTimeline(ov, 1000);
-  const slots = BASE_LANDS.map((x, k) => { const a = crownArt(x, WORLD_TIER(x)); return `<span class="vslot${x === l ? ' new' : ''}${landWon(x) ? '' : ' off'}${a ? ' art' : ''}" style="--k:${k}">${a ? `<img src="${a}" alt="">` : crownSVG(x, 'hard', landWon(x))}</span>`; }).join('');
+  const slots = BASE_LANDS.map((x, k) => { const a = crownArt(x, WORLD_TIER(x)); return `<span class="vslot${x === l ? ' new' : ''}${landWon(x) ? '' : ' off'}${a ? ' art' : ''}" style="--k:${k}">${a ? `<img src="${a}" alt="">` : landCrownImage(x, landWon(x))}</span>`; }).join('');
   ov.innerHTML = `${LAND_ART[l] ? `<div class="vbg" style="background-image:url('${LAND_ART[l]}')"></div>` : ''}
     <div class="vland">
       <p class="vkick">World Crown acquired</p>
-      <div class="vring"><div class="vsig">${art ? `<img src="${art}" alt="">` : crownSVG(l, 'hard', true)}</div></div>
+      <div class="vring"><div class="vsig">${art ? `<img src="${art}" alt="">` : landCrownImage(l, true)}</div></div>
       <b class="vk">${landCrownName(l)}</b>
       <span class="vlname">${pk.name} conquered</span>
       <div class="vslots">${slots}</div>
@@ -10699,7 +10679,7 @@ function crownCeremony(l, fresh){
   if(fresh){ coach('crown'); return landConquered(l); }   // (the coach tip is queued: it shows after the presentation closes)
   sfx.win(); setTimeout(() => { try{ kit.horn(0, 0.6); }catch(e){} }, 500);
   const art = crownArt(l, WORLD_TIER(l));
-  modal(`${art ? `<div class="trophy"><img src="${art}" alt="${landCrownName(l)}"></div>` : `<div class="ceremony"><div class="cglow"></div>${crownSVG(l, 'hard', true)}</div>`}
+  modal(`${art ? `<div class="trophy"><img src="${art}" alt="${landCrownName(l)}"></div>` : `<div class="ceremony"><div class="cglow"></div>${landCrownImage(l, true)}</div>`}
     <p class="tr-kicker">World Crown defended</p>
     <h2 class="tr-name">${landCrownName(l)}</h2>
     <p class="tr-count">${worldCrowns()} / ${WORLD_TOTAL} World Crowns</p>
@@ -10710,7 +10690,7 @@ function crownCeremony(l, fresh){
 function fourthReveal(l){
   musicStop(); sfx.win();
   const ring = BASE_LANDS.map((x, k) => { const a = (k / 4) * Math.PI * 2 - Math.PI / 2, art = crownArt(x, WORLD_TIER(x));
-    return `<span class="rc${art ? ' art' : ''}" style="left:${50 + Math.cos(a) * 44}%;top:${50 + Math.sin(a) * 37}%;animation-delay:${k * 0.3}s">${art ? `<img src="${art}" alt="">` : crownSVG(x, 'hard', true)}</span>`; }).join('');
+    return `<span class="rc${art ? ' art' : ''}" style="left:${50 + Math.cos(a) * 44}%;top:${50 + Math.sin(a) * 37}%;animation-delay:${k * 0.3}s">${art ? `<img src="${art}" alt="">` : landCrownImage(x, true)}</span>`; }).join('');
   const ov = vOverlay('four', 'throne'); const T = vTimeline(ov, 1000);
   ov.innerHTML = `${LAND_ART.throne ? `<div class="vbg obscured" style="background-image:url('${LAND_ART.throne}')"></div>` : ''}
     <div class="vland">
