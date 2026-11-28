@@ -546,3 +546,9 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Same rule for both sides, and the enemy AI's own search follows it (it never plans an illegal bounce while in check, and it finds the capture when that's its only way out).
 - Text updated: the board's Armor badge, piece info, the Help key, and the one-time tip now explain "only way out of check".
 - Tests: `validate-v255.cjs`; the v254 check updated to the new rule.
+
+## v257 — the enemy AI understands its own Armor
+- The AI's search only knew about Armor on your pieces, so it treated its own Armored pieces as capturable: it wasted moves protecting them and never used them boldly. Now it sees Armor on both sides: it values its own (+60 per layer, like yours), knows your attacks on its Armored pieces bounce (v254), and follows the v255 check rule in both directions.
+- Example from the tests: with your Pawn attacking its Queen and your Rook hanging elsewhere, an unarmored Queen is saved (3 of 3 games), while an Armored Queen stays put and the AI takes your Rook (2 of 3).
+- Thinking time unchanged (checked against v256 in the same fight).
+- Tests: `validate-v257.cjs`.

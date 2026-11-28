@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=256"></script>
-<script src="piece-designs.js?v=256"></script>
-<script src="character-style.js?v=256"></script>
-<script src="campaign-opponents.js?v=256"></script>
-<script src="campaign-dialogue.js?v=256"></script>
-<link rel="stylesheet" href="character-style.css?v=256">
+<script src="gameplay-polish.js?v=257"></script>
+<script src="piece-designs.js?v=257"></script>
+<script src="character-style.js?v=257"></script>
+<script src="campaign-opponents.js?v=257"></script>
+<script src="campaign-dialogue.js?v=257"></script>
+<link rel="stylesheet" href="character-style.css?v=257">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=256">
-<link rel="stylesheet" href="ruler-style.css?v=256">
-<link rel="stylesheet" href="gameplay-polish.css?v=256">
-<link rel="stylesheet" href="storybook.css?v=256">
+<link rel="stylesheet" href="city-board.css?v=257">
+<link rel="stylesheet" href="ruler-style.css?v=257">
+<link rel="stylesheet" href="gameplay-polish.css?v=257">
+<link rel="stylesheet" href="storybook.css?v=257">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3689,7 +3689,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 256;
+const GAME_VERSION = 257;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -3963,7 +3963,7 @@ const CFAI = (() => {
     for(let i = 0; i < 64; i++){ const p = b[i]; if(!p) continue;
       let c = T2C[p.t]; if(p.side === 'me') c |= ME;
       if(p.side === 'me' && p.e && String(p.e).split('+').includes('thorn')) c |= THN;   // enchantments are stored as 'a+b'
-      if(p.side === 'me' && p.sh > 0) c |= Math.min(3, p.sh) << 5;
+      if(p.sh > 0 && p.t !== 'K') c |= Math.min(3, p.sh) << 5;   // v257: Armor on both sides (the enemy's from Fury, crates, Edicts)
       s[i] = c; }
     return s;
   }
@@ -4007,19 +4007,20 @@ const CFAI = (() => {
     for(let i = 0; i < 64; i++){ const x = s[i]; if(!x || (x & ME) !== want || !(x & 96) || (x & 7) === K) continue;
       if(hits(s, i, k)){ if(und) und.push(i, x); s[i] = x & ~96; n++; } }
     return n; }
-  function onlyEscape(s, ctx, t){   // the enemy side's only way out of this check is capturing the piece on t
+  function onlyEscape(s, ctx, t, me){   // that side's only way out of this check is capturing the piece on t
     const c = s.slice();
-    for(const m of gen(c, false, ctx, false, true)){ if(((m >> 6) & 63) === t || (m >> 14 & 1)) continue; if(!inCheck(make(c, m), false)) return false; }
+    for(const m of gen(c, me, ctx, false, true)){ if(((m >> 6) & 63) === t || (m >> 14 & 1)) continue; if(!inCheck(make(c, m), me)) return false; }
     return true; }
   function gen(s, me, ctx, capsOnly, strict){
     const out = [], want = me ? ME : 0;
     // v255: a checking Armored piece keeps its Armor unless capturing it is the only way out of check (strict: Armor always holds)
-    const kOwn = me ? -1 : kingSq(s, false), onlyWay = {}, armorHolds = t => strict || !(kOwn >= 0 && hits(s, t, kOwn)) || !(onlyWay[t] ??= onlyEscape(s, ctx, t));
+    // v257: for both sides (the player's attacks on Armored enemy pieces bounce too)
+    const kOwn = kingSq(s, me), onlyWay = {}, armorHolds = t => strict || !(kOwn >= 0 && hits(s, t, kOwn)) || !(onlyWay[t] ??= onlyEscape(s, ctx, t, me));
     const add = (f, t) => {
       const v = s[t];
       if(v){ if((v & ME) === want) return false;                            // own piece
         if((v & 7) === K) return false;                                     // kings are never captured
-        if(!me && (v & 96) && armorHolds(t)){ if(!capsOnly && (s[f] & 7) !== K) out.push(f | t << 6 | 4 << 12); return false; }   // an attack on Armor bounces (a move, never a capture); a King's is a root special (knockback)
+        if((v & 96) && armorHolds(t)){ if(!capsOnly && (s[f] & 7) !== K) out.push(f | t << 6 | 4 << 12); return false; }   // an attack on Armor bounces (a move, never a capture); a King's is a root special (knockback) · v257: both sides
         if(!me && (v & THN) && (s[f] & 7) === K) return false;              // a King never takes a Thorns piece
         out.push(f | t << 6 | 1 << 12); return false; }
       if(!capsOnly) out.push(f | t << 6);
@@ -4035,7 +4036,7 @@ const CFAI = (() => {
           const two = f + 2 * dir; if(!capsOnly && ((me && r === 6) || (!me && (r === 1 || (ctx.dm && r <= 5)))) && !s[two]) out.push(f | two << 6 | (promo(two) ? 2 << 12 : 0)); }   // Double March: a Pawn Wave boss's Pawns may step 2 from any rank
         for(const dc of [-1, 1]){ const cc = c + dc; if(cc < 0 || cc > 7) continue; const to = one + dc; if(to < 0 || to > 63) continue;
           const v = s[to]; if(!v || (v & ME) === want || (v & 7) === K) continue;
-          if(!me && (v & 96) && armorHolds(to)){ if(!capsOnly) out.push(f | to << 6 | 4 << 12); continue; }   // pawn hits Armor: bounces
+          if((v & 96) && armorHolds(to)){ if(!capsOnly) out.push(f | to << 6 | 4 << 12); continue; }   // pawn hits Armor: bounces (v257: both sides)
           out.push(f | to << 6 | 1 << 12 | (promo(to) ? 2 << 12 : 0)); }
       } else if(t === N){ for(const to of NJ[f]) add(f, to); }
       else if(t === K){ for(const to of KJ[f]) add(f, to); }
@@ -4065,7 +4066,7 @@ const CFAI = (() => {
     let kEn = -1, kMe = -1;
     for(let i = 0; i < 64; i++){ const x = s[i]; if(!x) continue; const t = x & 7;
       if(x & ME){ if(t === K){ kMe = i; continue; } matMe += VAL[t] + ((x >> 5) & 3) * 60; if(t !== P) heavyMe += VAL[t]; if(t === Q) qMe = i; if(t === P) pawnsMe[i & 7]++; }
-      else { if(t === K){ kEn = i; continue; } matEn += VAL[t]; if(t !== P) heavyEn += VAL[t]; if(t === Q) qEn = i; if(t === P) pawnsEn[i & 7]++; } }
+      else { if(t === K){ kEn = i; continue; } matEn += VAL[t] + ((x >> 5) & 3) * 60 /* v257: its own Armor counts */; if(t !== P) heavyEn += VAL[t]; if(t === Q) qEn = i; if(t === P) pawnsEn[i & 7]++; } }
     if(kMe >= 0 && matMe === 0) return LONE;                                // Lone King: the player's army is gone
     const endgame = heavyEn + heavyMe < 2600;
     // piece squares + passed pawns
