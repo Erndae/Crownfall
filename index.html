@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=257"></script>
-<script src="piece-designs.js?v=257"></script>
-<script src="character-style.js?v=257"></script>
-<script src="campaign-opponents.js?v=257"></script>
-<script src="campaign-dialogue.js?v=257"></script>
-<link rel="stylesheet" href="character-style.css?v=257">
+<script src="gameplay-polish.js?v=258"></script>
+<script src="piece-designs.js?v=258"></script>
+<script src="character-style.js?v=258"></script>
+<script src="campaign-opponents.js?v=258"></script>
+<script src="campaign-dialogue.js?v=258"></script>
+<link rel="stylesheet" href="character-style.css?v=258">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2324,10 +2324,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=257">
-<link rel="stylesheet" href="ruler-style.css?v=257">
-<link rel="stylesheet" href="gameplay-polish.css?v=257">
-<link rel="stylesheet" href="storybook.css?v=257">
+<link rel="stylesheet" href="city-board.css?v=258">
+<link rel="stylesheet" href="ruler-style.css?v=258">
+<link rel="stylesheet" href="gameplay-polish.css?v=258">
+<link rel="stylesheet" href="storybook.css?v=258">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3159,10 +3159,14 @@ function diffPick(then){
     <p class="muted ed-held">Enemy armies are the same size on every difficulty. Your choice stays until you start a new campaign.</p></div>`);
   m.querySelectorAll('.ed-card').forEach(b => b.onclick = () => { m.remove(); ACH.cdiff_next = b.dataset.d; saveAch(); then(); });
 }
+/* v258: enemy Armor became real in v254 (and the AI learned to use it in v257); New Game+ had been tuned when it did
+   nothing, and cycle 3 armed every officer (5-7 pieces). Now: cycle 1 the Queen, cycle 2 the Queen and one Rook, cycle 3
+   and on the Queen and both Rooks, never more than 3 pieces (Queens first, then Rooks). */
+const NG_ARMOR_MAX = n => n >= 3 ? 3 : n >= 2 ? 2 : 1;
 function ngArmor(board){
   const n = ngLevel(); if(!n || !Array.isArray(board)) return 0; let c = 0;
-  const types = n >= 3 ? ['Q', 'R', 'B', 'N'] : n >= 2 ? ['Q', 'R'] : ['Q'];
-  for(const p of board) if(p && p.side === 'en' && types.includes(p.t)){ p.sh = (p.sh || 0) + 1; c++; }
+  const types = n >= 2 ? ['Q', 'R'] : ['Q'], max = NG_ARMOR_MAX(n);
+  for(const t of types) for(const p of board){ if(c >= max) break; if(p && p.side === 'en' && p.t === t){ p.sh = (p.sh || 0) + 1; c++; } }
   return c;
 }
 function ngAsk(){
@@ -3170,7 +3174,7 @@ function ngAsk(){
   const free = landsFree();   // v216: after the true ending, say why the war starts again
   const m = modal(`<div class="ngask"><small>${free ? 'The Lands were free' : 'The Crown of Crowns is yours'}</small><h2>${ngLabel(next)}</h2>
     <p>${free ? 'Someone gathered the shards of the Crown of Crowns. Four new crowns were forged from them, four Rulers put them on, and the Fallen Throne has a king again. Start' : 'Start again'} in Crown City with a new army. Every cycle is harder:</p>
-    <ul><li>Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)</li><li>Enemy ${next >= 3 ? 'officers' : next >= 2 ? 'Queens and Rooks' : 'Queens'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
+    <ul><li>Score targets <b>+${ngTargetPct(next)}%</b> (Blitz <b>+${ngTargetPct(next, true)}%</b>)</li><li>Enemy ${next >= 3 ? 'Queen and both Rooks' : next >= 2 ? 'Queen and one Rook' : 'Queen'} start <b>Armored</b></li><li>Blitz fights: <b>${next} fewer move${next > 1 ? 's' : ''}</b></li><li>Store prices <b>+${10 * next}%</b></li></ul>
     ${edictList().length ? `<p class="ng-ed">Edicts in force: <b>${edictList().map(id => EDICTS[id].name).join(', ')}</b>. You choose one more.</p>` : '<p class="ng-ed">You also choose an <b>Edict</b>: one extra rule, worth +15% campaign score.</p>'}
     <p class="muted">Your name, Royal Treasury, best campaign and achievements stay.</p>
     <div style="display:flex;gap:10px"><button class="btn ghost" id="ngno" style="flex:1">Not yet</button><button class="btn red" id="ngyes" style="flex:1">Begin</button></div></div>`, '#ngno');
@@ -3689,7 +3693,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 257;
+const GAME_VERSION = 258;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];

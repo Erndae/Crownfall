@@ -552,3 +552,10 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Example from the tests: with your Pawn attacking its Queen and your Rook hanging elsewhere, an unarmored Queen is saved (3 of 3 games), while an Armored Queen stays put and the AI takes your Rook (2 of 3).
 - Thinking time unchanged (checked against v256 in the same fight).
 - Tests: `validate-v257.cjs`.
+
+## v258 — New Game+ Armor eased (and an Armor-aware playtest)
+- Enemy Armor became real in v254 and the AI learned to use it in v257, but New Game+ had been tuned when it did nothing, and cycle 3 armed every enemy officer (5–7 pieces). A 1,224-fight playtest showed 3 Armored pieces alone cut a solid player's wins from 73% to 49% (Rulers 67% → 17%).
+- New Game+ now arms the enemy Queen in cycle 1, the Queen and one Rook in cycle 2, and the Queen and both Rooks from cycle 3 on: never more than 3 pieces. The New Game+ offer says so.
+- Unchanged: the Fury bargain, Iron Rulers, Vanguard and crate Armor (all chosen by you or earned in play).
+- `tools/playtest.cjs` now respects enemy Armor (your attacks bounce) and takes `--armor=N` to arm the enemy's N strongest pieces.
+- Tests: `validate-v258.cjs`; v210 check updated.

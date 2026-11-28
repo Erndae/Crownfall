@@ -15,7 +15,7 @@ E('RUN.gauntlet=true');assert.equal(E('ngLevel()'),0,'The Gauntlet is never affe
 E('ACH.ngplus="junk"');assert.equal(E('ngLevel()'),0);
 const army="[{t:'Q',side:'en'},{t:'R',side:'en'},{t:'B',side:'en'},{t:'N',side:'en'},{t:'P',side:'en'},{t:'K',side:'en'},{t:'Q',side:'me'}]";
 const arm=n=>{E(`ACH.ngplus=${n};globalThis.__b=${army};ngArmor(globalThis.__b)`);return JSON.parse(E('JSON.stringify(globalThis.__b.map(p=>p.sh||0))'));};
-assert.deepEqual(arm(0),[0,0,0,0,0,0,0]);assert.deepEqual(arm(1),[1,0,0,0,0,0,0],'Cycle 1: the enemy Queen');assert.deepEqual(arm(2),[1,1,0,0,0,0,0]);assert.deepEqual(arm(3),[1,1,1,1,0,0,0],'Never Pawns, Kings or your own pieces');
+assert.deepEqual(arm(0),[0,0,0,0,0,0,0]);assert.deepEqual(arm(1),[1,0,0,0,0,0,0],'Cycle 1: the enemy Queen');assert.deepEqual(arm(2),[1,1,0,0,0,0,0]);assert.deepEqual(arm(3),[1,1,0,0,0,0,0],'v258: cycle 3 caps at Queen and Rooks; never Pawns, Kings or your own pieces');
 // the cycle survives starting the next campaign; a plain new campaign returns to 0
 E('ACH.ngplus=1;ACH.ng_next=2;newCampaign()');assert.equal(E('ACH.ngplus'),2);assert.equal(E('ACH.ng_best'),2);assert.equal(E('ACH.ng_next'),undefined);
 E('newCampaign()');assert.equal(E('ACH.ngplus'),0,'A plain New Campaign is cycle 0');assert.equal(E('ACH.ng_best'),2,'The best cycle is kept');
