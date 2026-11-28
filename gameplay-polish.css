@@ -590,3 +590,11 @@ body[data-pack="street"] .relic-art { inset:9% }
 .modal .sc-sum{margin:6px 0 10px;line-height:1.5}
 .modal .sc-sum small{opacity:.7}
 .modal .sc-undo{width:100%;margin:2px 0 8px}
+/* v265 text waits for a tap: a quiet cue on cards, banners and scene lines */
+.tapcue{display:block;margin-top:8px;font:600 11px/1.2 var(--body,"Rubik",sans-serif);letter-spacing:.12em;text-transform:uppercase;opacity:.62;text-align:center;animation:tapcue 1.8s ease-in-out infinite}
+.vcard .tapcue{margin-top:12px;color:#fff}
+.en-tapcue{position:absolute;left:0;right:0;bottom:calc(var(--sab,0px) + 18px);z-index:6;text-align:center;font:600 11px/1.2 var(--body,"Rubik",sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#efe7da;opacity:0;transition:opacity .4s;pointer-events:none}
+.en-wait .en-tapcue{opacity:.55;animation:tapcue 1.8s ease-in-out infinite}
+.ckrise .en-tapcue{bottom:calc(var(--sab,0px) + 2vh)}
+@keyframes tapcue{0%,100%{opacity:.35}50%{opacity:.7}}
+@media (prefers-reduced-motion:reduce){.tapcue,.en-wait .en-tapcue{animation:none;opacity:.6}}

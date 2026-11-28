@@ -596,3 +596,13 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Color with a purpose: opponent names and tip headings in the Land's accent color, score and the fight's target in gold, Crown City's store headings in gold.
 - Readability fixes: Crown City's store headings, notes and "How it works" were dark text on a dark page; the Material number was black on dark blue; the Fallen Throne's opponent names are a lighter red.
 - Tests: `validate-v264.cjs`.
+
+## v265 — text waits for your tap; no more stuck screens after a match
+- Every message now stays up until you tap: opponent speech, your army's chatter, challenge and achievement banners, tips, opponent and wave cards, circuit arrival, Land cards, reinforcement banners, new recruits, Stage cleared / Ruler defeated, and every line of the crown walk, ceremonies and endings. Cards and scene lines show a faint "Tap to continue". One tap moves on (the v154 tap rules are unchanged). Waiting text sets no timer at all.
+- Stuck-proofing:
+  - A message that ignores a tap is removed anyway, so nothing can sit on screen swallowing every tap. The circuit arrival card now closes from a tap anywhere.
+  - The first "Reinforcements" banner can no longer leave a fight frozen (it continues however the banner goes away).
+  - If a victory animation ever fails, it is cleared and the rewards window still opens (campaign and Daily Run).
+  - If the board is ever left with the match over and nothing to tap for 6 seconds, a "Match over · Continue" button appears (the result is already saved).
+- Checked with an automated player that plays real fights by tapping (about an hour across runs): memory, timers and listeners stay flat over 20 matches.
+- Tests: `validate-v265.cjs`.

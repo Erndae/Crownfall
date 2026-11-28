@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=264"></script>
-<script src="piece-designs.js?v=264"></script>
-<script src="character-style.js?v=264"></script>
-<script src="campaign-opponents.js?v=264"></script>
-<script src="campaign-dialogue.js?v=264"></script>
-<link rel="stylesheet" href="character-style.css?v=264">
+<script src="gameplay-polish.js?v=265"></script>
+<script src="piece-designs.js?v=265"></script>
+<script src="character-style.js?v=265"></script>
+<script src="campaign-opponents.js?v=265"></script>
+<script src="campaign-dialogue.js?v=265"></script>
+<link rel="stylesheet" href="character-style.css?v=265">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2317,10 +2317,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=264">
-<link rel="stylesheet" href="ruler-style.css?v=264">
-<link rel="stylesheet" href="gameplay-polish.css?v=264">
-<link rel="stylesheet" href="storybook.css?v=264">
+<link rel="stylesheet" href="city-board.css?v=265">
+<link rel="stylesheet" href="ruler-style.css?v=265">
+<link rel="stylesheet" href="gameplay-polish.css?v=265">
+<link rel="stylesheet" href="storybook.css?v=265">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -2538,7 +2538,7 @@ function unlockAch(id, needCircuit){
   const el = document.createElement('div'); el.className = 'achtoast';
   el.innerHTML = `<small>Achievement unlocked</small><b>${a.name}</b><span>${a.desc}</span>`;
   el.style.setProperty('--ac', (CIRCUITS.find(c => c.id === a.c) || {}).col || (a.pk ? PACK_COL[a.pk] : '') || (a.story ? '#d9707a' : '') || '#ffe14d');
-  document.body.appendChild(el); setTimeout(() => el.classList.add('out'), 3200); setTimeout(() => el.remove(), 3700);
+  document.body.appendChild(el); let gone = false; el._gone = () => { if(gone) return; gone = true; el.classList.add('out'); setTimeout(() => el.remove(), 500); }; tapTimer(el._gone, 3200);   // v265: until tapped
   try{ kit.horn(0, 0.3); kit.kick(0); }catch(e){}
 }
 const PACK_COL = {street:'#ffe14d', medieval:'#d9a441', greek:'#7fb2ff', fantasy:'#b18cff', throne:'#e0263f'};
@@ -2888,7 +2888,7 @@ function landChapter(l){
       <div class="lc-txt"><small>Land ${LAND_NUM[l] || ''}</small><b>${PACKS.find(x => x.id === l).name}</b><p>${C.d}</p><em>${hint}</em><span class="lc-tap">Tap to begin</span></div>`;
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
     let done = false; const gone = () => { if(done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 500); };
-    el._gone = gone; el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(9000));
+    el._gone = gone; el.addEventListener('pointerdown', gone); tapTimer(gone, 9000);
     };
     landWalk(l, show);
     return true;
@@ -2898,7 +2898,7 @@ function landIntro(l){ const a = landArt(l); if(!a || calm) return;
   const el = document.createElement('div'); el.className = 'landintro';
   el.innerHTML = `<img src="${a}" alt=""${LAND_FOCUS[l] ? ` style="object-position:${LAND_FOCUS[l]}"` : ''}><span class="lh-shade"></span><div><small>LAND ${LAND_NUM[l] || ''}</small><b>${PACKS.find(x => x.id === l).name}</b></div>`;
   document.body.appendChild(el); const done = () => { el.classList.add('out'); setTimeout(() => el.remove(), 450); };
-  el.addEventListener('pointerdown', done); setTimeout(done, msgT(4000)); }   // v154
+  tapCue(el); el.addEventListener('pointerdown', done); tapTimer(done, 4000); }   // v154
 let PACK = 'street'; try{ PACK = localStorage.getItem('crownfall-pack') || 'street'; }catch(e){}
 if(!PACKS.some(x => x.id === PACK)) PACK = 'street';
 document.body.dataset.pack = PACK;
@@ -3716,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 264;
+const GAME_VERSION = 265;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5275,7 +5275,7 @@ function say(kind, force){
   const bw = $('#bw'); (bw || document.body).appendChild(el);
   try{ tone({f: pp.ruler ? 150 : 220, f2: pp.ruler ? 110 : 180, type:'sawtooth', dur:0.18, vol:0.05}); tone({f: pp.ruler ? 225 : 330, f2: pp.ruler ? 160 : 260, type:'triangle', dur:0.22, vol:0.04, at:0.08}); }catch(e){}
   el.onclick = () => el.remove();
-  clearTimeout(say.t); say.t = setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, kind === 'intro' ? MSG_INTRO_MS : MSG_MS);   // v154
+  clearTimeout(say.t); say.t = tapTimer(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, kind === 'intro' ? MSG_INTRO_MS : MSG_MS);   // v154, v265: until tapped
 }
 // play-style adjustments to how the boss picks moves
 function styleBonus(from, to){
@@ -5678,7 +5678,7 @@ function circuitArrival(){
     </article>`;
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
     const done = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 300); };
-    el.addEventListener('click', done); setTimeout(done, msgT(myst ? 7000 : MSG_INTRO_MS)); };   // v154   // (v134: long enough to read one line; v143: a clue line adds time)
+    tapCue(el.querySelector('article') || el); el._gone = done; el.addEventListener('click', done); tapTimer(done, myst ? 7000 : MSG_INTRO_MS); };   // v265: a tap anywhere closes it   // v154   // (v134: long enough to read one line; v143: a clue line adds time)
   setTimeout(go, 120);
 }
 /* v189: after an update, say so once. The last build seen is remembered on the device; a first visit says nothing. */
@@ -6143,7 +6143,7 @@ function bindRelicTips(root, onSell){
   });
 }
 let tipT = null;
-function showTip(html){ hideTip(); const t = document.createElement('div'); t.className = 'tip'; t.id = 'tip'; t.innerHTML = html; document.body.appendChild(t); clearTimeout(tipT); tipT = setTimeout(hideTip, 5000); t.onclick = e => { if(e.target.id !== 'sell' && e.target.id !== 'relp' && e.target.id !== 'settrap') hideTip(); }; }
+function showTip(html){ hideTip(); const t = document.createElement('div'); t.className = 'tip'; t.id = 'tip'; t.innerHTML = html; document.body.appendChild(t); clearTimeout(tipT); tipT = tapTimer(hideTip, 5000); t.onclick = e => { if(e.target.id !== 'sell' && e.target.id !== 'relp' && e.target.id !== 'settrap') hideTip(); }; }
 function hideTip(){ const t = $('#tip'); if(t) t.remove(); }
 
 /* Stage-screen boss card: compact chips only. The full rules sit one tap away (bossDetails) and in How to play;
@@ -6217,10 +6217,12 @@ function recruitNote(items){
    for the Land chapter; the dice wait for the entrance card. Reading times: banners 5 s (long toasts 6 s), info overlays
    5-6 s, introductions 6-8 s, the Land chapter until tapped (or 9 s). Reduced motion keeps the times, without animation. */
 const MSG_P3 = '.oppin,.carrive,.landintro,.reinf,.recintro,.lachap,.vict';
-const MSG_P4 = '#speech,.lachat,.chaltoast';
+const MSG_P4 = '#speech,.lachat,.chaltoast,.achtoast';   // (v265: + achievements)
 let msgSwallow = 0;
 let msgInner = false;
-function msgDismiss(el){ msgInner = true; try{ if(el._wake) return el._wake(); if(el._gone) return el._gone(); el.dispatchEvent(new Event('pointerdown')); if(el.id === 'speech') el.remove(); }catch(e){} finally{ msgInner = false; } }
+function msgDismiss(el){ msgInner = true; try{ if(el._wake) el._wake(); else if(el._gone) el._gone(); else { el.dispatchEvent(new Event('pointerdown')); el.dispatchEvent(new Event('click')); if(el.id === 'speech') el.remove(); } }catch(e){} finally{ msgInner = false; }
+  // v265: a message that ignored the tap is removed anyway, so a card can never sit there swallowing every tap
+  if(!el.classList.contains('vict')) setTimeout(() => { if(el.isConnected && !el.classList.contains('out')) el.remove(); }, 700); }
 document.addEventListener('pointerdown', e => {
   if(msgInner || !e.isTrusted) return;                                            // (our own dismiss signals, or scripted events)
   if(e.target.closest && e.target.closest('.modal, .tip')) return;                     // P1 choices and tips handle their own taps
@@ -6235,7 +6237,12 @@ document.addEventListener('pointerdown', e => {
 }, true);
 document.addEventListener('click', e => { if(performance.now() < msgSwallow){ msgSwallow = 0; e.stopPropagation(); e.preventDefault(); } }, true);
 const MSG_MS = 5000, MSG_INTRO_MS = 6000;
-const msgT = ms => Math.round(ms * (window.__msgScale || 1));   // (tests may scale reading times; the game always uses 1)
+/* v265 TEXT WAITS FOR YOU: every message, story card and scene line stays up until you tap (the v154 rules above still
+   decide what a tap does). msgT() used to be a reading time; it now means "until tapped". Tests may still scale it. */
+const TAP_HOLD = 2147483000;   // the longest timer a browser allows (~24 days): in practice, never
+const msgT = ms => window.__msgScale ? Math.round(ms * window.__msgScale) : TAP_HOLD;
+const tapTimer = (fn, ms) => { const t = msgT(ms); return t >= TAP_HOLD ? 0 : setTimeout(fn, t); };   // no timer at all while waiting for a tap
+const tapCue = el => { if(el && !el.querySelector('.tapcue')) el.insertAdjacentHTML('beforeend', '<small class="tapcue">Tap to continue</small>'); };
 function blindSelect(){
   if(app.classList.contains('play')) leaveBoard();
   sceneMusic('land');
@@ -6352,7 +6359,7 @@ function oppEntrance(boss, tier){
   el.innerHTML = `<small class="oland">${PACKS.find(x => x.id === land()).name} · ${CIR().name}</small>${oppFace(bossName(boss.id), 'big')}<b>${bossName(boss.id)}</b><span class="otags"><i class="otag">${opponentRole(boss)}</i>${sigChip()}${mech ? `<small class="mchip">${mech}</small>` : ''}</span>${line ? `<q class="oline">${line}</q>` : ''}${encounterHTML()}${hazardHTML(true)}<small class="otap">Tap to continue</small>`;
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
-  el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(MSG_INTRO_MS));   // v154
+  tapCue(el); el.addEventListener('pointerdown', gone); tapTimer(gone, MSG_INTRO_MS);   // v154
 }
 /* v223 The Hunger's bargain. Once you carry a World Crown, the Hunger may make an offer before a Stage Battle (the third
    fight of a stage): a boon and a price, both growing with the World Crowns you carry (1-4). Take it or refuse it; the
@@ -6896,7 +6903,7 @@ function gEntrance(){
   host.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
   if(boss && !calm){ document.body.classList.add('gflare'); setTimeout(() => document.body.classList.remove('gflare'), 1300); }
   const gone = () => { if(!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 260); };
-  el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(boss ? MSG_INTRO_MS : MSG_MS));   // v154
+  tapCue(el); el.addEventListener('pointerdown', gone); tapTimer(gone, boss ? MSG_INTRO_MS : MSG_MS);   // v154
 }
 function gFoeDetails(boss){
   const lim = moveLimitFor(parFor(), boss.id), sg = B && B.ai && B.ai.sig ? sigBase(B.ai.sig) : null, A = sg && ARCHE[sg];
@@ -7061,7 +7068,7 @@ function dailyWin(vScore, vLog, laRes, mate, captureFinish){
     ${laWinHtml(laRes)}<p class="gnext">${all ? 'All ten waves cleared!' : `Next · Wave ${RUN.gWave} of ${DAILY_WAVES}${gBossWave(RUN.gWave) ? ' · Boss wave' : ''}`}</p>
     <button class="btn" id="cash">${all ? 'See your score' : 'Choose a reward'}</button><button class="btn ghost" id="peek">View the board</button>`;
   const rewardView = battleView;
-  stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared} of ${DAILY_WAVES}`, name:tag, kick:'Wave cleared'}, captureFinish).then(() => {
+  stageWinIntro(land(), vScore, '', {tier:'boss', tag:boss ? 'Boss wave' : `Wave ${cleared} of ${DAILY_WAVES}`, name:tag, kick:'Wave cleared'}, captureFinish).catch(vRescue).then(() => {   // v265: a broken animation still reaches the rewards
     if(rewardView !== battleView) return;
     const m = modal(`<p class="gwave">Wave ${cleared} of ${DAILY_WAVES} cleared</p>` + html, null); m.classList.add('vicm', 'gvic'); addPeek(m, vLog);
     let go = false; m.querySelector('#cash').onclick = () => { if(go) return; go = true; m.remove(); sfx.coin(); all ? dailyFinish(true) : dailyPick(() => gNextWave()); };
@@ -7337,7 +7344,7 @@ async function finalPhaseShow(){
   el.innerHTML = MATCH ? '<b>Final phase</b><span>Only the King remains. Checkmate the King.</span>' : '<b>No reinforcements left</b><span>Checkmate the King to win the round.</span>';
   bw.appendChild(el); requestAnimationFrame(() => el.classList.add('on'));
   try{ tone({f:220, f2:330, type:'triangle', dur:.3, vol:.05}); tone({f:440, type:'sine', dur:.45, vol:.03, at:.12}); }catch(e){}
-  await new Promise(r => { const t = setTimeout(r, msgT(4000)); el._wake = () => { clearTimeout(t); r(); }; el.addEventListener('pointerdown', el._wake); });   // v154: readable, a tap continues
+  tapCue(el); await new Promise(r => { const t = tapTimer(r, 4000); el._wake = () => { clearTimeout(t); r(); }; el.addEventListener('pointerdown', el._wake); });   // v154: readable, a tap continues
   el.classList.remove('on'); el.classList.add('out'); setTimeout(() => el.remove(), 260);
 }
 async function reinforce(){
@@ -7368,7 +7375,10 @@ async function reinforceShow(sq){
   if(hand) hand.textContent = 'Reinforcements inbound';
   reinfSound();
   if(first){ coachMark('reinforce');                      // the full explanation, once per profile
-    await new Promise(r => { const t0 = performance.now(); let tt; const done = () => { clearTimeout(tt); r(); }; tt = setTimeout(done, msgT(MSG_MS)); el.addEventListener('pointerdown', () => { if(performance.now() - t0 > 700) done(); }); }); }
+    // v265: waits for your tap; it can never hang (any dismissal, or the banner going away, also continues)
+    await new Promise(r => { const t0 = performance.now(); let tt, iv, over = false; const done = () => { if(over) return; over = true; clearTimeout(tt); clearInterval(iv); r(); };
+      tt = tapTimer(done, MSG_MS); el._wake = () => { if(performance.now() - t0 > 700) done(); else setTimeout(done, 700 - (performance.now() - t0)); };
+      el.addEventListener('pointerdown', el._wake); iv = setInterval(() => { if(!el.isConnected) done(); }, 400); }); }
   else await sleep(calm ? 500 : 600);
   REINF_HIDE = null; drawBoard();
   sq.forEach((i, k) => { const e = document.querySelector(`#board .sq[data-i="${i}"]`); if(e){ e.style.setProperty('--d', (k * 45) + 'ms'); e.classList.add('arrive'); } });
@@ -7606,7 +7616,7 @@ function boardMarks(){
 const boardMarkAt = i => { if(!B) return ''; const k = (B.lights || []).includes(i) ? 'light' : (B.vantage || []).includes(i) ? 'vantage' : (B.banner || []).includes(i) ? 'banner' : (B.crates || []).includes(i) ? 'crate' : (B.trapSq || []).includes(i) ? 'trap' : ''; const m = k && boardMarks().find(x => x.k === k);
   return m ? `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${{light:'Green light', crate:'Supply crate', vantage:'Vantage point', banner:'Royal banner'}[k] || m.name} on ${sqName(i)}</b><br>${m.text}</span></span>` : ''; };
 function boardKey(){ const L = boardMarks(); if(!L.length) return;
-  showTip('<b>Board key</b>' + L.map(m => `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${m.name}</b><br>${m.text}</span></span>`).join('')); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = setTimeout(hideTip, 12000); } }
+  showTip('<b>Board key</b>' + L.map(m => `<span class="bk-row"><i class="bk-ic">${BK_ICON[m.k]}</i><span><b>${m.name}</b><br>${m.text}</span></span>`).join('')); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = tapTimer(hideTip, 12000); } }
 async function tapSquare(i){
   if(busy || !B || B.done || document.body.classList.contains('peeking')) return;
   const p = B.board[i];
@@ -7649,7 +7659,7 @@ async function tapSquare(i){
     return;
   }
   if(!busy && mateNow()) return;                                            // v156
-  if(!p && !swapMode && !(sel !== null && legalMoves(sel).includes(i))){ const mk = boardMarkAt(i); if(mk){ showTip(mk); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = setTimeout(hideTip, 9000); } return; } }   // v199: what this mark does
+  if(!p && !swapMode && !(sel !== null && legalMoves(sel).includes(i))){ const mk = boardMarkAt(i); if(mk){ showTip(mk); const t = $('#tip'); if(t){ t.classList.add('bktip'); clearTimeout(tipT); tipT = tapTimer(hideTip, 9000); } return; } }   // v199: what this mark does
   if(sel !== null && legalMoves(sel).includes(i)){
     if(confirmMoves()){previewMove(sel,i);return;}
     const from=sel;movePreview=null;pieceInfo(null);await doMove(from,i);return;
@@ -9287,9 +9297,9 @@ function chalToast(title, sub, kind){
   if(n) el.style.marginTop = (n * 52) + 'px';                                  // a second message stacks below the first
   el.innerHTML = `<b>${title}</b>${sub ? `<span>${sub}</span>` : ''}`; bw.appendChild(el);
   requestAnimationFrame(() => el.classList.add('on'));
-  const ms = ((title || '') + (sub || '')).length > 42 ? 6000 : MSG_MS;   // v154
+  const ms = ((title || '') + (sub || '')).length > 42 ? 6000 : MSG_MS;   // v154 (v265: until tapped, below)
   const gone = () => { if(!el.isConnected) return; el.classList.remove('on'); setTimeout(() => { el.remove(); toastCatch(); }, 250); };
-  el._gone = gone; setTimeout(gone, ms); toastCatch();
+  el._gone = gone; tapTimer(gone, ms); toastCatch();
   if(kind === 'ok'){ try{ tone({f:660, dur:.18, vol:.05}); tone({f:990, dur:.25, vol:.04, at:.08}); }catch(e){} }
 }
 function toastCatch(){
@@ -9563,7 +9573,7 @@ function laBubble(ch, line, ri, pri){
   const gone = () => { if(!el.isConnected) return; el.classList.remove('on'); if(ring) ring.remove(); setTimeout(() => el.remove(), 200); if(laCur && laCur.el === el) laCur = null; };
   const eat = e => { e.stopPropagation(); e.preventDefault(); gone(); };
   el.addEventListener('pointerdown', eat); el.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); });
-  setTimeout(gone, MSG_MS);   // v154
+  tapTimer(gone, MSG_MS);   // v154, v265: until tapped
   const q = el.getBoundingClientRect(); return q.height > 0 && q.bottom <= innerHeight + 1 && q.top >= -1;
 }
 // your move resolved (after its capture effects): the mover is the speaker
@@ -9655,7 +9665,7 @@ function laIntroShow(){
     document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
     try{ tone({f:523, dur:.12, vol:.04}); tone({f:784, dur:.18, vol:.035, at:.1}); }catch(e){}
     let done = false; const gone = () => { if(done) return; done = true; el.classList.add('out'); setTimeout(() => { el.remove(); laIntroShow(); }, 280); };
-    el._gone = gone; el.addEventListener('pointerdown', gone); setTimeout(gone, msgT(7000));
+    el._gone = gone; tapCue(el.querySelector('.ri-card') || el); el.addEventListener('pointerdown', gone); tapTimer(gone, 7000);
   }catch(e){}
 }
 function laProfile(ch, t){ const acc = laAccText(ch.acc);
@@ -9960,8 +9970,30 @@ function victorySound(l, big){
 function vTimeline(ov, minMs){
   const born = performance.now(); let skip = false, wake = null;
   ov.addEventListener('pointerdown', e => { e.preventDefault(); if(performance.now() - born >= minMs){ skip = true; wake && wake(); } });
-  return {wait: ms => skip ? Promise.resolve() : new Promise(r => { const t = setTimeout(r, calm ? Math.min(ms, 700) : ms); wake = () => { clearTimeout(t); r(); }; }), skipped: () => skip};
+  return {wait: ms => skip ? Promise.resolve() : new Promise(r => { const t = ms >= TAP_HOLD ? 0 : setTimeout(r, calm ? Math.min(ms, 700) : ms); wake = () => { clearTimeout(t); r(); }; }), skipped: () => skip};
 }
+// v265: if a victory animation throws, clear it away so the rewards window can still open (the win is already saved)
+function vRescue(err){ try{ console.error(err); }catch(e){} document.querySelectorAll('.vict').forEach(x => x.remove()); busy = false; try{ musicDip(1); }catch(e){} }
+/* v265 NEVER STUCK AFTER A MATCH: the board is still up, the match is over (and already saved), and nothing is showing
+   that a tap could move on (no window, animation or scene) for 6 seconds: offer a Continue that goes where the game
+   would have gone (the store, or the title screen when the run has ended). */
+let stallSince = 0;
+function stallCheck(){ try{
+  const dead = app.classList.contains('play') && !document.body.classList.contains('peeking') && (!B || B.done)
+    && !document.querySelector('.modal, .vict, .endhold, .ending, .lwalk, .passage, .lachap, .landintro, .coach, .recintro, .carrive, #splash');
+  if(!dead){ stallSince = 0; return; }
+  if(!stallSince){ stallSince = Date.now(); return; }
+  if(Date.now() - stallSince < 6000) return;
+  stallSince = 0; stallRescue();
+}catch(e){} }
+function stallRescue(){
+  busy = false; document.querySelectorAll('.vict').forEach(x => x.remove());
+  (window.__stall = window.__stall || []).push({at:Date.now(), run:!!RUN, b:!!B});
+  const m = modal(`<h2>Match over</h2><p style="margin:0 0 12px">Your result is saved. Tap Continue to carry on.</p><button class="btn" id="stallgo">Continue</button>`, null);
+  m.classList.add('stallfix');
+  m.querySelector('#stallgo').onclick = () => { m.remove(); if(RUN && !RUN.gauntlet && !MATCH && !RUN.won) shop(); else title(); };
+}
+{ const iv = setInterval(stallCheck, 1500); if(iv && iv.unref) iv.unref(); }   // (unref: never keeps a test runner alive)
 function vOverlay(cls, l){
   const st = VICTORY_STYLE[l] || VICTORY_STYLE.street;
   const ov = document.createElement('div'); ov.className = 'vict ' + cls; ov.dataset.land = l;
@@ -9980,7 +10012,7 @@ async function stageWinIntro(l, score, name, opp, captureFinish){
   victorySound(l, false);
   const bd = $('#bw'); if(bd && !calm) bd.animate([{transform:'scale(1)'},{transform:'scale(1.012)'},{transform:'scale(1)'}], {duration:260});
   requestAnimationFrame(() => ov.classList.add('in'));
-  await T.wait(msgT(4500));   // v154: readable
+  tapCue(ov.querySelector('.vcard')); await T.wait(msgT(4500));   // v154: readable; v265: until tapped
   ov.classList.add('out'); await T.wait(220); ov.remove(); if(view === battleView) busy = false;
 }
 // 2) ruler defeated: board stays, darkens, music dips (no restart), name reveal (~3s, tap after 1s)
@@ -9994,7 +10026,7 @@ async function rulerDefeatIntro(l, rulerName){
   victorySound(l, true);
   requestAnimationFrame(() => ov.classList.add('in'));
   await T.wait(600); ov.classList.add('name');
-  await T.wait(1800);
+  tapCue(ov.querySelector('.vcard')); await T.wait(msgT(1800));   // v265: until tapped
   ov.classList.add('out'); await new Promise(r => setTimeout(r, 260)); ov.remove(); if(view === battleView){ busy = false; musicDip(1); }
 }
 const rulerShort = l => RULERS[l].short || RULERS[l].name.split(/,| the /)[0];
@@ -10150,7 +10182,7 @@ function winBlind(){
   const rewardView = battleView;
   const intro = vRuler && vLand === 'throne' ? Promise.resolve()                       // the Crownless King keeps his own story flow
     : vRuler ? rulerDefeatIntro(vLand, rulerShort(vLand)) : stageWinIntro(vLand, vScore, vName, vOpp, captureFinish);
-  intro.then(() => {
+  intro.catch(vRescue).then(() => {   // v265: a broken animation still reaches the rewards
   if(rewardView !== battleView) return;
   const m = modal(html, null); m.classList.add('vicm'); addPeek(m, vLog);
   let paid = false;
@@ -10536,14 +10568,16 @@ function endingSounds(){   // minimal: stone, wind, a low rumble, crown resonanc
 }
 function endingKit(ov){
   const E = {ov, stop:false, STOP:{stop:1}, lockUntil:0, skipHold:null, wake:new Set(), txt:ov.querySelector('.en-txt')};
+  if(!ov.querySelector('.en-tapcue')) ov.insertAdjacentHTML('beforeend', '<small class="en-tapcue" aria-hidden="true">Tap to continue</small>');   // v265
   E.halt = () => { if(E.stop) return; E.stop = true; [...E.wake].forEach(f => f()); };
   const timer = (ms, skippable) => new Promise((res, rej) => {
     if(E.stop) return rej(E.STOP);
     const t0 = performance.now(); let t;
-    const done = () => { clearTimeout(t); E.wake.delete(done); if(skippable) E.skipHold = null; E.stop ? rej(E.STOP) : res(); };
-    t = setTimeout(done, ms); E.wake.add(done);
+    const done = () => { clearTimeout(t); E.wake.delete(done); if(skippable){ E.skipHold = null; ov.classList.remove('en-wait'); } E.stop ? rej(E.STOP) : res(); };
+    t = skippable && !window.__msgScale ? 0 : setTimeout(done, ms); E.wake.add(done);   // v265: a line waits for your tap
+    if(skippable) ov.classList.add('en-wait');
     // tap to advance: only a text beat, only after it has been up for 1s, and never two beats from one burst of taps
-    if(skippable) E.skipHold = () => { const now = performance.now(); if(now - t0 < 1000 || now < E.lockUntil) return; E.lockUntil = now + 1500; done(); };
+    if(skippable) E.skipHold = () => { const now = performance.now(); if(now - t0 < 500 || now < E.lockUntil) return; E.lockUntil = now + 600; done(); };
   });
   E.wait = ms => timer(ms, false);
   E.hold = ms => timer(ms, true);
@@ -11226,7 +11260,7 @@ function bindArmy(root, canRelease){
     const rb = document.getElementById('relp');
     if(rb) rb.onclick = e => {
       e.stopPropagation();
-      if(!rb.dataset.sure){ rb.dataset.sure = 1; rb.textContent = `Tap again to release this ${T0.name}`; rb.classList.add('red'); clearTimeout(tipT); tipT = setTimeout(hideTip, 5000); return; }
+      if(!rb.dataset.sure){ rb.dataset.sure = 1; rb.textContent = `Tap again to release this ${T0.name}`; rb.classList.add('red'); clearTimeout(tipT); tipT = tapTimer(hideTip, 5000); return; }
       RUN.money += releaseValue(x); RUN.roster.splice(ri, 1); sfx.coin(); save(); hideTip(); shop();
     };
   });
