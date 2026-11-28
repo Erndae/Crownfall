@@ -28,7 +28,7 @@ assert(src.includes("if(victim && B.pact && B.pact.k === 'fury'){ mult += (B.pac
 assert(src.includes("const pactCash = B.pact && B.pact.k === 'greed' ? B.pact.cash || 0 : 0;")&&src.includes('+ chal.cash + pactCash;'));
 E('B=null;RUN.pactPending=undefined');E('hungerApply()');
 // choices are counted for this campaign only
-E('ACH.campaign_epoch=111;delete ACH.hunger');E("hungerNote('fed');hungerNote('fed');hungerNote('refused')");{const t=JSON.parse(E('JSON.stringify(hungerTally())'));delete t.byLand;assert.deepEqual(t,{ep:111,fed:2,refused:1});}   // v259 adds byLand
+E('ACH.campaign_epoch=111;delete ACH.hunger');E("hungerNote('fed');hungerNote('fed');hungerNote('refused')");{const t=JSON.parse(E('JSON.stringify(hungerTally())'));delete t.byLand;delete t.refByLand;assert.deepEqual(t,{ep:111,fed:2,refused:1});}   // v259 adds byLand
 E('ACH.campaign_epoch=222');assert.deepEqual(JSON.parse(E('JSON.stringify(hungerTally())')),{ep:222,fed:0,refused:0},'a new campaign starts clean');
 // wiring and endings
 assert(src.includes("$('#play').onclick = () => hungerAsk(startBlind);")&&src.includes('hungerApply();   // v223'));

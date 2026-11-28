@@ -576,3 +576,12 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - The code carries everything: Campaign (with any fight in progress), Daily Run and records, achievements, your Crownrunner and sound/music settings. It is compressed and has a check, so a code cut off while copying is refused instead of loading half a save.
 - Loading keeps this browser's previous progress once: **Undo last load** puts it back.
 - Tests: `validate-v261.cjs`.
+
+## v263 — the Hunger feeds its Ruler
+- The Hunger lives in the crowns, so what you feed it in a Land now goes to that Land's Ruler (Vex, Aldric, Athena, Morwen; not the Fallen Throne).
+- Each bargain you take in a Land arms one more of that Ruler's strongest officers for the Ruler's fight (up to 2). Enemy Armor in a Ruler fight still stops at 3 pieces; past that, a feed raises the score target 10% instead.
+- Refuse it every time it comes in a Land and that Ruler goes hungry: score target −10% in the Ruler's fight.
+- The bargain says so ("Feed it here and King Aldric grows stronger. Refuse it and King Aldric goes hungry."), the Ruler's fight opens with a note saying what changed, and each Ruler has a new opening line for fed and for starved.
+- Refusals are now counted per Land (feeding already was, since v259). Older saves start counting now.
+- Playtest (Ruler's Road, Normal, 64 fights per row, the tool's simplified player): no Armor 39% wins, 1 Armored piece 32%, 2 Armored pieces 25%.
+- Tests: `validate-v263.cjs`; v223 check updated.

@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=262"></script>
-<script src="piece-designs.js?v=262"></script>
-<script src="character-style.js?v=262"></script>
-<script src="campaign-opponents.js?v=262"></script>
-<script src="campaign-dialogue.js?v=262"></script>
-<link rel="stylesheet" href="character-style.css?v=262">
+<script src="gameplay-polish.js?v=263"></script>
+<script src="piece-designs.js?v=263"></script>
+<script src="character-style.js?v=263"></script>
+<script src="campaign-opponents.js?v=263"></script>
+<script src="campaign-dialogue.js?v=263"></script>
+<link rel="stylesheet" href="character-style.css?v=263">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2317,10 +2317,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=262">
-<link rel="stylesheet" href="ruler-style.css?v=262">
-<link rel="stylesheet" href="gameplay-polish.css?v=262">
-<link rel="stylesheet" href="storybook.css?v=262">
+<link rel="stylesheet" href="city-board.css?v=263">
+<link rel="stylesheet" href="ruler-style.css?v=263">
+<link rel="stylesheet" href="gameplay-polish.css?v=263">
+<link rel="stylesheet" href="storybook.css?v=263">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3716,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 262;
+const GAME_VERSION = 263;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5206,6 +5206,8 @@ function storyLines(o){
       if(W.branch === 'wore' && W.king) o.intro = `Once I was ${W.king}. I said the same thing you're about to say.`;
       if(W.branch === 'broke' && W.ruler) o.intro = `Once I was ${W.ruler}. I fed it more than anyone, and it remembered. You broke my crown, ${nm || 'Bearer'}. It grew back.`; }
     if(W && W.branch === 'wore' && o.ruler && fresh && WHEEL_RULER[o.name]) o.intro = WHEEL_RULER[o.name]; }
+  { const r = o.ruler && RULER_HUNGER[o.name] && !MATCH ? rulerHunger(land()) : null;   // v263: fed or starved by you in this Land
+    if(r && !(o.name === 'Morwen the Shadow Queen' && n === WORLD_TOTAL - 1)) o.intro = RULER_HUNGER[o.name][r.k]; }
   if(nm && o.name === 'The Crownless King' && !fallenRecord() && !ngStory()) o.intro = throneCrowns() ? `Again, ${nm}? The throne remembers you.` : crownsReforged() ? `You broke my crown, ${nm}. They gathered the pieces. Somebody always does.` : `Welcome home, ${nm}. Every crown you carry was once mine. I have come to take them back.`;   // v218
   // v216: the throne's hold on the Lands. After the first World Crown, about one ordinary opponent in three sounds released
   // when they lose (the same line for the same opponent). Hints only: nobody names the throne or says what it does.
@@ -6385,6 +6387,7 @@ const hungerTaken = () => hungerTally().taken || [];
 function namesList(a, max = 4){ if(!a.length) return ''; if(a.length > max) return `${a.slice(0, max - 1).join(', ')} and ${a.length - max + 1} others`;
   return a.length === 1 ? a[0] : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
 function hungerNote(k){ const h = hungerTally(); h[k] = (h[k] || 0) + 1; if(k === 'fed' && RUN && RUN.land){ h.byLand = h.byLand || {}; h.byLand[RUN.land] = (+h.byLand[RUN.land] || 0) + 1; }   // v259: for the Wheel
+  if(k === 'refused' && RUN && RUN.land){ h.refByLand = h.refByLand || {}; h.refByLand[RUN.land] = (+h.refByLand[RUN.land] || 0) + 1; }   // v263: a starved Ruler
   ACH.hunger = h; saveAch(); if(k === 'fed' && h.fed >= HUNGER_FED_ACH) unlockAch('sa_fed', false); }
 const hungerKey = () => RUN ? [RUN.land, RUN.circuit, RUN.ante].join('|') : '';
 function hungerDue(){ return !!(RUN && !MATCH && !RUN.gauntlet && RUN.blind === 2 && (baseCrowns() >= 1 || edictOn('hungry')) && RUN.pactKey !== hungerKey()); }
@@ -6425,7 +6428,7 @@ function hungerAsk(go){
   const m = modal(`<div class="hunger"><small>The Hunger whispers</small><h2>“${['', 'Win.', 'More.', 'Make them kneel.', 'Come home.'][o.n]}”</h2>
     <p>The Hunger rarely comes. Each World Crown you carry makes its bargain bigger, and its price real.</p>${(() => { const h = hungerTally(); return h.fed + h.refused ? `<p class="hg-so">So far: fed ${h.fed} · refused ${h.refused}</p>` : ''; })()}
     <div class="hg-deal"><span class="hg-boon"><b>You gain</b>${o.boon}</span><span class="hg-cost"><b>It takes</b>${o.cost}</span></div>${o.lasting ? '<p class="hg-so hg-last">This bargain lasts beyond this battle.</p>' : ''}
-    ${edictOn('hungry') ? '<p class="hg-so">Hungry Crowns: refusing costs $2.</p>' : ''}<div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse${edictOn('hungry') ? ' · $2' : ''}</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
+    ${rulerHungerNote()}${edictOn('hungry') ? '<p class="hg-so">Hungry Crowns: refusing costs $2.</p>' : ''}<div class="hg-btns"><button class="btn ghost" id="hgNo">Refuse${edictOn('hungry') ? ' · $2' : ''}</button><button class="btn red" id="hgYes">Take it</button></div></div>`);
   let done = false; const pick = yes => { if(done) return; done = true; m.remove();
     if(yes){ RUN.pactPending = o; if(o.k === 'reach') RUN.money = Math.max(0, RUN.money - o.pay);
       if(o.k === 'blood'){ const pi = hungerPawnAt(); if(pi >= 0) hungerTake(RUN.roster.splice(pi, 1)[0]); if(o.bt){ RUN.lv[o.bt] = Math.min(LV_MAX, effLv(o.bt) + 1); normLv(RUN); } }   // v236: for good
@@ -6444,6 +6447,40 @@ function hungerApply(){   // at the start of the Stage Battle the bargain was ma
   if(o.k === 'fury') strongest('en').slice(0, o.armor || o.n + 1).forEach(x => { x.q.sh = (x.q.sh || 0) + 1; });
   logPos(`The Hunger's bargain: ${o.boon}. ${o.cost}.`, -1, -1, 'fx');
 }
+/* v263 THE HUNGER FEEDS ITS RULER: the Hunger lives in the crowns, so what you feed it in a Land goes to that Land's Ruler.
+   Each bargain taken in a Land arms one more of the Ruler's officers (strongest first, up to 2). Enemy Armor in a Ruler
+   fight stops at 3 pieces (with New Game+ Armor, v258); past that a feed raises the score target 10% instead. Refuse it
+   every time it comes in a Land and that Ruler goes hungry: score target -10%. The four Lands only (not the throne). */
+const RH_MAX = 2, RH_ARMOR_CAP = 3, RH_PCT = 10;
+const RULER_HUNGER = {
+  'Kingpin Vex':{fed:'You fed it on my streets. It paid me back, every bit.', starved:'You starved it out here. My crew can feel it. So can I.'},
+  'King Aldric the Iron-Handed':{fed:'You fed it in my kingdom. My iron drank every drop.', starved:'You refused it in my kingdom. My crown has never felt so light.'},
+  'Athena, Queen of Olympus':{fed:'Every bargain you made in Olympus, I felt. Thank you for the strength.', starved:'You refused it every time. Wise. It leaves me weaker, and I know it.'},
+  'Morwen the Shadow Queen':{fed:'You fed it under my moon. It came to me hungry and left me strong.', starved:'You let it starve in my shadows. I am thinner for it.'}};
+function rulerHunger(l){ l = l || land(); if(!RUN || RUN.gauntlet || MATCH || !BASE_LANDS.includes(l)) return null;
+  const h = hungerTally(), fed = +((h.byLand || {})[l]) || 0, ref = +((h.refByLand || {})[l]) || 0;
+  return fed ? {k:'fed', n:Math.min(RH_MAX, fed), fed} : ref ? {k:'starved', n:ref} : null; }
+function rulerHungerNote(){ const l = land(); if(!RUN || RUN.gauntlet || MATCH || !BASE_LANDS.includes(l) || landWon(l)) return '';
+  const nm = rulerShort(l); return `<p class="hg-so">Feed it here and ${nm} grows stronger. Refuse it and ${nm} goes hungry.</p>`; }
+function rulerHungerApply(){
+  if(!B || !rulerFight() || RUN.blind !== 2) return; const r = rulerHunger(); if(!r) return;   // the Ruler's own fight only
+  const nm = rulerShort(land());
+  if(r.k === 'starved'){ B.target = Math.max(10, Math.round(B.target * (1 - RH_PCT / 100) / 10) * 10); B.rh = {k:'starved', pct:RH_PCT};
+    logPos(`${nm} went hungry: score target -${RH_PCT}%.`, -1, -1, 'fx'); return; }
+  let armored = B.board.filter(q => q && q.side === 'en' && q.sh > 0).length, pct = 0; const got = [];
+  const cand = B.board.filter(q => q && q.side === 'en' && q.t !== 'K' && q.t !== 'P' && !(q.sh > 0)).sort((a, b) => TYPE[b.t].val - TYPE[a.t].val);
+  for(let i = 0; i < r.n; i++){ const q = cand[got.length]; if(q && armored < RH_ARMOR_CAP){ q.sh = 1; got.push(q.t); armored++; } else pct += RH_PCT; }
+  if(pct) B.target = Math.max(10, Math.round(B.target * (1 + pct / 100) / 10) * 10);
+  B.rh = {k:'fed', n:r.n, got, pct};
+  logPos(`${nm} grew strong on what you fed the Hunger: ${rulerHungerFx(B.rh)}.`, -1, -1, 'fx');
+}
+function rulerHungerFx(x){ const parts = [];
+  if(x.got && x.got.length){ const nm = x.got.map(t => TYPE[t].name); parts.push(`enemy ${nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]} start${nm.length > 1 ? '' : 's'} Armored`); }
+  if(x.pct) parts.push(`score target +${x.pct}%`);
+  return parts.join(', '); }
+function rulerHungerTip(){ const x = B && B.rh; if(!x) return ''; const nm = rulerShort(land());
+  return x.k === 'starved' ? `<b>You starved the Hunger in this Land</b><br>${nm} is weaker for it: score target −${x.pct}%.`
+    : `<b>${nm} grew strong on what you fed the Hunger here</b><br>${(s => s[0].toUpperCase() + s.slice(1))(rulerHungerFx(x))}.`; }
 function startBlind(){ try{ laClear(); }catch(e){} preloadOppSheets();   // v237
   migrateIntroRule(RUN, B);
   if(RUN && !RUN.gauntlet && !RUN.match && !MATCH && RUN.circuit !== 'ruler' && RUN.ante === 1) RUN.introStarted = true;
@@ -6478,6 +6515,10 @@ function startBlind(){ try{ laClear(); }catch(e){} preloadOppSheets();   // v237
   B.vantage = vantagePoints(B.board); B.bounty = bountyPick(B.board);   // v200: Rooftop Kings and Midnight Market fights
   B.banner = bannerSquare(B.board);   // v205: Ruler fights
   ngArmor(B.board);   // v210: New Game+
+  rulerHungerApply();   // v263: the Ruler gets what you fed the Hunger in this Land
+  if(B.rh){ const tip = rulerHungerTip(), fight = B; let tries = 0;
+    const later = () => { if(!app.classList.contains('play') || B !== fight || B.done) return; if((document.querySelector('.oppin, .coach, .modal, #tip') || coachOn || (coachQ.length && !coachCool)) && tries++ < 150) return setTimeout(later, 400); showTip(tip); };
+    setTimeout(later, 2200); }
   edictsApply();   // v226
   hungerApply();   // v223: the Hunger's bargain, if one was taken for this battle
   B.board.forEach(q => { if(q && q.side === 'me' && q.t !== 'K' && hasE(q, 'steel')) q.sh = Math.max(q.sh || 0, 1); });   // v137 Reinforced
