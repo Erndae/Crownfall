@@ -585,3 +585,14 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Refusals are now counted per Land (feeding already was, since v259). Older saves start counting now.
 - Playtest (Ruler's Road, Normal, 64 fights per row, the tool's simplified player): no Armor 39% wins, 1 Armored piece 32%, 2 Armored pieces 25%.
 - Tests: `validate-v263.cjs`; v223 check updated.
+
+## v264 — lettering and color
+- v245 set nearly all text in Georgia and the phone's own system font, so the game read plain and every Land looked the same. The fonts each Land already loads are now used again:
+  - Headings, Land names, opponent and Ruler names, crown names and buttons use the Land's own lettering: Crown City Permanent Marker, the Iron Kingdom MedievalSharp, the Olympian Court and the Fallen Throne Cinzel, the Shattered Realm Cinzel Decorative.
+  - Body text (descriptions, tips, story lines) is Rubik on every phone.
+  - Numbers (score, target, cash, Material, Brilliance, the Journey's crown count) are Barlow Condensed bold, like a scoreboard.
+  - Crown City keeps the marker for big words; its small labels and the move hint use clean lettering so they stay readable.
+  - The Journey shows every Land's card in that Land's own lettering, whichever Land you are in.
+- Color with a purpose: opponent names and tip headings in the Land's accent color, score and the fight's target in gold, Crown City's store headings in gold.
+- Readability fixes: Crown City's store headings, notes and "How it works" were dark text on a dark page; the Material number was black on dark blue; the Fallen Throne's opponent names are a lighter red.
+- Tests: `validate-v264.cjs`.

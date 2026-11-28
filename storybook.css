@@ -146,3 +146,42 @@ body[data-pack] #app.play .cbox.chips {background:#365b72}
 body[data-pack] #app.play .cbox.mult {background:#834638}
 body[data-pack] :is(.btn.blue,.btn.gbtn):not(:disabled) {background:#365b72;color:#fff2dc}
 body[data-pack] .btn.red:not(:disabled) {background:#813c39;color:#fff2dc}
+
+/* v264 LETTERING AND COLOR: v245 set nearly all text in Georgia and the phone's own font. Each Land now speaks in its
+   own lettering (the fonts the game already loads), body text is Rubik on every phone, numbers are Barlow Condensed,
+   and color carries meaning: the Land's accent for names, gold for money, scores and section headings. */
+body[data-pack]{--body:"Rubik","Helvetica Neue",Arial,sans-serif;--num:"Barlow Condensed","Arial Narrow",sans-serif;--lt-gold:#f3c969;--lt-cream:#f6ead3}
+body[data-pack="street"],body[data-pack="gauntlet"],body[data-pack="arena"]{--display:"Permanent Marker","Comic Sans MS",cursive;--tag:"Permanent Marker","Comic Sans MS",cursive}
+body[data-pack="medieval"]{--display:"MedievalSharp",serif;--tag:"MedievalSharp",serif}
+body[data-pack="greek"]{--display:"Cinzel",serif;--tag:"Cinzel",serif}
+body[data-pack="fantasy"]{--display:"Cinzel Decorative","Cinzel",serif;--tag:"Cinzel Decorative","Cinzel",serif}
+body[data-pack="throne"]{--display:"Cinzel",serif;--tag:"Cinzel",serif}
+/* the containers v245 pinned to Georgia follow the Land too */
+body[data-pack] :is(.lw-head,.landintro,.en-cap,.recintro,.bcard,.landhero){--display:var(--tag)}
+/* the Journey: every Land's card in its own lettering, whichever Land you are in */
+.jland[data-p="street"]{--display:"Permanent Marker","Comic Sans MS",cursive;--tag:"Permanent Marker","Comic Sans MS",cursive}
+.jland[data-p="medieval"]{--display:"MedievalSharp",serif;--tag:"MedievalSharp",serif}
+.jland[data-p="greek"],.jland[data-p="throne"]{--display:"Cinzel",serif;--tag:"Cinzel",serif}
+.jland[data-p="fantasy"]{--display:"Cinzel Decorative","Cinzel",serif;--tag:"Cinzel Decorative","Cinzel",serif}
+.jland :is(.jhero b,.jrul b,.jslot small,.jlock b){font-family:var(--tag)}
+/* numbers read like a scoreboard */
+body[data-pack] :is(#sw,#cash,.money,#score,#cc,#cm,#goalLabel,.coord,.gstats b,.bests b,#mvolv){font-family:var(--num)!important;font-weight:700}
+body[data-pack] #goalLabel{letter-spacing:.06em}
+/* Crown City's marker is for big words; small labels and the move hint stay clean */
+body[data-pack="street"] :is(.otag,.sigchip,#app.play small,#moodTxt,.jstate,.setg .btn,.tagline,.kind,.gmc.empty,.savecodebtn small){font-family:var(--num);font-weight:700;letter-spacing:.06em}
+body[data-pack="street"] #hand{font-family:var(--body);font-weight:500}
+/* color */
+body[data-pack] :is(.pblind b,.oppin b,.encounter-brief b,#tip b:first-child){color:var(--name-col,var(--lt-accent,#ffe14d))}
+body[data-pack="throne"]{--name-col:#ff6b7d}   /* the throne's red is too dark for names on its dark panels */
+.jland .jrul b{color:var(--lt-cream)}
+body[data-pack] :is(#score,#goalLabel,.bests b){color:var(--lt-gold)}
+/* Crown City's store is dark (the others are paper): its headings and notes were dark ink on a dark page */
+body[data-pack="street"] .shopscr :is(.invlab,.invlab b,.cardrow .lab,.armystrip .lab,.armystrip .lab b,.ssec){color:var(--lt-gold)}
+body[data-pack] .shopscr .shoptitle h2{text-shadow:0 2px 0 rgba(0,0,0,.35)}
+body[data-pack="street"] .shopscr :is(.recnote,.training-help){color:#d9ccb4}
+body[data-pack="street"] .shopscr .armycap{color:#d9ccb4;border-color:#8d8170}
+.jland[data-p="street"] :is(.jstate,.jcount,.jstep,.jslot em,.jpips i){font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;letter-spacing:.06em}
+/* the Journey's crown count is a number */
+.jworld b,.jworld b i{font-family:"Barlow Condensed","Arial Narrow",sans-serif!important;font-weight:700}
+/* the Material box went dark blue in v245 but kept black text */
+body[data-pack] #app.play .cbox.chips{color:#f6ead3}

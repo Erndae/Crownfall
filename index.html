@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=263"></script>
-<script src="piece-designs.js?v=263"></script>
-<script src="character-style.js?v=263"></script>
-<script src="campaign-opponents.js?v=263"></script>
-<script src="campaign-dialogue.js?v=263"></script>
-<link rel="stylesheet" href="character-style.css?v=263">
+<script src="gameplay-polish.js?v=264"></script>
+<script src="piece-designs.js?v=264"></script>
+<script src="character-style.js?v=264"></script>
+<script src="campaign-opponents.js?v=264"></script>
+<script src="campaign-dialogue.js?v=264"></script>
+<link rel="stylesheet" href="character-style.css?v=264">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2317,10 +2317,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=263">
-<link rel="stylesheet" href="ruler-style.css?v=263">
-<link rel="stylesheet" href="gameplay-polish.css?v=263">
-<link rel="stylesheet" href="storybook.css?v=263">
+<link rel="stylesheet" href="city-board.css?v=264">
+<link rel="stylesheet" href="ruler-style.css?v=264">
+<link rel="stylesheet" href="gameplay-polish.css?v=264">
+<link rel="stylesheet" href="storybook.css?v=264">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3445,13 +3445,13 @@ function landsScreen(after){
       <span class="jimg">${veil ? '<span class="jveil">?</span>' : art ? `<img class="${g ? '' : 'sil'}" src="${art}" alt="" loading="lazy">` : landCrownImage(l, g)}</span>
       ${g ? '<i class="jchk">✓</i>' : ''}<small>${veil ? '???' : landCrownName(l)}</small><em>${l === 'throne' ? 'The final crown' : g ? 'World Crown' : 'World Crown · not yet earned'}</em></button>`; };
   const chapter = (x, i) => { const l = x.id, R = RULERS[l], art = LAND_ART[l], won = landWon(l), n = conqCount(l);
-    if(!landOpen(l)) return `<section class="jland locked" style="--lc:${R.gem}">
+    if(!landOpen(l)) return `<section class="jland locked" data-p="${l}" style="--lc:${R.gem}">
       <div class="jhero dark">${art ? `<img src="${art}" alt="" loading="lazy">` : ''}<span class="lh-shade"></span><b>${x.name}</b></div>
       <span class="jstate locked">Locked</span><i class="jstep">${LAND_NUM[l]}</i>
       <div class="jlock"><span>🔒</span><b>${l === 'throne' ? `Requires ${WORLD_TOTAL} / ${WORLD_TOTAL} World Crowns` : `Conquer ${PACKS.find(p => p.id === BASE_LANDS[BASE_LANDS.indexOf(l) - 1]).name}`}</b>${l === 'throne' ? `<small>You have ${W} / ${WORLD_TOTAL}</small><span class="jmini">${BASE_LANDS.map(x => `<i class="${landWon(x) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div>
       ${l === 'throne' ? '' : `<div class="jone">${slot(l)}</div>`}</section>`;
     const st = won ? 'done' : 'cur', pipsJ = l === 'throne' ? '' : `<span class="jpips">${CIRCUITS.map(c => `<i class="${circuitDone(l, c.id) ? 'on' : ''}" style="--pc:${(csDef(l, c.id) || {}).c2 || 'var(--lc)'}"></i>`).join('')}<i class="r${won ? ' on' : ''}">♛</i></span>`;
-    return `<section class="jland ${won ? 'done' : 'cur'} ${l === PACK ? 'on' : ''} ${l === 'throne' ? 'throne' : ''}" style="--lc:${R.gem}"><span class="jstate ${st}">${won ? 'Completed' : 'Current'}</span><i class="jstep">${LAND_NUM[l]}</i>
+    return `<section class="jland ${won ? 'done' : 'cur'} ${l === PACK ? 'on' : ''} ${l === 'throne' ? 'throne' : ''}" data-p="${l}" style="--lc:${R.gem}"><span class="jstate ${st}">${won ? 'Completed' : 'Current'}</span><i class="jstep">${LAND_NUM[l]}</i>
       <button class="jhero" data-p="${l}">${art ? `<img src="${art}" alt="" loading="${i ? 'lazy' : 'eager'}">` : ''}<span class="lh-shade"></span><b>${x.name}</b><i class="jnum">${l === 'throne' ? 'The end of the road' : `Land ${LAND_NUM[l]}`}</i></button>
       <div class="jrul">${rulerFace(l, 'talk') || landCrownImage(l, true)}<span><small>Ruler</small><b>${R.name}</b></span><span class="jcount">${won ? 'Conquered' : `${n} / ${CIRCUITS.length} circuits`}${pipsJ}</span></div>
       ${landsFree() && FREED_SAID[l] ? `<p class="jfree"><small>The morning the crown broke</small>“${FREED_SAID[l]}”</p>` : ''}
@@ -3716,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 263;
+const GAME_VERSION = 264;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
