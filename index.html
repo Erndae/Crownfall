@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=260"></script>
-<script src="piece-designs.js?v=260"></script>
-<script src="character-style.js?v=260"></script>
-<script src="campaign-opponents.js?v=260"></script>
-<script src="campaign-dialogue.js?v=260"></script>
-<link rel="stylesheet" href="character-style.css?v=260">
+<script src="gameplay-polish.js?v=261"></script>
+<script src="piece-designs.js?v=261"></script>
+<script src="character-style.js?v=261"></script>
+<script src="campaign-opponents.js?v=261"></script>
+<script src="campaign-dialogue.js?v=261"></script>
+<link rel="stylesheet" href="character-style.css?v=261">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -705,20 +705,14 @@ html{overflow-x:hidden} body{overflow-x:clip;max-width:100%;margin:0}
 .loremark{width:26px;height:26px;padding:0;border:0;background:none;color:var(--enemy,#ff3d9a);opacity:.55;transform:rotate(-8deg)}
 .loremark svg{width:26px;height:26px}
 body[data-pack="street"] .loremark{color:#ff3d9a;filter:drop-shadow(0 0 3px rgba(255,61,154,.6))}
-.reveal{position:relative;width:260px;height:260px;margin:0 auto}
-.reveal .rc{position:absolute;width:40px;height:40px;transform:translate(-50%,-50%);opacity:0;animation:rcin .6s ease-out forwards}
+.reveal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:min(78vw,286px);margin:0 auto 4px}
+.reveal .rc{display:grid;place-items:center;aspect-ratio:1.65;border:1px solid #8f7653;border-radius:5px;overflow:hidden;background:#211c1b;box-shadow:0 2px 7px #0008;animation:rcin .55s ease-out both}
+.reveal .rc img{width:100%;height:100%;object-fit:cover;display:block}
 .reveal .rc svg{width:40px;height:40px}
-.reveal .rc.art{width:64px;height:64px;border-radius:50%;overflow:hidden;border:2px solid #ffd23d;box-shadow:0 0 12px rgba(255,210,61,.6);background:#0d0d0d}
-.reveal .rc.art img{width:100%;height:100%;object-fit:cover;display:block}
-.reveal .rc svg .frac{stroke:#ffd23d;opacity:1;stroke-width:1.6;filter:drop-shadow(0 0 3px #ffd23d)}
-@keyframes rcin{from{opacity:0;transform:translate(-50%,-50%) scale(.3)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-.reveal .bigcrown{position:absolute;left:50%;top:50%;width:150px;height:150px;transform:translate(-50%,-50%);fill:none;stroke:#ffd23d;stroke-width:1.4;stroke-linejoin:round;filter:drop-shadow(0 0 8px #ffd23d)}
-.reveal .bigcrown path{stroke-dasharray:160;stroke-dashoffset:160;animation:drawc 2.4s ease-in-out 1.8s forwards}
-.reveal .bigcrown path + path{stroke:#e0263f;filter:drop-shadow(0 0 6px #e0263f)}
-@keyframes drawc{to{stroke-dashoffset:0}}
+@keyframes rcin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .rv1{animation:fadein .8s ease 1s both}.rv2{animation:fadein .8s ease 4.2s both}.rv3{animation:fadein .8s ease 5s both}.rv4{animation:fadein .8s ease 6s both}
 @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){ .reveal .rc,.reveal .bigcrown path,.rv1,.rv2,.rv3,.rv4{animation:none;opacity:1;stroke-dashoffset:0} }
+@media (prefers-reduced-motion: reduce){ .reveal .rc,.rv1,.rv2,.rv3,.rv4{animation:none;opacity:1} }
 .landhero{position:relative;height:clamp(150px,44vw,200px);border-radius:6px;overflow:hidden;border:3px solid #0d0d0d;box-shadow:4px 4px 0 rgba(0,0,0,.6);flex:none}
 .landhero img,.landintro img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 38%}
 .lh-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 0%,rgba(13,13,13,.05) 45%,rgba(13,13,13,.6) 72%,rgba(13,13,13,.94) 100%),radial-gradient(ellipse 70% 55% at 0% 100%,rgba(13,13,13,.75),transparent 70%)}
@@ -1241,7 +1235,6 @@ img.img-fail{visibility:hidden!important;filter:none!important;animation:none!im
 .vict.b4 .vslots,.vict.b4 .vcount{opacity:1;transform:none}
 .vict.b5 .vworld{opacity:1;transform:none}
 .vict.b6 .vbtns,.vict.four.b5 .vbtns{opacity:1;transform:none}
-.vict.four .reveal{height:250px;width:260px}
 .vict.four.b1 .reveal,.vict.four.b1 .vkick{opacity:1;transform:none}
 .vict.four .vk.t1{opacity:0}.vict.four.b2 .vk.t1{opacity:1;transform:none}
 .vict.four .vk.t2{color:#e0263f;font-size:clamp(22px,6.6vw,30px)}.vict.four.b3 .vk.t2{opacity:1;transform:none}
@@ -1249,7 +1242,6 @@ img.img-fail{visibility:hidden!important;filter:none!important;animation:none!im
 .vict.four.b3 .vbg{filter:brightness(.24) blur(4px) grayscale(.2)}
 @media (prefers-reduced-motion: reduce){
   .vict *,.vict .vcard{transition:opacity .2s ease!important;animation:none!important;transform:none!important}
-  .vict .reveal .rc,.vict .reveal .bigcrown{translate:-50% -50%}   /* keep the 4/4 ring centred without its transform */
 }
 
 /* ===== Ruler intro ===== */
@@ -2325,10 +2317,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=260">
-<link rel="stylesheet" href="ruler-style.css?v=260">
-<link rel="stylesheet" href="gameplay-polish.css?v=260">
-<link rel="stylesheet" href="storybook.css?v=260">
+<link rel="stylesheet" href="city-board.css?v=261">
+<link rel="stylesheet" href="ruler-style.css?v=261">
+<link rel="stylesheet" href="gameplay-polish.css?v=261">
+<link rel="stylesheet" href="storybook.css?v=261">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3724,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 260;
+const GAME_VERSION = 261;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -10750,12 +10742,14 @@ function crownCeremony(l, fresh){
 // 4 / 4: the four World Crowns, then the Fallen Throne opens
 function fourthReveal(l){
   musicStop(); sfx.win();
-  const ring = BASE_LANDS.map((x, k) => { const a = (k / 4) * Math.PI * 2 - Math.PI / 2, art = crownArt(x, WORLD_TIER(x));
-    return `<span class="rc${art ? ' art' : ''}" style="left:${50 + Math.cos(a) * 44}%;top:${50 + Math.sin(a) * 37}%;animation-delay:${k * 0.3}s">${art ? `<img src="${art}" alt="">` : landCrownImage(x, true)}</span>`; }).join('');
+  const crowns = BASE_LANDS.map((land, index) => {
+    const art = crownArt(land, WORLD_TIER(land));
+    return `<span class="rc" style="animation-delay:${index * 0.3}s">${art ? `<img src="${art}" alt="${landCrownName(land)}">` : landCrownImage(land, true)}</span>`;
+  }).join('');
   const ov = vOverlay('four', 'throne'); const T = vTimeline(ov, 1000);
   ov.innerHTML = `${LAND_ART.throne ? `<div class="vbg obscured" style="background-image:url('${LAND_ART.throne}')"></div>` : ''}
     <div class="vland">
-      <div class="reveal">${ring}<svg class="bigcrown" viewBox="0 0 40 40" aria-hidden="true"><path d="M5 32 L4 12 L11 19 L14 6 L20 15 L26 6 L29 19 L36 12 L35 32 Z"/><path d="M21 5 L18 15 L22 18 L17 28 L20 35"/></svg></div>
+      <div class="reveal">${crowns}</div>
       <p class="vkick">${landCrownName(l)} claimed</p>
       <b class="vk t1">4 Crowns collected</b>
       <b class="vk t2">The Fallen Throne has opened</b>
