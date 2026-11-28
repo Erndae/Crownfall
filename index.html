@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="gameplay-polish.js?v=261"></script>
-<script src="piece-designs.js?v=261"></script>
-<script src="character-style.js?v=261"></script>
-<script src="campaign-opponents.js?v=261"></script>
-<script src="campaign-dialogue.js?v=261"></script>
-<link rel="stylesheet" href="character-style.css?v=261">
+<script src="gameplay-polish.js?v=262"></script>
+<script src="piece-designs.js?v=262"></script>
+<script src="character-style.js?v=262"></script>
+<script src="campaign-opponents.js?v=262"></script>
+<script src="campaign-dialogue.js?v=262"></script>
+<link rel="stylesheet" href="character-style.css?v=262">
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -2317,10 +2317,10 @@ body[data-pack="gauntlet"] .pblind .sigchip{display:none}
 .scoring-total b{color:var(--brass);font-size:clamp(18px,5vw,26px)}
 @media(prefers-reduced-motion:reduce){.scoring-sequence.bump{animation:none}}
 </style>
-<link rel="stylesheet" href="city-board.css?v=261">
-<link rel="stylesheet" href="ruler-style.css?v=261">
-<link rel="stylesheet" href="gameplay-polish.css?v=261">
-<link rel="stylesheet" href="storybook.css?v=261">
+<link rel="stylesheet" href="city-board.css?v=262">
+<link rel="stylesheet" href="ruler-style.css?v=262">
+<link rel="stylesheet" href="gameplay-polish.css?v=262">
+<link rel="stylesheet" href="storybook.css?v=262">
 <div id="app"></div>
 <div id="rotateOv" aria-live="polite"><i aria-hidden="true">📱</i><b>Rotate your phone</b><span>Crownfall battles are designed for portrait play.</span></div>
 
@@ -3716,7 +3716,7 @@ async function cloudInit(){
 let onTitle = false;
 // ===== build number: the ONE place the version lives. Shown on the title screen and in How to play;
 // the site build reads it to name the service-worker cache 'crownfall-v' + GAME_VERSION. +1 every published update.
-const GAME_VERSION = 261;
+const GAME_VERSION = 262;
 const VERSION_LABEL = () => `v${GAME_VERSION}`;
 const has = id => RUN.relics.includes(id);
 const bossAt = a => RUN.bosses[(a-1) % RUN.bosses.length];
@@ -5730,6 +5730,7 @@ function title(){
     ${inC ? `<div class="bests"><span>Best stage <b>${BEST.ante || '—'}</b></span><span>Best capture <b>${BEST.hand ? BEST.hand.toLocaleString() : '—'}</b></span>${bestCampaign() ? `<span>Best campaign <b>$${bestCampaign().toLocaleString('en-US')}</b></span>` : ''}</div>` : ''}
     <div class="setg three"><button class="btn ghost" id="mus">Music: ${musicOn?'On':'Off'}</button><button class="btn ghost" id="snd">Sound: ${soundOn?'On':'Off'}</button><button class="btn ghost" id="spd">Speed: ${fast?'Fast':'Normal'}</button></div>
     ${musicControls('mvol')}
+    <button class="btn ghost savecodebtn" id="savecode">Save code<small>Back up or move to another phone</small></button>
     <div class="gver" id="gver">Crownfall ${VERSION_LABEL()}</div>
   </section>`;
   { const c = $('#cont'); if(c) c.onclick = () => inC ? continueCampaign() : goMode('campaign', 'cont'); }
@@ -5740,6 +5741,7 @@ function title(){
   $('#gnew').onclick = () => gs ? gNewAsk(gs) : (MODE === 'gauntlet' ? gNewRun() : goMode('gauntlet', 'new'));
   $('#grec').onclick = () => dailyRecords();   // v230
   $('#how').onclick = () => howTo(false);
+  $('#savecode').onclick = () => saveCodeScreen();   // v262
   if(inC){
     if(kingTrainRefunded > 0){ const r = kingTrainRefunded; kingTrainRefunded = 0; setTimeout(() => showTip(`<b>King Training retired: +$${r} refunded</b><br>The King no longer trains. Your King grows through World Crowns.`), 600); }
     if(worldCrowns() > 0 && coachSeen().crown) coach('journey'); }
@@ -5750,6 +5752,95 @@ function title(){
   bindMusicControls(app, 'mvol');
   $('#snd').onclick = e => { soundOn = !soundOn; try{ localStorage.setItem('gambit-sound', soundOn?'on':'off'); }catch(_){} e.target.textContent = 'Sound: ' + (soundOn?'On':'Off'); };
   $('#spd').onclick = e => { fast = !fast; try{ localStorage.setItem('gambit-fast', fast?'on':'off'); }catch(_){} e.target.textContent = 'Speed: ' + (fast?'Fast':'Normal'); };
+}
+/* v262 SAVE CODE: everything Crownfall keeps in this browser (Campaign, Daily Run, records, achievements, your Crownrunner
+   and settings) packed into one code or file, to back it up or carry it to another phone. Loading a code replaces this
+   browser's progress and keeps the old progress once, so the last load can be undone. Reads the raw keys (both storage worlds). */
+const SC_HEAD = 'CROWNFALL1', SC_UNDO = 'crownfall-undo-load';
+const SC_SKIP = new Set(['crownfall-mode', 'crownfall-intent', SC_UNDO]);
+const scKeep = k => /^(cf151[cg]-|crownrunner-)/.test(k) && !/crownfall-lastver$/.test(k) || /^(gambit-(sound|fast)|crownfall-(music|music-vol|chatter|tut|tips|gauntlet-best|gauntlet-history|gauntlet-done|gauntlet-last|daily))$/.test(k);
+function scData(){ const d = {}; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && !SC_SKIP.has(k) && scKeep(k)){ const v = rawGet(k); if(v != null) d[k] = v; } } }catch(e){} return d; }
+function scSum(s){ let h = 0x811c9dc5; for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(16).padStart(8, '0'); }
+const scB64 = u8 => { let s = ''; for(let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+const scUnB64 = t => { const s = atob(t.replace(/-/g, '+').replace(/_/g, '/')); const u = new Uint8Array(s.length); for(let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+async function scPipe(u8, Stream, kind){ const out = new Blob([u8]).stream().pipeThrough(new Stream(kind)); return new Uint8Array(await new Response(out).arrayBuffer()); }
+async function scEncode(d){
+  const json = JSON.stringify({v:1, at:Date.now(), d}), raw = new TextEncoder().encode(json);
+  let z = 'j', body = raw;
+  try{ if(typeof CompressionStream === 'function'){ body = await scPipe(raw, CompressionStream, 'deflate-raw'); z = 'z'; } }catch(e){ body = raw; z = 'j'; }
+  const b = scB64(body); return `${SC_HEAD}.${z}.${b}.${scSum(b)}`;
+}
+async function scDecode(text){
+  const t = String(text || '').replace(/\s+/g, ''), p = t.split('.');
+  if(p[0] !== SC_HEAD || p.length !== 4 || !/^[jz]$/.test(p[1])) throw new Error(t.startsWith(SC_HEAD) ? 'cut' : 'not');
+  if(scSum(p[2]) !== p[3]) throw new Error('cut');
+  let u8; try{ u8 = scUnB64(p[2]); if(p[1] === 'z'){ if(typeof DecompressionStream !== 'function') throw new Error('old'); u8 = await scPipe(u8, DecompressionStream, 'deflate-raw'); } }catch(e){ throw new Error(e && e.message === 'old' ? 'old' : 'cut'); }
+  let x; try{ x = JSON.parse(new TextDecoder().decode(u8)); }catch(e){ throw new Error('cut'); }
+  if(!x || x.v !== 1 || !x.d || typeof x.d !== 'object') throw new Error('not');
+  for(const k of Object.keys(x.d)) if(!scKeep(k) || typeof x.d[k] !== 'string') delete x.d[k];
+  return x;
+}
+function scSummary(x){
+  const d = x.d, j = k => { try{ return JSON.parse(d[k] || 'null'); }catch(e){ return null; } };
+  const ach = j('cf151c-gambit-ach') || {}, ch = j('crownrunner-character-v1') || {};
+  const nm = (() => { try{ const n = cleanName(ch.name || ''); return n.length >= 2 && n !== NAME_DEFAULT ? n : ''; }catch(e){ return ''; } })();
+  const crowns = BASE_LANDS.filter(l => ach[landCrownId(l)]).length, ng = Math.max(0, Math.floor(+ach.ngplus || 0));
+  const at = +(d['cf151c-gambit-savedAt'] || 0) || x.at;
+  const parts = [nm ? `<b>${nm.replace(/</g, '&lt;')}</b>` : '<b>Unnamed Crownrunner</b>', `${crowns} of ${BASE_LANDS.length} crowns`];
+  if(ng) parts.push(ng === 1 ? 'New Game+' : `New Game${'+'.repeat(Math.min(ng, 3))}${ng > 3 ? ` (cycle ${ng})` : ''}`);
+  return `${parts.join(' · ')}<br><small>Saved ${new Date(at).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'})}</small>`;
+}
+function scApply(d, keepUndo){
+  if(keepUndo){ const cur = JSON.stringify({v:1, at:Date.now(), d:scData()}); try{ rawSet(SC_UNDO, cur); }catch(e){} }
+  const old = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && !SC_SKIP.has(k) && scKeep(k)) old.push(k); } }catch(e){}
+  old.forEach(rawDel); Object.keys(d).forEach(k => rawSet(k, d[k]));
+  rawSet('cf151c-gambit-savedAt', String(Date.now()));   // newer than any copy in your Claude account, so cloud save keeps this one
+  rawSet('crownfall-mode', 'campaign'); rawDel('crownfall-intent');
+  try{ location.reload(); }catch(e){}
+}
+const scErr = e => ({cut:'That code is incomplete. Copy the whole code, from CROWNFALL1 to the end, and try again.', old:'This browser is too old to open save codes. Update it, or try another browser.'})[e && e.message] || 'That isn’t a Crownfall save code.';
+function scConfirm(x){
+  const m = modal(`<h2>Load this save?</h2><p class="sc-sum">${scSummary(x)}</p>
+    <p class="muted">This replaces all Crownfall progress in this browser: Campaign, Daily Run, records, achievements and your Crownrunner. Your current progress is kept so you can undo this once.</p>
+    <div class="sc-row"><button class="btn ghost" id="scNo">Cancel</button><button class="btn" id="scYes">Load save</button></div>`, '#scNo');
+  m.querySelector('#scYes').onclick = () => { m.querySelector('#scYes').disabled = true; scApply(x.d, true); };
+}
+function saveCodeScreen(){
+  let undo = null; try{ undo = JSON.parse(rawGet(SC_UNDO) || 'null'); }catch(e){}
+  const m = modal(`<h2>Save code</h2>
+    <p class="muted">Your progress is stored only in this browser. Copy a save code (or save it as a file) to back it up or move it to another phone.</p>
+    <div class="sc-row"><button class="btn" id="scCopy">Copy save code</button><button class="btn ghost" id="scFile">Save as file</button></div>
+    <p class="sc-msg" id="scOut" role="status"></p>
+    <h3 class="sc-h">Load a save code</h3>
+    <textarea class="dshare sc-in" id="scIn" rows="3" placeholder="Paste a save code here" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div class="sc-row"><button class="btn ghost" id="scLoad">Load save code</button><button class="btn ghost" id="scOpen">Open a save file</button></div>
+    <p class="sc-msg sc-bad" id="scErr" role="alert"></p>
+    ${undo && undo.d ? `<button class="btn ghost sc-undo" id="scUndo">Undo last load</button>` : ''}
+    <input type="file" id="scPick" accept=".txt,text/plain" hidden>
+    <button class="btn ghost" id="scClose">Close</button>`, '#scClose');
+  const q = s => m.querySelector(s), out = q('#scOut'), err = q('#scErr');
+  const msg = (el, t) => { el.textContent = t; };
+  const tryLoad = async text => { msg(err, ''); try{ const x = await scDecode(text); scConfirm(x); }catch(e){ msg(err, scErr(e)); } };
+  q('#scCopy').onclick = async () => {
+    const code = await scEncode(scData());
+    try{ await navigator.clipboard.writeText(code); msg(out, 'Save code copied. Paste it somewhere safe, like your notes or an email to yourself.'); sfx.coin(); return; }catch(e){}
+    const ta = q('#scIn'); ta.value = code; ta.focus(); ta.select(); msg(out, 'Copying was blocked. The code is in the box below: select it all and copy it.');
+  };
+  q('#scFile').onclick = async () => {
+    const code = await scEncode(scData()), d = new Date(), name = `crownfall-save-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.txt`;
+    const file = new Blob([code], {type:'text/plain'});
+    try{ const f = new File([file], name, {type:'text/plain'}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); msg(out, 'Save file ready.'); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    msg(out, `Saved as ${name}.`);
+  };
+  q('#scLoad').onclick = () => { const v = q('#scIn').value.trim(); if(!v){ msg(err, 'Paste a save code in the box first.'); return; } tryLoad(v); };
+  q('#scOpen').onclick = () => q('#scPick').click();
+  q('#scPick').onchange = e => { const f = e.target.files && e.target.files[0]; if(!f) return; f.text().then(tryLoad).catch(() => msg(err, 'That file couldn’t be read.')); e.target.value = ''; };
+  const u = q('#scUndo'); if(u) u.onclick = () => {
+    const c = modal(`<h2>Undo last load?</h2><p class="sc-sum">${scSummary(undo)}</p><p class="muted">This puts back the progress this browser had before the last save code was loaded.</p>
+      <div class="sc-row"><button class="btn ghost" id="suNo">Cancel</button><button class="btn" id="suYes">Undo load</button></div>`, '#suNo');
+    c.querySelector('#suYes').onclick = () => { rawDel(SC_UNDO); scApply(undo.d, false); };
+  };
 }
 /* tap anywhere dismisses an opponent's speech bubble. The tap is consumed (pointer + the click that follows), so it never
    also moves a piece or presses a button. Only the plain speech bubble: choices, confirmations and modals are untouched. */

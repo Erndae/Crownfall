@@ -568,3 +568,11 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - Breaking the crown again on New Game++ or later adds one closing line.
 - Saves: the Hunger now counts how much you fed it in each Land; older saves simply start counting.
 - Tests: `validate-v259.cjs`; v217, v218, v223, v226, v231 and v258 checks updated.
+
+## v262 — Save code (back up or move your progress)
+- Crownfall keeps progress only in the browser, so clearing site data or changing phones lost everything. The title screen now has a **Save code** button.
+- **Copy save code** puts one code on the clipboard; **Save as file** saves it as a small .txt file (on phones, the share sheet). Paste it into notes or email it to yourself.
+- **Load save code** (paste) or **Open a save file** shows whose save it is (name, crowns, New Game+ cycle, when it was saved) and asks before replacing anything.
+- The code carries everything: Campaign (with any fight in progress), Daily Run and records, achievements, your Crownrunner and sound/music settings. It is compressed and has a check, so a code cut off while copying is refused instead of loading half a save.
+- Loading keeps this browser's previous progress once: **Undo last load** puts it back.
+- Tests: `validate-v261.cjs`.

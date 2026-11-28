@@ -577,3 +577,16 @@ body[data-pack="street"] .relic-art { inset:9% }
 /* v259 the Wheel */
 .edicts .ed-why{margin:0 0 4px;font-size:13.5px;line-height:1.45;color:var(--muted,#b9b1c9)}
 .nameask #nameKeep{margin-top:8px;width:100%}
+/* v262 save code */
+.savecodebtn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-top:10px}
+.savecodebtn small{font-size:11px;opacity:.7;font-weight:400;letter-spacing:0;text-transform:none}
+.modal .sc-row{display:flex;gap:8px;margin:8px 0}
+.modal .sc-row .btn{flex:1;min-width:0}
+.modal .sc-h{margin:14px 0 6px;font-size:16px}
+.modal .sc-in{font:12px/1.35 ui-monospace,Menlo,monospace;word-break:break-all}
+.modal .sc-msg{margin:4px 0;font-size:13px;min-height:0}
+.modal .sc-msg:empty{display:none}
+.modal .sc-bad{color:#ff8a80}
+.modal .sc-sum{margin:6px 0 10px;line-height:1.5}
+.modal .sc-sum small{opacity:.7}
+.modal .sc-undo{width:100%;margin:2px 0 8px}
