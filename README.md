@@ -560,7 +560,7 @@ From a 1,224-fight playtest of the Olympian Court, the Road and the Fallen Thron
 - `tools/playtest.cjs` now respects enemy Armor (your attacks bounce) and takes `--armor=N` to arm the enemy's N strongest pieces.
 - Tests: `validate-v258.cjs`; v210 check updated.
 
-## v259 — the Wheel (New Game+ story)
+## v260 — the Wheel (New Game+ story)
 - New Game+ now has a story that follows the ending you chose. Each new cycle is a "Turning" of the Wheel (The Second Turning, The Third Turning…).
 - If you wore the crown: you became the Crownless King. A new Crownrunner sets out (you name them, or keep your name), and the King on the Fallen Throne is the one you became. The four Rulers greet the new runner with fresh lines, and the King remembers being you.
 - If you broke the crown: the crowns grew back, and the throne chose the Ruler who fed the Hunger most during your run (ties go to the later Land). That Ruler waits as the Crownless King and says so.
